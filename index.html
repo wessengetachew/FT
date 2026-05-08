@@ -29,7 +29,8 @@ window.MathJax = {
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:11px;overflow-x:hidden;}
+html{overflow-x:hidden;}
+body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:11px;}
 
 /* ── STICKY N BAR ── */
 #nbar{
@@ -80,8 +81,19 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 .hero-formula{
   display:inline-block;font-family:var(--mono);font-size:clamp(.9rem,2vw,1.2rem);
   color:var(--gold);background:rgba(200,168,74,.06);border:1px solid rgba(200,168,74,.2);
-  padding:14px 28px;margin-bottom:10px;
+  padding:14px 28px 0;margin-bottom:10px;
 }
+.hero-live{
+  display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:0 6px;
+  margin-top:14px;padding:11px 0 14px;
+  border-top:1px solid rgba(200,168,74,.18);
+  font-family:var(--mono);font-size:clamp(.78rem,1.6vw,.95rem);
+  color:var(--cream3);line-height:1.4;text-align:center;
+}
+.hero-live .hn{color:var(--gold);font-weight:700;font-size:1.12em;}
+.hero-live .hn1{color:var(--teal);font-weight:700;font-size:1.12em;}
+.hero-live .heq{color:var(--cream2);padding:0 4px;}
+.hero-live .hresult{color:var(--gold);font-weight:700;font-size:1.35em;letter-spacing:-.01em;}
 .hero-sub{font-family:var(--serif);font-size:.95rem;font-style:italic;color:var(--cream3);line-height:1.65;}
 
 /* ── CARDS ── */
@@ -152,8 +164,8 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 
 .cv-outer{position:relative;background:#030310;border:1px solid var(--edge);overflow:hidden;}
 .cv-outer canvas{display:block;width:100%;height:100%;}
-#cv-gl{height:60vh;min-height:420px;max-height:700px;}
-#cv-ring{height:55vh;min-height:380px;max-height:650px;margin-top:20px;}
+#cv-gl{height:60vh;min-height:420px;max-height:700px;cursor:grab;}
+#cv-ring{height:55vh;min-height:380px;max-height:650px;margin-top:20px;cursor:grab;}
 
 /* Canvas overlays */
 .cv-badge{
@@ -204,7 +216,7 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 .sec-anchor{scroll-margin-top:58px;}
 
 /* ── EXPORT MODAL ── */
-#em-overlay{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.78);align-items:center;justify-content:center;}
+#em-overlay{display:none;position:fixed;inset:0;z-index:9100;background:rgba(0,0,0,.78);align-items:center;justify-content:center;}
 #em-overlay.open{display:flex;}
 #em-box{
   background:var(--bg1);border:1px solid var(--edge2);
@@ -285,7 +297,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 #exp-dd-wrap{position:relative;flex-shrink:0;}
 #exp-dd-btn{background:rgba(200,168,74,.1);border:1px solid rgba(200,168,74,.4);color:var(--gold);font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;cursor:pointer;height:32px;white-space:nowrap;transition:background .12s;}
 #exp-dd-btn:hover{background:rgba(200,168,74,.2);}
-#exp-dd{display:none;position:fixed;z-index:2000;background:rgba(5,5,18,.99);border:1px solid rgba(200,168,74,.3);min-width:248px;box-shadow:0 10px 40px rgba(0,0,0,.92);}
+#exp-dd{display:none;position:fixed;z-index:9000;background:rgba(5,5,18,.99);border:1px solid rgba(200,168,74,.3);min-width:248px;box-shadow:0 10px 40px rgba(0,0,0,.92);}
 #exp-dd.open{display:block;}
 .exp-opt{display:flex;align-items:flex-start;gap:10px;width:100%;padding:11px 16px;background:none;border:none;border-bottom:1px solid var(--edge);color:var(--cream2);font-family:var(--mono);font-size:9px;letter-spacing:.05em;cursor:pointer;text-align:left;transition:background .1s;line-height:1.4;}
 .exp-opt:last-child{border-bottom:none;}
@@ -293,7 +305,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 .exp-opt-icon{font-size:13px;min-width:20px;margin-top:1px;}
 .exp-opt-sub{display:block;font-size:7.5px;color:var(--cream3);margin-top:2px;}
 /* ── PNG PREVIEW MODAL ── */
-#px-overlay{display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.88);align-items:center;justify-content:center;}
+#px-overlay{display:none;position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.88);align-items:center;justify-content:center;}
 #px-overlay.open{display:flex;}
 #px-box{background:var(--bg1);border:1px solid rgba(200,168,74,.32);width:min(840px,96vw);max-height:93vh;display:flex;flex-direction:column;box-shadow:0 28px 90px rgba(0,0,0,.97);}
 .px-head{padding:14px 20px;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;background:rgba(200,168,74,.04);}
@@ -327,7 +339,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 .chb-val{color:var(--cream);}.chb-val.gold{color:var(--gold);}.chb-val.teal{color:var(--teal);}.chb-val.violet{color:var(--violet);}
 
 /* ── PRIME DETAIL MODAL ── */
-#pd-overlay{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.82);align-items:center;justify-content:center;}
+#pd-overlay{display:none;position:fixed;inset:0;z-index:9300;background:rgba(0,0,0,.82);align-items:center;justify-content:center;}
 #pd-overlay.open{display:flex;}
 #pd-box{
   background:var(--bg1);border:1px solid rgba(200,168,74,.3);
@@ -392,7 +404,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 #dt-body tr:hover{background:rgba(61,200,184,.05)!important;}
 #dt-body tr:focus{outline:1px solid rgba(61,200,184,.4);background:rgba(61,200,184,.04)!important;}
 /* data row detail modal */
-#dd-overlay{display:none;position:fixed;inset:0;z-index:3500;background:rgba(0,0,0,.84);align-items:center;justify-content:center;}
+#dd-overlay{display:none;position:fixed;inset:0;z-index:9400;background:rgba(0,0,0,.84);align-items:center;justify-content:center;}
 #dd-overlay.open{display:flex;}
 #dd-box{
   background:var(--bg1);border:1px solid rgba(61,200,184,.28);
@@ -467,8 +479,8 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <span class="nb-label">n</span>
   <button class="nb-step" onclick="stepN(-10)" title="-10">−10</button>
   <button class="nb-step" onclick="stepN(-1)">−</button>
-  <input id="nb-sl" type="range" min="0" max="500" value="1" oninput="setN(+this.value)">
-  <input id="nb-num" type="number" min="0" value="1" oninput="setN(+this.value||0)">
+  <input id="nb-sl" type="range" min="0" max="500" value="0" oninput="setN(+this.value)">
+  <input id="nb-num" type="number" min="0" value="0" oninput="setN(+this.value||0)">
   <button class="nb-step" onclick="stepN(1)">+</button>
   <button class="nb-step" onclick="stepN(10)" title="+10">+10</button>
   <div class="nb-sep"></div>
@@ -486,23 +498,23 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
       <button id="exp-dd-btn" onclick="toggleExpDD()">↓ Export ▾</button>
       <div id="exp-dd">
         <button class="exp-opt" onclick="openEM();closeExpDD()">
-          <span class="exp-opt-icon">🖼</span>
+          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">PNG</span>
           <span><b>Comprehensive PNG</b><span class="exp-opt-sub">Multi-panel · custom layout · all views</span></span>
         </button>
         <button class="exp-opt" onclick="openChartPNGPreview()">
-          <span class="exp-opt-icon">📈</span>
+          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">PNG</span>
           <span><b>Chart PNG</b><span class="exp-opt-sub">C(n) vs n chart · high-res 1920×800</span></span>
         </button>
         <button class="exp-opt" onclick="exportChartCSV();closeExpDD()">
-          <span class="exp-opt-icon">📊</span>
+          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">CSV</span>
           <span><b>Chart CSV</b><span class="exp-opt-sub">n, C(n), D(n), ratio · 0 to x-max</span></span>
         </button>
         <button class="exp-opt" onclick="exportPrimeCSV();closeExpDD()">
-          <span class="exp-opt-icon">🔢</span>
+          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">CSV</span>
           <span><b>Prime Table CSV</b><span class="exp-opt-sub">Local factors · first 60 primes at n</span></span>
         </button>
         <button class="exp-opt" onclick="exportDOMPage();closeExpDD()">
-          <span class="exp-opt-icon">📄</span>
+          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">HTM</span>
           <span><b>HTML Report</b><span class="exp-opt-sub">Standalone page · chart + all tables</span></span>
         </button>
       </div>
@@ -519,6 +531,13 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <h1 class="hero-title">C(n) — The Generalized Feller–Tornier Constant</h1>
   <div class="hero-formula" id="hero-formula">
     $$C(n)\;=\;\zeta(2)\cdot\prod_{p\;\text{prime}}\!\left(1-\frac{\min(n+1,\,p)}{p^2}\right)$$
+    <div class="hero-live" id="hero-live">
+      <span>C(<span class="hn" id="hl-n">n</span>)</span>
+      <span class="heq">=</span>
+      <span>&#950;(2) &middot; &prod;<sub>p</sub>(1 &minus; min(<span class="hn1" id="hl-n1">n+1</span>, p) / p&sup2;)</span>
+      <span class="heq">=</span>
+      <span class="hresult" id="hl-val">—</span>
+    </div>
   </div>
   <div class="hero-sub">
     Natural density of pairs (r, M) with gcd(r, M+j) = 1 for all j = 0,…,n, rescaled by ζ(2)
@@ -653,7 +672,11 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <span class="cv-lbl" id="global-label-sz-v">9</span>
     <div class="cv-sep"></div>
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--lime);" title="Link grid n and ring n sliders">
-      <input type="checkbox" id="lock-grid-ring-n" checked onchange="renderGrid();renderRing();" style="accent-color:var(--lime);">🔗 Link grid↔ring n
+      <input type="checkbox" id="lock-grid-ring-n" checked onchange="renderGrid();renderRing();" style="accent-color:var(--lime);">Link grid-ring n
+    </label>
+    <div class="cv-sep"></div>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--coral);" title="Click any point to circle it and draw its radial path">
+      <input type="checkbox" id="inspect-cb" onchange="toggleInspect()" style="accent-color:var(--coral);">Inspect
     </label>
   </div>
 
@@ -669,6 +692,12 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <span class="cv-lbl">Grid n:</span>
     <input class="cv-sl" type="range" id="grid-own-n" min="0" max="100" value="1" style="width:70px;" oninput="document.getElementById('grid-own-n-v').textContent=this.value;onGridNChange();">
     <span class="cv-lbl" id="grid-own-n-v">1</span>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl">Zoom:</span>
+    <button class="cv-btn" style="padding:2px 9px;font-size:14px;line-height:1;" onclick="setGridZoom(glZoom*.67)" title="Zoom out">−</button>
+    <input class="cv-sl" type="range" id="grid-zoom-sl" min="0" max="100" value="0" step="1" style="width:80px;" oninput="setGridZoom(_sliderToGridZoom(+this.value))">
+    <button class="cv-btn" style="padding:2px 9px;font-size:14px;line-height:1;" onclick="setGridZoom(glZoom*1.5)" title="Zoom in">+</button>
+    <span class="cv-lbl" id="grid-zoom-v" style="min-width:34px;text-align:right;color:var(--teal);">1.0×</span>
     <div class="cv-sep"></div>
     <button class="cv-btn" onclick="resetGridView()">↺ Reset</button>
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--cream2);">
@@ -705,7 +734,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
       <div class="cv-sep"></div>
     </div>
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--gold);" title="Ring mirrors global n slider">
-      <input type="checkbox" id="ring-lock-n" checked onchange="toggleRingLock()" style="accent-color:var(--gold);">🔒 Lock to N
+      <input type="checkbox" id="ring-lock-n" checked onchange="toggleRingLock()" style="accent-color:var(--gold);">Lock to N
     </label>
     <div class="cv-sep"></div>
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--cream2);">
@@ -717,6 +746,12 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--cream2);">
       <input type="checkbox" id="ring-dim" checked onchange="renderRing()" style="accent-color:var(--teal);">Dim dots
     </label>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl">Zoom:</span>
+    <button class="cv-btn" style="padding:2px 9px;font-size:14px;line-height:1;" onclick="setRingZoom(rZoom*.67)" title="Zoom out">−</button>
+    <input class="cv-sl" type="range" id="ring-zoom-sl" min="0" max="100" value="19" step="1" style="width:80px;" oninput="setRingZoom(_sliderToRingZoom(+this.value))">
+    <button class="cv-btn" style="padding:2px 9px;font-size:14px;line-height:1;" onclick="setRingZoom(rZoom*1.5)" title="Zoom in">+</button>
+    <span class="cv-lbl" id="ring-zoom-v" style="min-width:34px;text-align:right;color:var(--teal);">1.0×</span>
     <div class="cv-sep"></div>
     <button class="cv-btn" onclick="resetRingView()">↺ Reset</button>
     <button class="cv-btn" id="ring-2x-btn" onclick="toggleCanvas2x('ring')" title="Double canvas height">⤢ 2×</button>
@@ -999,7 +1034,7 @@ function initCanvas2DGrid(){
       const dist=Math.sqrt(dx*dx+dy*dy);
       const f=dist/lastDist;
       const nz=Math.max(1,Math.min(80,glZoom*f));
-      glZoom=nz; lastDist=dist; renderGrid();
+      setGridZoom(nz); lastDist=dist;
     }else{
       const tx=e.touches[0].clientX,ty=e.touches[0].clientY;
       glPanU-=(tx-lastTX)/rect.width/glZoom;
@@ -1086,7 +1121,7 @@ function renderCanvas2DGrid(){
         if(cellH>22){
           ctx.font=`${Math.min(8,cellH*.28)}px 'JetBrains Mono',monospace`;
           ctx.fillStyle=ok?'rgba(0,0,0,.55)':'rgba(200,168,74,.4)';
-          ctx.fillText(ok?'✓':`j=${ff}`,px+cellW/2,py+cellH*.68);
+          ctx.fillText(ok?'ok':`j=${ff}`,px+cellW/2,py+cellH*.68);
         }
       }
     }
@@ -1216,6 +1251,145 @@ function toggleCanvas2x(which){
   }
 }
 
+// ══════════════════════════════════════════════════════════
+//  INSPECT MODE
+// ══════════════════════════════════════════════════════════
+let inspectMode=false;
+let _inspectGrid=null; // {r,M}
+let _inspectRing=null; // {r,M}
+let _glClickX=0,_glClickY=0; // mousedown pos for click-vs-drag detection
+let _rClickX=0,_rClickY=0;
+
+function toggleInspect(){
+  inspectMode=document.getElementById('inspect-cb').checked;
+  if(!inspectMode){_inspectGrid=null;_inspectRing=null;}
+  glCV.style.cursor=inspectMode?'crosshair':'grab';
+  ringCV.style.cursor=inspectMode?'crosshair':'grab';
+  renderGrid();renderRing();
+}
+
+// ── Grid inspect overlay (drawn on cv-gl-lbl) ──
+function drawGridInspect(lctx,cW,cH){
+  if(!_inspectGrid)return;
+  const{r,M}=_inspectGrid;
+  const G=getGridG();
+  const gridN=getGridN();
+  if(r<1||r>G||M<1||M>G)return;
+
+  const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
+  const cellW=cW/G*glZoom,cellH=cH/G*glZoom;
+  const px=((r-.5)/G-x0)*cW*glZoom;
+  const py=cH-((M-.5)/G-y0)*cH*glZoom;
+
+  // Row + column band highlights
+  lctx.fillStyle='rgba(61,200,184,.1)';
+  lctx.fillRect(0,py-cellH/2,cW,cellH);
+  lctx.fillStyle='rgba(200,168,74,.1)';
+  lctx.fillRect(px-cellW/2,0,cellW,cH);
+
+  // Crosshair dashes
+  lctx.save();
+  lctx.strokeStyle='rgba(61,200,184,.55)';
+  lctx.lineWidth=1;lctx.setLineDash([5,4]);
+  lctx.beginPath();lctx.moveTo(0,py);lctx.lineTo(cW,py);
+  lctx.moveTo(px,0);lctx.lineTo(px,cH);lctx.stroke();
+  lctx.restore();
+
+  // Check coprimality
+  let ok=true,ff=-1,fp=0;
+  for(let j=0;j<=gridN&&ok;j++){const g=gcd(r,M+j);if(g>1){ok=false;ff=j;fp=spf(g);}}
+
+  // Selected cell circle
+  const circR=Math.max(Math.min(cellW,cellH)*.46,6);
+  lctx.strokeStyle=ok?'#f2c44a':'#cc4444';
+  lctx.lineWidth=2.5;
+  lctx.beginPath();lctx.arc(px,py,circR,0,Math.PI*2);lctx.stroke();
+
+  // Inner dot
+  lctx.fillStyle=ok?'rgba(242,196,74,.35)':'rgba(204,68,68,.35)';
+  lctx.beginPath();lctx.arc(px,py,circR,0,Math.PI*2);lctx.fill();
+
+  // Label
+  const status=ok?'pass':`fails j=${ff} p=${fp}`;
+  lctx.font=`bold 9.5px "JetBrains Mono",monospace`;
+  lctx.textAlign='center';
+  const tx=Math.max(circR+2,Math.min(cW-50,px));
+  const ty=py-circR-8 < 14 ? py+circR+14 : py-circR-8;
+  lctx.fillStyle='rgba(4,4,13,.82)';
+  const lw=lctx.measureText(`r=${r} M=${M}`).width+12;
+  lctx.fillRect(tx-lw/2,ty-12,lw,28);
+  lctx.strokeStyle=ok?'rgba(242,196,74,.5)':'rgba(204,68,68,.5)';
+  lctx.lineWidth=1;lctx.strokeRect(tx-lw/2,ty-12,lw,28);
+  lctx.fillStyle=ok?'#f2c44a':'#cc4444';
+  lctx.fillText(`r=${r}  M=${M}`,tx,ty+1);
+  lctx.font=`8px "JetBrains Mono",monospace`;
+  lctx.fillStyle=ok?'rgba(61,200,184,.9)':'rgba(255,120,120,.9)';
+  lctx.fillText(status,tx,ty+12);
+}
+
+// ── Ring inspect overlay (drawn on ring ctx after main ring) ──
+function drawRingInspect(ctx,cW,cH){
+  if(!_inspectRing)return;
+  const{r,M}=_inspectRing;
+  const mMax=parseInt(document.getElementById('ring-max').value)||60;
+  if(M<2||M>mMax)return;
+
+  const n=getRingN();
+  const R=Math.min(cW,cH)*0.44*rZoom;
+  const cx=cW/2+rPanX,cy=cH/2+rPanY;
+  const rho=(M/mMax)*R;
+  const angle=-2*Math.PI*r/M;
+  const dotX=cx+rho*Math.cos(angle);
+  const dotY=cy+rho*Math.sin(angle);
+  const dotSz=Math.max(1.5,parseFloat(document.getElementById('ring-dot').value)||1);
+
+  const{ok,ff,fp}=_ringCell(r,M,n);
+
+  // Full ring circle for this M (the "path")
+  ctx.save();
+  ctx.strokeStyle='rgba(200,168,74,.55)';
+  ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.arc(cx,cy,rho,0,Math.PI*2);ctx.stroke();
+  ctx.restore();
+
+  // Radial spoke from center to dot
+  ctx.strokeStyle=ok?'rgba(242,196,74,.75)':'rgba(204,68,68,.65)';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(dotX,dotY);ctx.stroke();
+
+  // Center origin dot
+  ctx.fillStyle='rgba(200,168,74,.6)';
+  ctx.beginPath();ctx.arc(cx,cy,3.5,0,Math.PI*2);ctx.fill();
+
+  // Outer ring circle (glow)
+  ctx.strokeStyle=ok?'rgba(242,196,74,.25)':'rgba(204,68,68,.25)';
+  ctx.lineWidth=dotSz*2+10;
+  ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+10,0,Math.PI*2);ctx.stroke();
+
+  // Selected dot circle
+  ctx.strokeStyle=ok?'#f2c44a':'#cc4444';
+  ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+5,0,Math.PI*2);ctx.stroke();
+
+  // Label
+  const lx=dotX+(dotX>cx?14:-14);
+  const ly=dotY+(dotY>cy?-14:14);
+  const status=ok?'pass':`j=${ff} p=${fp}`;
+  ctx.font=`bold 9.5px "JetBrains Mono",monospace`;
+  ctx.textAlign=dotX>cx?'left':'right';
+  const lbl1=`M=${M}  r=${r}`;
+  const lw=Math.max(ctx.measureText(lbl1).width,ctx.measureText(status).width)+14;
+  ctx.fillStyle='rgba(4,4,13,.85)';
+  ctx.fillRect(dotX>cx?lx-4:lx-lw,ly-24,lw,30);
+  ctx.strokeStyle=ok?'rgba(242,196,74,.5)':'rgba(204,68,68,.5)';
+  ctx.lineWidth=1;ctx.strokeRect(dotX>cx?lx-4:lx-lw,ly-24,lw,30);
+  ctx.fillStyle=ok?'#f2c44a':'#cc4444';
+  ctx.fillText(lbl1,lx,ly-12);
+  ctx.font=`8px "JetBrains Mono",monospace`;
+  ctx.fillStyle=ok?'rgba(61,200,184,.9)':'rgba(255,120,120,.9)';
+  ctx.fillText(status,lx,ly+2);
+}
+
 function renderGrid(){
   if(!useGL){ renderCanvas2DGrid(); return; }
   const{W,H}=sizeGLCanvas();
@@ -1282,7 +1456,7 @@ function renderGrid(){
             if(cellH>22&&lmode!=='none'){
               lctx.font=`${Math.min(lsz-2,cellH*.26)}px 'JetBrains Mono',monospace`;
               lctx.fillStyle=ok?'rgba(0,0,0,.55)':'rgba(200,168,74,.5)';
-              lctx.fillText(ok?'✓':`j=${ff}`,px+cellW/2,py+cellH*.68);
+              lctx.fillText(ok?'ok':`j=${ff}`,px+cellW/2,py+cellH*.68);
               lctx.font=`${Math.min(lsz,cellH*.32)}px 'JetBrains Mono',monospace`;
             }
           }
@@ -1292,6 +1466,23 @@ function renderGrid(){
   } else {
     const lblCV=document.getElementById('cv-gl-lbl');
     if(lblCV){const lctx=lblCV.getContext('2d');lctx.clearRect(0,0,lblCV.width,lblCV.height);}
+  }
+
+  // Inspect overlay — always draw on top of label canvas when inspect mode active
+  if(inspectMode){
+    const lblCV=document.getElementById('cv-gl-lbl');
+    if(lblCV){
+      const wrap=document.getElementById('cv-gl-wrap');
+      const cW=Math.max(1,wrap.clientWidth),cH=Math.max(1,wrap.clientHeight);
+      const dpr=Math.min(devicePixelRatio||1,2);
+      // Only re-size if not already sized (avoid clearing labels drawn above)
+      if(lblCV.width!==Math.round(cW*dpr)||lblCV.height!==Math.round(cH*dpr)){
+        lblCV.width=Math.round(cW*dpr);lblCV.height=Math.round(cH*dpr);
+      }
+      const lctx=lblCV.getContext('2d');
+      lctx.setTransform(dpr,0,0,dpr,0,0);
+      drawGridInspect(lctx,cW,cH);
+    }
   }
 
   // Density estimate (async so it doesn't block render)
@@ -1313,7 +1504,32 @@ function renderGrid(){
   document.getElementById('badge-zoom').textContent=`zoom ${glZoom.toFixed(1)}× · G=${G} · n=${gridN}`;
 }
 
-function resetGridView(){glZoom=1;glPanU=0.5;glPanV=0.5;renderGrid();}
+// ── ZOOM HELPERS (log-scale sliders) ──
+// Grid: slider 0-100 → zoom 1-80 on log scale
+function _sliderToGridZoom(v){return Math.pow(80,v/100);}
+function _gridZoomToSlider(z){return Math.round(Math.log(Math.max(1,z))/Math.log(80)*100);}
+// Ring: slider 0-100 → zoom 0.5-20 on log scale
+function _sliderToRingZoom(v){return .5*Math.pow(40,v/100);}
+function _ringZoomToSlider(z){return Math.round(Math.log(Math.max(.5,z)/.5)/Math.log(40)*100);}
+
+function setGridZoom(z){
+  glZoom=Math.max(1,Math.min(80,z));
+  const sl=document.getElementById('grid-zoom-sl');
+  const lbl=document.getElementById('grid-zoom-v');
+  if(sl)sl.value=_gridZoomToSlider(glZoom);
+  if(lbl)lbl.textContent=glZoom.toFixed(1)+'×';
+  renderGrid();
+}
+function setRingZoom(z){
+  rZoom=Math.max(.5,Math.min(20,z));
+  const sl=document.getElementById('ring-zoom-sl');
+  const lbl=document.getElementById('ring-zoom-v');
+  if(sl)sl.value=_ringZoomToSlider(rZoom);
+  if(lbl)lbl.textContent=rZoom.toFixed(1)+'×';
+  renderRing();
+}
+
+function resetGridView(){glZoom=1;glPanU=0.5;glPanV=0.5;setGridZoom(1);}
 
 // Grid pan/zoom
 glCV.addEventListener('wheel',e=>{
@@ -1328,10 +1544,10 @@ glCV.addEventListener('wheel',e=>{
   const h=.5/nz;
   glPanU=Math.max(h,Math.min(1-h,glPanU));
   glPanV=Math.max(h,Math.min(1-h,glPanV));
-  glZoom=nz; renderGrid();
+  setGridZoom(nz); // syncs slider
 },{passive:false});
 
-glCV.addEventListener('mousedown',e=>{glDragging=true;glLX=e.clientX;glLY=e.clientY;glCV.style.cursor='grabbing';});
+glCV.addEventListener('mousedown',e=>{glDragging=true;glLX=e.clientX;glLY=e.clientY;_glClickX=e.clientX;_glClickY=e.clientY;glCV.style.cursor='grabbing';});
 window.addEventListener('mousemove',e=>{
   if(glDragging){
     const r=glCV.getBoundingClientRect();
@@ -1345,7 +1561,64 @@ window.addEventListener('mousemove',e=>{
   }
   showGridTip(e);
 });
-window.addEventListener('mouseup',()=>{if(glDragging){glDragging=false;glCV.style.cursor='';}});
+window.addEventListener('mouseup',e=>{
+  if(glDragging){
+    const wasDrag=Math.hypot(e.clientX-_glClickX,e.clientY-_glClickY)>4;
+    glDragging=false;
+    glCV.style.cursor=inspectMode?'crosshair':'';
+    if(inspectMode&&!wasDrag){
+      const rect=glCV.getBoundingClientRect();
+      if(e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
+        const mx=(e.clientX-rect.left)/rect.width;
+        const my=1-(e.clientY-rect.top)/rect.height;
+        const u=glPanU+(mx-.5)/glZoom;
+        const v=glPanV+(my-.5)/glZoom;
+        const G=getGridG();
+        const r=Math.round(u*G);
+        const M=Math.round(v*G);
+        if(r>=1&&r<=G&&M>=1&&M<=G)_inspectGrid={r,M};
+      }
+    }
+    renderGrid();
+  }
+});
+
+// Grid touch events (mobile pinch-to-zoom + drag)
+let _glTouchDist=0,_glTX=0,_glTY=0;
+glCV.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    _glTouchDist=Math.sqrt(dx*dx+dy*dy);
+  }else{_glTX=e.touches[0].clientX;_glTY=e.touches[0].clientY;}
+},{passive:false});
+glCV.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  const rect=glCV.getBoundingClientRect();
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(_glTouchDist>0){
+      const nz=Math.max(1,Math.min(80,glZoom*dist/_glTouchDist));
+      const h=.5/nz;
+      glPanU=Math.max(h,Math.min(1-h,glPanU));
+      glPanV=Math.max(h,Math.min(1-h,glPanV));
+      setGridZoom(nz);
+    }
+    _glTouchDist=dist;
+  }else{
+    const tx=e.touches[0].clientX,ty=e.touches[0].clientY;
+    glPanU-=(tx-_glTX)/rect.width/glZoom;
+    glPanV+=(ty-_glTY)/rect.height/glZoom;
+    const h=.5/glZoom;
+    glPanU=Math.max(h,Math.min(1-h,glPanU));
+    glPanV=Math.max(h,Math.min(1-h,glPanV));
+    _glTX=tx;_glTY=ty; renderGrid();
+  }
+},{passive:false});
+glCV.addEventListener('touchend',()=>{_glTouchDist=0;});
 
 function showGridTip(e){
   const rect=glCV.getBoundingClientRect();
@@ -1377,7 +1650,7 @@ function showGridTip(e){
 
   document.getElementById('tt-hd').textContent=`r=${r}, M=${M}`;
   document.getElementById('tt-body').innerHTML=`
-    <div class="tt-row"><span class="tt-k">block-coprime</span><span class="tt-v ${ok?'gold':'coral'}">${ok?'YES ✓':'NO ✗'}</span></div>
+    <div class="tt-row"><span class="tt-k">block-coprime</span><span class="tt-v ${ok?'gold':'coral'}">${ok?'YES':'NO'}</span></div>
     <div class="tt-row"><span class="tt-k">gcd(r,M)=1?</span><span class="tt-v ${copM?'teal':'coral'}">${copM?'yes':'no'}</span></div>
     ${!ok?`<div class="tt-row"><span class="tt-k">first fail j</span><span class="tt-v coral">${ff} (p=${fp})</span></div>`:''}
     <div class="tt-row"><span class="tt-k">M prime?</span><span class="tt-v">${primeM?'yes':'no'}</span></div>
@@ -1408,10 +1681,17 @@ function _ringCell(r,M,n){
 
 function sizeRingCanvas(){
   const wrap=document.getElementById('cv-ring-wrap');
-  const W=wrap.clientWidth,H=wrap.clientHeight;
+  const W=Math.max(1,wrap.clientWidth);
+  const H=Math.max(1,wrap.clientHeight);
   const dpr=Math.min(devicePixelRatio||1,2);
-  ringCV.width=W*dpr; ringCV.height=H*dpr;
-  return{W:ringCV.width,H:ringCV.height,dpr,cW:W,cH:H};
+  const nW=Math.round(W*dpr), nH=Math.round(H*dpr);
+  // Only reset canvas backing store when dimensions actually change.
+  // Setting canvas.width/height ALWAYS clears it — even to the same value — so
+  // we guard here to prevent spurious clears during pan/zoom/click sequences.
+  if(ringCV.width!==nW||ringCV.height!==nH){
+    ringCV.width=nW; ringCV.height=nH;
+  }
+  return{W:nW,H:nH,dpr,cW:W,cH:H};
 }
 
 function drawRingImpl(ctx,cW,cH,zoom,panX,panY){
@@ -1537,6 +1817,7 @@ function renderRing(){
   const ctx=ringCtx;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const{rho2}=drawRingImpl(ctx,cW,cH,rZoom,rPanX,rPanY);
+  if(inspectMode)drawRingInspect(ctx,cW,cH);
   const mMax=parseInt(document.getElementById('ring-max').value)||60;
   const ringN=getRingN();
   const theory=(getCn(ringN)/ZETA2).toFixed(4);
@@ -1544,16 +1825,15 @@ function renderRing(){
   document.getElementById('nb-rho').textContent=rho2.toFixed(4);
 }
 
-function resetRingView(){rZoom=1;rPanX=0;rPanY=0;renderRing();}
+function resetRingView(){rZoom=1;rPanX=0;rPanY=0;setRingZoom(1);}
 
 ringCV.addEventListener('wheel',e=>{
   e.preventDefault();
   const f=e.deltaY>0?.85:1.18;
-  rZoom=Math.max(.5,Math.min(20,rZoom*f));
-  renderRing();
+  setRingZoom(rZoom*f); // syncs slider
 },{passive:false});
 
-ringCV.addEventListener('mousedown',e=>{rDragging=true;rLX=e.clientX;rLY=e.clientY;ringCV.style.cursor='grabbing';});
+ringCV.addEventListener('mousedown',e=>{rDragging=true;rLX=e.clientX;rLY=e.clientY;_rClickX=e.clientX;_rClickY=e.clientY;ringCV.style.cursor='grabbing';});
 window.addEventListener('mousemove',e=>{
   if(rDragging){
     rPanX+=(e.clientX-rLX);rPanY+=(e.clientY-rLY);
@@ -1561,7 +1841,61 @@ window.addEventListener('mousemove',e=>{
   }
   showRingTip(e);
 });
-window.addEventListener('mouseup',()=>{if(rDragging){rDragging=false;ringCV.style.cursor='';}});
+window.addEventListener('mouseup',e=>{
+  if(rDragging){
+    const wasDrag=Math.hypot(e.clientX-_rClickX,e.clientY-_rClickY)>4;
+    rDragging=false;
+    ringCV.style.cursor=inspectMode?'crosshair':'';
+    if(inspectMode&&!wasDrag){
+      const rect=ringCV.getBoundingClientRect();
+      if(e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
+        const dpr=Math.min(devicePixelRatio||1,2);
+        const cW=Math.max(1,ringCV.width)/dpr,cH=Math.max(1,ringCV.height)/dpr;
+        const R=Math.min(cW,cH)*0.44*rZoom;
+        const cx=cW/2+rPanX,cy=cH/2+rPanY;
+        const mx=(e.clientX-rect.left)*(Math.max(1,ringCV.width)/Math.max(1,rect.width))/dpr;
+        const my=(e.clientY-rect.top)*(Math.max(1,ringCV.height)/Math.max(1,rect.height))/dpr;
+        const dx=mx-cx,dy=my-cy;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        const mMax=parseInt(document.getElementById('ring-max').value)||60;
+        const M=Math.round((dist/R)*mMax);
+        if(M>=2&&M<=mMax){
+          const theta=Math.atan2(-dy,dx);
+          const frac=((theta/(2*Math.PI))+1)%1;
+          const r=Math.round(frac*M);
+          if(r>=1&&r<M)_inspectRing={r,M};
+        }
+      }
+    }
+    renderRing();
+  }
+});
+
+// Ring touch events (mobile pinch-to-zoom + drag)
+let _rTouchDist=0,_rTX=0,_rTY=0;
+ringCV.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    _rTouchDist=Math.sqrt(dx*dx+dy*dy);
+  }else{_rTX=e.touches[0].clientX;_rTY=e.touches[0].clientY;}
+},{passive:false});
+ringCV.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX;
+    const dy=e.touches[0].clientY-e.touches[1].clientY;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(_rTouchDist>0)setRingZoom(rZoom*dist/_rTouchDist);
+    _rTouchDist=dist;
+  }else{
+    const tx=e.touches[0].clientX,ty=e.touches[0].clientY;
+    rPanX+=(tx-_rTX);rPanY+=(ty-_rTY);
+    _rTX=tx;_rTY=ty; renderRing();
+  }
+},{passive:false});
+ringCV.addEventListener('touchend',()=>{_rTouchDist=0;});
 
 function showRingTip(e){
   const rect=ringCV.getBoundingClientRect();
@@ -1571,11 +1905,11 @@ function showRingTip(e){
   }
   const mMax=parseInt(document.getElementById('ring-max').value)||60;
   const dpr=Math.min(devicePixelRatio||1,2);
-  const cW=ringCV.width/dpr, cH=ringCV.height/dpr;
+  const cW=Math.max(1,ringCV.width)/dpr, cH=Math.max(1,ringCV.height)/dpr;
   const R=Math.min(cW,cH)*0.44*rZoom;
   const cx=cW/2+rPanX,cy=cH/2+rPanY;
-  const mx=(e.clientX-rect.left)*(ringCV.width/rect.width)/Math.min(devicePixelRatio||1,2);
-  const my=(e.clientY-rect.top)*(ringCV.height/rect.height)/Math.min(devicePixelRatio||1,2);
+  const mx=(e.clientX-rect.left)*(Math.max(1,ringCV.width)/Math.max(1,rect.width))/Math.min(devicePixelRatio||1,2);
+  const my=(e.clientY-rect.top)*(Math.max(1,ringCV.height)/Math.max(1,rect.height))/Math.min(devicePixelRatio||1,2);
   const dx=mx-cx,dy=my-cy;
   const dist=Math.sqrt(dx*dx+dy*dy);
   const M=Math.round((dist/R)*mMax);
@@ -1594,7 +1928,7 @@ function showRingTip(e){
 
   document.getElementById('tt-hd').textContent=`Ring M=${M}, r=${r}`;
   document.getElementById('tt-body').innerHTML=`
-    <div class="tt-row"><span class="tt-k">block-coprime</span><span class="tt-v ${ok?'gold':'coral'}">${ok?'YES ✓':'NO ✗'}</span></div>
+    <div class="tt-row"><span class="tt-k">block-coprime</span><span class="tt-v ${ok?'gold':'coral'}">${ok?'YES':'NO'}</span></div>
     <div class="tt-row"><span class="tt-k">gcd(r,M)=1?</span><span class="tt-v ${copM?'teal':'coral'}">${copM?'yes':'no'}</span></div>
     ${!ok&&ff>=0?`<div class="tt-row"><span class="tt-k">fails at j=${ff}</span><span class="tt-v coral">p=${fp2}</span></div>`:''}
     <div class="tt-sep"></div>
@@ -1742,7 +2076,7 @@ function drawChartImpl(ctx,W,H,n,opts){
   ctx.strokeStyle=lg;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
 
   // Notable points
-  [[0,getCn(0),'C(0)=1'],[1,getCn(1),'FT≈0.5307']].forEach(([ni,val,lbl])=>{
+  [[0,getCn(0),'C(0)=1'],[1,getCn(1),'C(1)=z(2)*FT']].forEach(([ni,val,lbl])=>{
     if(ni>MAX)return;
     const x=toX(ni),y=toY(val);
     ctx.beginPath();ctx.arc(x,y,4,0,2*Math.PI);ctx.fillStyle='rgba(200,168,74,.5)';ctx.fill();
@@ -1923,6 +2257,7 @@ function _updateUIAnimFrame(){
   document.getElementById('r-block').textContent=n+1;
   document.getElementById('r-sat').textContent=sat;
   document.getElementById('r-next').textContent=next;
+  _updateHeroFormula(n,Cn);
   // Pills
   const pills=document.getElementById('sat-pills');
   if(pills)pills.innerHTML=PRIMES.slice(0,30).map(p=>`<div class="pill ${p<=n+1?'sat':'act'}">${p}</div>`).join('');
@@ -1938,15 +2273,20 @@ function _updateUIAnimFrame(){
 function toggleExpDD(){
   const dd=document.getElementById('exp-dd'),btn=document.getElementById('exp-dd-btn');
   if(dd.classList.contains('open')){dd.classList.remove('open');return;}
+  // #nbar has backdrop-filter which makes it the containing block for position:fixed children,
+  // clipping the dropdown to the 50px navbar height. Move #exp-dd to <body> once to escape it.
+  if(dd.parentElement!==document.body)document.body.appendChild(dd);
   const r=btn.getBoundingClientRect();
   dd.style.top=(r.bottom+4)+'px';
   dd.style.right=(window.innerWidth-r.right)+'px';
   dd.classList.add('open');
 }
-function closeExpDD(){document.getElementById('exp-dd').classList.remove('open');}
+function closeExpDD(){const dd=document.getElementById('exp-dd');if(dd)dd.classList.remove('open');}
 document.addEventListener('click',function(e){
-  const w=document.getElementById('exp-dd-wrap');
-  if(w&&!w.contains(e.target))closeExpDD();
+  const btn=document.getElementById('exp-dd-btn');
+  const dd=document.getElementById('exp-dd');
+  // After the move, exp-dd is no longer inside exp-dd-wrap so check both separately
+  if(btn&&dd&&!btn.contains(e.target)&&!dd.contains(e.target))closeExpDD();
 });
 
 // ── 1. CHART PNG ──
@@ -2235,7 +2575,7 @@ function _renderDD(rowN){
       <div class="dd-head-title">n = ${n} — Step-by-Step Derivation</div>
       <div class="dd-head-sub">Block length ${n+1} · C(${n}) = ${Cn.toFixed(8)} · D(${n}) = ${Dn.toFixed(8)}</div>
     </div>
-    <button class="dd-close" onclick="closeDD()">✕</button>
+    <button class="dd-close" onclick="closeDD()">x</button>
   </div>
   <div class="dd-body">
 
@@ -2444,7 +2784,16 @@ function stepAnim(){
 // ══════════════════════════════════════════════════════════
 //  UI UPDATE
 // ══════════════════════════════════════════════════════════
-const KNOWN={0:'C(0)=1 · trivial coprime density',1:'Feller–Tornier constant · C(1)≈0.530712'};
+const KNOWN={0:'C(0)=1 · trivial coprime density',1:'zeta(2) x Feller-Tornier · C_FT=prod(1-2/p^2)=0.3226'};
+
+function _updateHeroFormula(n, Cn){
+  const nEl=document.getElementById('hl-n');
+  const n1El=document.getElementById('hl-n1');
+  const valEl=document.getElementById('hl-val');
+  if(nEl)nEl.textContent=n;
+  if(n1El)n1El.textContent=n+1;
+  if(valEl)valEl.textContent=(Cn||getCn(n)).toFixed(6);
+}
 
 function updateUI(){
   const n=N;
@@ -2457,6 +2806,9 @@ function updateUI(){
   document.getElementById('nb-cn').textContent=Cn.toFixed(6);
   document.getElementById('nb-dn').textContent=Dn.toFixed(6);
   document.getElementById('nb-sat').textContent=sat;
+
+  // Hero live formula
+  _updateHeroFormula(n, Cn);
 
   // Calculator
   document.getElementById('r-cn').textContent=Cn.toFixed(6);
@@ -2503,8 +2855,8 @@ const STEPS=[
   {t:'Global Density D(n)',b:`<p><strong>Theorem.</strong> The natural density of pairs $(r,M)\\in\\mathbb{Z}^2$ satisfying $\\gcd(r,M+j)=1$ for all $j=0,\\dots,n$ exists and equals
     $$D(n)=\\prod_p\\left(1-\\frac{\\min(n+1,p)}{p^2}\\right).$$
     The product converges absolutely for every $n\\ge 0$, and $D(0)=1/\\zeta(2)=6/\\pi^2$ recovers the standard coprime-pair density.</p>`},
-  {t:'Verify Small Cases',b:`<p><strong>$n=0$:</strong> $\\min(1,p)=1$ always, so $D(0)=\\prod_p(1-1/p^2)=1/\\zeta(2)=6/\\pi^2\\approx0.6079$. ✓<br>
-    <strong>$n=1$:</strong> $\\min(2,p)=2$ for all $p\\ge2$, giving the classical Feller–Tornier constant $D(1)\\approx0.3226$. ✓</p>`},
+  {t:'Verify Small Cases',b:`<p><strong>$n=0$:</strong> $\\min(1,p)=1$ always, so $D(0)=\\prod_p(1-1/p^2)=1/\\zeta(2)=6/\\pi^2\\approx0.6079$.<br>
+    <strong>$n=1$:</strong> $\\min(2,p)=2$ for all $p\\ge2$, giving the classical Feller–Tornier constant $D(1)\\approx0.3226$.</p>`},
   {t:'The C(n) Rescaling',b:`<p>Set $C(n)=\\zeta(2)\\cdot D(n)$. Then $C(0)=1$ (trivial normalisation) and
     $$C(n)=\\zeta(2)\\prod_p\\left(1-\\frac{\\min(n+1,p)}{p^2}\\right).$$
     Values: $C(1)\\approx0.5307$, $C(2)\\approx0.4128$, $C(3)\\approx0.3737$.</p>`},
@@ -2556,7 +2908,7 @@ function init(){
   }
   buildSteps();
   setupChartHover();
-  setN(1);
+  setN(0);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -2673,7 +3025,11 @@ function renderPanelToCanvas(panel,W,H){
   }
   if(panel==='ring'){
     const cv=document.createElement('canvas');cv.width=W;cv.height=H;
-    drawRingImpl(cv.getContext('2d'),W,H,rZoom,rPanX*(W/ringCV.width*Math.min(devicePixelRatio||1,2)),rPanY*(H/ringCV.height*Math.min(devicePixelRatio||1,2)));
+    const dpr=Math.min(devicePixelRatio||1,2);
+    const liveW=ringCV.width||1, liveH=ringCV.height||1;
+    const scaledPanX=rPanX*(W/(liveW/dpr));
+    const scaledPanY=rPanY*(H/(liveH/dpr));
+    drawRingImpl(cv.getContext('2d'),W,H,rZoom,scaledPanX,scaledPanY);
     return cv;
   }
   if(panel==='chart'){
@@ -2984,7 +3340,7 @@ function showPrimeDetail(p, runningLogD){
       <div class="pd-head-title">p = ${p}</div>
       <div class="pd-head-sub">${threshDesc}</div>
     </div>
-    <button class="pd-close" onclick="closePD()">✕</button>
+    <button class="pd-close" onclick="closePD()">x</button>
   </div>
   <div class="pd-body">
     <div class="pd-status ${statusClass}">
@@ -3077,7 +3433,7 @@ function showPrimeDetail(p, runningLogD){
           <div class="pd-formula">Δ_p  =  1 / (p(p−1))  =  1 / (${p}×${p-1})  =  1/${p*(p-1)}  ≈  ${(1/(p*(p-1))).toFixed(8)}</div>
           <div class="kv"><span class="kv-k">Jump threshold n</span><span class="kv-v coral">${p-1}</span></div>
           <div class="kv"><span class="kv-k">Theoretical Δ in D(n)</span><span class="kv-v coral">${(1/(p*(p-1))).toFixed(8)}</span></div>
-          ${n>=p-1?`<div class="kv"><span class="kv-k">Current n ≥ threshold?</span><span class="kv-v teal">Yes — p is saturated ✓</span></div>`:`<div class="kv"><span class="kv-k">Current n &lt; threshold?</span><span class="kv-v" style="color:var(--cream3)">Not yet — p still active</span></div>`}
+          ${n>=p-1?`<div class="kv"><span class="kv-k">Current n ≥ threshold?</span><span class="kv-v teal">Yes — p is saturated</span></div>`:`<div class="kv"><span class="kv-k">Current n &lt; threshold?</span><span class="kv-v" style="color:var(--cream3)">Not yet — p still active</span></div>`}
         </div>
       </div>`:''}
 
@@ -3288,7 +3644,7 @@ init();
 <div id="em-box">
   <div class="em-head">
     <span class="em-head-title">Export PNG</span>
-    <button class="em-close" onclick="closeEM()">✕</button>
+    <button class="em-close" onclick="closeEM()">x</button>
   </div>
   <div class="em-body">
     <!-- LEFT COLUMN -->
@@ -3398,7 +3754,7 @@ init();
         <div class="px-head-title" id="px-title">Export Preview</div>
         <div class="px-head-sub" id="px-sub"></div>
       </div>
-      <button class="px-close" onclick="closePX()">✕</button>
+      <button class="px-close" onclick="closePX()">x</button>
     </div>
     <div class="px-body">
       <div class="px-meta" id="px-meta"></div>
