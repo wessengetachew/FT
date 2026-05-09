@@ -790,6 +790,16 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--violet);" title="Overlay Farey fraction barrier paths r/M = k/j">
       <input type="checkbox" id="grid-barriers" onchange="renderGrid()" style="accent-color:var(--violet);">Barriers
     </label>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--lime);" title="Overlay prime spiral paths on grid">
+      <input type="checkbox" id="grid-prime-spiral" onchange="renderGrid()" style="accent-color:var(--lime);">Prime spiral
+    </label>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl" style="color:var(--lime)">View:</span>
+    <select class="cv-sel" id="grid-view-mode" onchange="renderGrid()" title="Grid coordinate system">
+      <option value="euclidean" selected>Euclidean (r,M)</option>
+      <option value="fermat">H² / √M (Fermat)</option>
+      <option value="farey">Farey strip (r/M)</option>
+    </select>
     <span class="cv-lbl" id="grid-info" style="color:var(--teal);margin-left:4px;"></span>
     <div class="cv-sep"></div>
     <button class="cv-btn" id="grid-2x-btn" onclick="toggleCanvas2x('grid')" title="Double canvas height">⤢ 2×</button>
@@ -802,8 +812,11 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <div class="cv-outer" id="cv-gl-wrap">
     <canvas id="cv-gl"></canvas>
     <canvas id="cv-gl-lbl" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
-    <div class="cv-badge" id="badge-zoom">zoom 1× · G=128</div>
-    <div class="cv-badge" id="badge-density">empirical D(n)<br><span id="bd-val" style="color:var(--teal);font-size:13px;">—</span><br><span id="bd-theory" style="font-size:8px;color:var(--cream3);">theory —</span></div>
+  </div>
+  <!-- Grid info bar — moved outside canvas so it doesn't overlay data -->
+  <div id="grid-info-bar" style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;padding:5px 10px;background:rgba(255,255,255,.03);border:1px solid var(--edge);font-family:var(--mono);font-size:9px;color:var(--cream3);">
+    <span id="badge-zoom-ext">zoom 1× · G=128 · n=0</span>
+    <span>empirical D(n): <b id="bd-val-ext" style="color:var(--teal);">—</b> &nbsp;|&nbsp; theory: <b id="bd-theory-ext" style="color:var(--cream2);">—</b></span>
   </div>
 
   <!-- RING VIEW -->
@@ -847,6 +860,12 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--violet);" title="Farey radial spokes + lift arcs on ring">
       <input type="checkbox" id="ring-barriers" onchange="renderRing()" style="accent-color:var(--violet);">Barriers
     </label>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--lime);" title="Prime spiral path: trace prime p across rings">
+      <input type="checkbox" id="ring-prime-spiral" onchange="renderRing()" style="accent-color:var(--lime);">Prime spiral
+    </label>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl" style="color:var(--lime)">p=</span>
+    <input type="number" id="ring-spiral-p" value="5" min="2" max="9999" style="width:50px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--lime);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderRing();" title="Prime for spiral">
     <div class="cv-sep"></div>
     <button class="cv-btn" onclick="resetRingView()">↺ Reset</button>
     <button class="cv-btn" id="ring-2x-btn" onclick="toggleCanvas2x('ring')" title="Double canvas height">⤢ 2×</button>
@@ -858,7 +877,11 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   </div>
   <div class="cv-outer" id="cv-ring-wrap">
     <canvas id="cv-ring"></canvas>
-    <div class="cv-badge" id="badge-ring">M=2…128 · n=1</div>
+  </div>
+  <!-- Ring info bar — outside canvas -->
+  <div id="ring-info-bar" style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;padding:5px 10px;background:rgba(255,255,255,.03);border:1px solid var(--edge);font-family:var(--mono);font-size:9px;color:var(--cream3);">
+    <span id="badge-ring-ext">M=2…128 · n=1</span>
+    <span>ρ: <b id="rho-ext" style="color:var(--teal);">—</b> &nbsp;|&nbsp; theory: <b id="theory-ext" style="color:var(--cream2);">—</b></span>
   </div>
 
   <!-- Inspect points table — shown when inspect mode on -->
@@ -1277,15 +1300,15 @@ function renderCanvas2DGrid(){
 
   // Badges
   if(gridRot!==0)ctx.restore();
-  document.getElementById('badge-zoom').textContent=`zoom ${glZoom.toFixed(1)}× · G=${G} · n=${n}`;
+  document.getElementById('badge-zoom-ext').textContent=`zoom ${glZoom.toFixed(1)}× · G=${G} · n=${n}`;
   const Dn=getCn(n)/ZETA2;
-  document.getElementById('bd-theory').textContent='theory '+Dn.toFixed(5);
+  document.getElementById('bd-theory-ext').textContent='theory '+Dn.toFixed(5);
 
   const rk=`${n},${G}`;
   if(rk!==_lastRenderKey){
     _lastRenderKey=rk;
     const rho=estimateDensity(G,n);
-    document.getElementById('bd-val').textContent=rho.toFixed(4);
+    document.getElementById('bd-val-ext').textContent=rho.toFixed(4);
     document.getElementById('nb-rho').textContent=rho.toFixed(4);
   }
 }
@@ -1654,129 +1677,54 @@ function drawRingInspect(ctx,cW,cH){
   });
 }
 
-// ── Grid inspect overlay (drawn on cv-gl-lbl) ──
+// ── Grid inspect overlay (drawn on cv-gl-lbl) — multi-point version ──
 function drawGridInspect(lctx,cW,cH){
-  if(!_inspectGrid)return;
-  const{r,M}=_inspectGrid;
-  const G=getGridG();
-  const gridN=getGridN();
-  if(r<1||r>G||M<1||M>G)return;
-
+  if(!_inspectGridPts.length)return;
+  const G=getGridG();const gridN=getGridN();
   const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
   const cellW=cW/G*glZoom,cellH=cH/G*glZoom;
-  const px=((r-.5)/G-x0)*cW*glZoom;
-  const py=cH-((M-.5)/G-y0)*cH*glZoom;
-
-  // Row + column band highlights
-  lctx.fillStyle='rgba(61,200,184,.1)';
-  lctx.fillRect(0,py-cellH/2,cW,cellH);
-  lctx.fillStyle='rgba(200,168,74,.1)';
-  lctx.fillRect(px-cellW/2,0,cellW,cH);
-
-  // Crosshair dashes
-  lctx.save();
-  lctx.strokeStyle='rgba(61,200,184,.55)';
-  lctx.lineWidth=1;lctx.setLineDash([5,4]);
-  lctx.beginPath();lctx.moveTo(0,py);lctx.lineTo(cW,py);
-  lctx.moveTo(px,0);lctx.lineTo(px,cH);lctx.stroke();
-  lctx.restore();
-
-  // Check coprimality
-  let ok=true,ff=-1,fp=0;
-  for(let j=0;j<=gridN&&ok;j++){const g=gcd(r,M+j);if(g>1){ok=false;ff=j;fp=spf(g);}}
-
-  // Selected cell circle
-  const circR=Math.max(Math.min(cellW,cellH)*.46,6);
-  lctx.strokeStyle=ok?'#f2c44a':'#cc4444';
-  lctx.lineWidth=2.5;
-  lctx.beginPath();lctx.arc(px,py,circR,0,Math.PI*2);lctx.stroke();
-
-  // Inner dot
-  lctx.fillStyle=ok?'rgba(242,196,74,.35)':'rgba(204,68,68,.35)';
-  lctx.beginPath();lctx.arc(px,py,circR,0,Math.PI*2);lctx.fill();
-
-  // Label
-  const status=ok?'pass':`fails j=${ff} p=${fp}`;
-  lctx.font=`bold 9.5px "JetBrains Mono",monospace`;
-  lctx.textAlign='center';
-  const tx=Math.max(circR+2,Math.min(cW-50,px));
-  const ty=py-circR-8 < 14 ? py+circR+14 : py-circR-8;
-  lctx.fillStyle='rgba(4,4,13,.82)';
-  const lw=lctx.measureText(`r=${r} M=${M}`).width+12;
-  lctx.fillRect(tx-lw/2,ty-12,lw,28);
-  lctx.strokeStyle=ok?'rgba(242,196,74,.5)':'rgba(204,68,68,.5)';
-  lctx.lineWidth=1;lctx.strokeRect(tx-lw/2,ty-12,lw,28);
-  lctx.fillStyle=ok?'#f2c44a':'#cc4444';
-  lctx.fillText(`r=${r}  M=${M}`,tx,ty+1);
-  lctx.font=`8px "JetBrains Mono",monospace`;
-  lctx.fillStyle=ok?'rgba(61,200,184,.9)':'rgba(255,120,120,.9)';
-  lctx.fillText(status,tx,ty+12);
+  const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
+  _inspectGridPts.forEach(({r,M},idx)=>{
+    if(r<1||r>G||M<1||M>G)return;
+    const px=((r-.5)/G-x0)*cW*glZoom;
+    const py=cH-((M-.5)/G-y0)*cH*glZoom;
+    const col=COLS[idx%COLS.length];
+    let ok=true,ff=-1,fp=0;
+    for(let j=0;j<=gridN&&ok;j++){const g=gcd(r,M+j);if(g>1){ok=false;ff=j;fp=spf(g);}}
+    // Crosshair (only for first point)
+    if(idx===0){
+      lctx.save();lctx.strokeStyle='rgba(61,200,184,.35)';lctx.lineWidth=1;lctx.setLineDash([4,4]);
+      lctx.beginPath();lctx.moveTo(0,py);lctx.lineTo(cW,py);lctx.moveTo(px,0);lctx.lineTo(px,cH);lctx.stroke();
+      lctx.restore();
+    }
+    // Cell fill
+    lctx.fillStyle=col+'22';lctx.fillRect(px-cellW/2,py-cellH/2,cellW,cellH);
+    // Cell circle
+    const circR=Math.max(Math.min(cellW,cellH)*.46,5);
+    lctx.strokeStyle=col;lctx.lineWidth=2;
+    lctx.beginPath();lctx.arc(px,py,circR,0,Math.PI*2);lctx.stroke();
+    // Number badge
+    lctx.fillStyle=col+'dd';lctx.font=`bold ${Math.max(7,circR*.8)}px "JetBrains Mono",monospace`;
+    lctx.textAlign='center';lctx.textBaseline='middle';lctx.fillText(idx+1,px,py);
+    lctx.textBaseline='alphabetic';
+    // Label
+    const lbl=`r=${r} M=${M}  ${ok?'pass':('j='+ff)}`;
+    const lx=Math.max(circR+2,Math.min(cW-60,px));
+    const ly=py-circR-10 < 10 ? py+circR+12 : py-circR-10;
+    lctx.fillStyle='rgba(4,4,13,.8)';
+    const lw=lctx.measureText(lbl).width+10;
+    lctx.fillRect(lx-lw/2,ly-9,lw,14);
+    lctx.fillStyle=col;lctx.font=`8px "JetBrains Mono",monospace`;lctx.textAlign='center';
+    lctx.fillText(lbl,lx,ly+1);
+  });
 }
 
-// ── Ring inspect overlay (drawn on ring ctx after main ring) ──
-function drawRingInspect(ctx,cW,cH){
-  if(!_inspectRing)return;
-  const{r,M}=_inspectRing;
-  const mMax=parseInt(document.getElementById('ring-max').value)||60;
-  if(M<2||M>mMax)return;
-
-  const n=getRingN();
-  const R=Math.min(cW,cH)*0.44*rZoom;
-  const cx=cW/2+rPanX,cy=cH/2+rPanY;
-  const rho=(M/mMax)*R;
-  const angle=-2*Math.PI*r/M;
-  const dotX=cx+rho*Math.cos(angle);
-  const dotY=cy+rho*Math.sin(angle);
-  const dotSz=Math.max(1.5,parseFloat(document.getElementById('ring-dot').value)||1);
-
-  const{ok,ff,fp}=_ringCell(r,M,n);
-
-  // Full ring circle for this M (the "path")
-  ctx.save();
-  ctx.strokeStyle='rgba(200,168,74,.55)';
-  ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
-  ctx.beginPath();ctx.arc(cx,cy,rho,0,Math.PI*2);ctx.stroke();
-  ctx.restore();
-
-  // Radial spoke from center to dot
-  ctx.strokeStyle=ok?'rgba(242,196,74,.75)':'rgba(204,68,68,.65)';
-  ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(dotX,dotY);ctx.stroke();
-
-  // Center origin dot
-  ctx.fillStyle='rgba(200,168,74,.6)';
-  ctx.beginPath();ctx.arc(cx,cy,3.5,0,Math.PI*2);ctx.fill();
-
-  // Outer ring circle (glow)
-  ctx.strokeStyle=ok?'rgba(242,196,74,.25)':'rgba(204,68,68,.25)';
-  ctx.lineWidth=dotSz*2+10;
-  ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+10,0,Math.PI*2);ctx.stroke();
-
-  // Selected dot circle
-  ctx.strokeStyle=ok?'#f2c44a':'#cc4444';
-  ctx.lineWidth=2.5;
-  ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+5,0,Math.PI*2);ctx.stroke();
-
-  // Label
-  const lx=dotX+(dotX>cx?14:-14);
-  const ly=dotY+(dotY>cy?-14:14);
-  const status=ok?'pass':`j=${ff} p=${fp}`;
-  ctx.font=`bold 9.5px "JetBrains Mono",monospace`;
-  ctx.textAlign=dotX>cx?'left':'right';
-  const lbl1=`M=${M}  r=${r}`;
-  const lw=Math.max(ctx.measureText(lbl1).width,ctx.measureText(status).width)+14;
-  ctx.fillStyle='rgba(4,4,13,.85)';
-  ctx.fillRect(dotX>cx?lx-4:lx-lw,ly-24,lw,30);
-  ctx.strokeStyle=ok?'rgba(242,196,74,.5)':'rgba(204,68,68,.5)';
-  ctx.lineWidth=1;ctx.strokeRect(dotX>cx?lx-4:lx-lw,ly-24,lw,30);
-  ctx.fillStyle=ok?'#f2c44a':'#cc4444';
-  ctx.fillText(lbl1,lx,ly-12);
-  ctx.font=`8px "JetBrains Mono",monospace`;
-  ctx.fillStyle=ok?'rgba(61,200,184,.9)':'rgba(255,120,120,.9)';
-  ctx.fillText(status,lx,ly+2);
-}
+// (old single-point drawRingInspect removed — multi-point version above handles all cases)
 
 function renderGrid(){
+  // Check if alternate view mode is selected
+  const viewMode=document.getElementById('grid-view-mode')?.value||'euclidean';
+  if(viewMode!=='euclidean'){ renderGridAltView(); return; }
   if(!useGL){ renderCanvas2DGrid(); return; }
   if(!gl||gl.isContextLost()){ renderCanvas2DGrid(); return; }
   const{W,H}=sizeGLCanvas();
@@ -1856,8 +1804,10 @@ function renderGrid(){
     if(lblCV){const lctx=lblCV.getContext('2d');lctx.clearRect(0,0,lblCV.width,lblCV.height);}
   }
 
-  // Inspect + barrier overlay — always evaluate on label canvas
-  const _needOverlay=(_inspectGridPts.length>0)||(document.getElementById('grid-barriers')&&document.getElementById('grid-barriers').checked);
+  // Inspect + barrier + prime spiral overlay — always evaluate on label canvas
+  const _needOverlay=(_inspectGridPts.length>0)
+    ||(document.getElementById('grid-barriers')&&document.getElementById('grid-barriers').checked)
+    ||(document.getElementById('grid-prime-spiral')&&document.getElementById('grid-prime-spiral').checked);
   if(_needOverlay){
     const lblCV=document.getElementById('cv-gl-lbl');
     if(lblCV){
@@ -1871,6 +1821,7 @@ function renderGrid(){
       lctx.setTransform(dpr,0,0,dpr,0,0);
       drawGridInspect(lctx,cW,cH);
       drawGridBarriers(lctx,cW,cH);
+      drawGridPrimeSpiral(lctx,cW,cH);
     }
   }
 
@@ -1878,20 +1829,20 @@ function renderGrid(){
   const rk=`${gridN},${G}`;
   if(rk!==_lastRenderKey){
     _lastRenderKey=rk;
-    document.getElementById('bd-val').textContent='…';
+    document.getElementById('bd-val-ext').textContent='…';
     if(_densityRAF)clearTimeout(_densityRAF);
     _densityRAF=setTimeout(()=>{
       _densityRAF=null;
       const rho=estimateDensity(G,gridN);
-      document.getElementById('bd-val').textContent=rho.toFixed(4);
+      document.getElementById('bd-val-ext').textContent=rho.toFixed(4);
       document.getElementById('nb-rho').textContent=rho.toFixed(4);
       gridGold=Math.round(rho*G*G); gridTotal=G*G;
     },120);
   }
 
   const Dn=getCn(gridN)/ZETA2;
-  document.getElementById('bd-theory').textContent='theory '+Dn.toFixed(5);
-  document.getElementById('badge-zoom').textContent=`zoom ${glZoom.toFixed(1)}× · G=${G} · n=${gridN}`;
+  document.getElementById('bd-theory-ext').textContent='theory '+Dn.toFixed(5);
+  document.getElementById('badge-zoom-ext').textContent=`zoom ${glZoom.toFixed(1)}× · G=${G} · n=${gridN}`;
 }
 
 // ── ZOOM HELPERS (log-scale sliders) ──
@@ -2207,11 +2158,14 @@ function renderRing(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const{rho2}=drawRingImpl(ctx,cW,cH,rZoom,rPanX,rPanY);
   drawRingBarriers(ctx,cW,cH);
+  drawRingPrimeSpiral(ctx,cW,cH);
   if(_inspectRingPts.length>0)drawRingInspect(ctx,cW,cH);
   const mMax=parseInt(document.getElementById('ring-max').value)||60;
   const ringN=getRingN();
   const theory=(getCn(ringN)/ZETA2).toFixed(4);
-  document.getElementById('badge-ring').innerHTML=`M=2…${mMax} · n=${ringN} · zoom ${rZoom.toFixed(1)}×<br><span style="color:var(--teal)">ρ≈${rho2.toFixed(4)}</span> <span style="color:var(--cream3)">theory ${theory}</span>`;
+  document.getElementById('badge-ring-ext').textContent=`M=2…${mMax} · n=${ringN} · zoom ${rZoom.toFixed(1)}×`;
+  document.getElementById('rho-ext').textContent=rho2.toFixed(4);
+  document.getElementById('theory-ext').textContent=theory;
   document.getElementById('nb-rho').textContent=rho2.toFixed(4);
 }
 
@@ -3446,16 +3400,20 @@ function drawGridBarriers(lctx,cW,cH){
       lctx.fillText(lbl,mx+3,my-2);
     }
   });
-  // Barrier pair: r=(M±1)/2 (dashed offset lines around k=1/2)
-  [{k:1/2,off:1},{k:1/2,off:-1}].forEach(({k,off})=>{
-    // Slight pixel offset in screen space from the k=1/2 line
+  // Barrier pair: r=(M±n)/2 (lift theorem paths) — dashed offset lines
+  const barrierN=Math.max(1,getGridN());
+  [{sign:+1,c:'rgba(200,168,74,.55)'},{sign:-1,c:'rgba(155,127,232,.45)'}].forEach(({sign,c})=>{
+    lctx.beginPath();let first=true;
     const vA=Math.max(0,y0),vB=Math.min(1,y0+1/glZoom);
-    const uA=k*vA+off/(2*G),uB=k*vB+off/(2*G);
-    const px1=(uA-x0)*cW*glZoom,py1=cH-(vA-y0)*cH*glZoom;
-    const px2=(uB-x0)*cW*glZoom,py2=cH-(vB-y0)*cH*glZoom;
-    lctx.strokeStyle='rgba(200,168,74,.55)';lctx.lineWidth=1;lctx.setLineDash([3,3]);
-    lctx.beginPath();lctx.moveTo(px1,py1);lctx.lineTo(px2,py2);lctx.stroke();
-    lctx.setLineDash([]);
+    for(let Mint=Math.max(2,Math.round(vA*G));Mint<=Math.min(G,Math.round(vB*G)+1);Mint++){
+      const rHalf=(Mint+sign*barrierN)/2;
+      if(rHalf<1||rHalf>=G||Math.round(rHalf)!==rHalf)continue;
+      const u=(rHalf-.5)/G,v=(Mint-.5)/G;
+      const px2=(u-x0)*cW*glZoom,py2=cH-(v-y0)*cH*glZoom;
+      if(first){lctx.moveTo(px2,py2);first=false;}else lctx.lineTo(px2,py2);
+    }
+    lctx.strokeStyle=c;lctx.lineWidth=1;lctx.setLineDash([3,3]);
+    lctx.stroke();lctx.setLineDash([]);
   });
 
   // ── Saturation diagonal: r = M (k=1) — gcd(r,M)=M boundary ──
@@ -3521,23 +3479,22 @@ function drawRingBarriers(ctx,cW,cH){
     }
   });
 
-  // ── 2. Lift-condition arcs: r=(M±1)/2  (the half-integer barrier) ──
-  // At each ring radius rho = (M/mMax)*R, mark the two points r=(M+1)/2 and r=(M-1)/2
-  // These trace a wobbling path near the θ=π spoke (k=1/2 sector boundary).
-  // Draw as a connected arc-curve through all M values.
+  // ── 2. Lift-condition arcs: r=(M±n)/2  (the barrier from lift theorem) ──
+  // Thm 8.4: r=(M+1)/2 never lifts (blocked).  Thm 8.5: r=(M-1)/2 lifts iff M≡3 mod 4.
+  // For general n: r=(M±n)/2 valid when M≡n mod 2.
+  const barrierN=Math.max(1,getRingN());
   [+1,-1].forEach(sign=>{
     ctx.beginPath();
     let first=true;
     for(let M=2;M<=mMax;M++){
-      // Only valid when M is odd (so (M±1)/2 is an integer)
-      const rHalf=(M+sign)/2;
+      const rHalf=(M+sign*barrierN)/2;
       if(rHalf<1||rHalf>=M||Math.round(rHalf)!==rHalf)continue;
       const rho=(M/mMax)*R;
       const theta=2*Math.PI*rHalf/M + globalRot;
       const x=cx+rho*Math.cos(theta), y=cy-rho*Math.sin(theta);
       if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
     }
-    ctx.strokeStyle='rgba(200,168,74,.65)';
+    ctx.strokeStyle=sign>0?'rgba(200,168,74,.65)':'rgba(155,127,232,.55)';
     ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
     ctx.stroke(); ctx.setLineDash([]);
   });
@@ -3546,7 +3503,7 @@ function drawRingBarriers(ctx,cW,cH){
     ctx.fillStyle='rgba(200,168,74,.7)'; ctx.font='7.5px "JetBrains Mono",monospace';
     ctx.textAlign='left'; ctx.textBaseline='middle';
     const theta0=2*Math.PI*(1/2) + globalRot;
-    ctx.fillText('lift r=(M±1)/2', cx+R*.55*Math.cos(theta0)+6, cy-R*.55*Math.sin(theta0)-6);
+    ctx.fillText(`r=(M±${barrierN})/2 barrier`, cx+R*.55*Math.cos(theta0)+6, cy-R*.55*Math.sin(theta0)-6);
   }
 
   // ── 3. Ford-circle projections: tangency dots at Farey level ──
@@ -3593,6 +3550,277 @@ function drawRingBarriers(ctx,cW,cH){
   ctx.restore();
 }
 
+
+// ══════════════════════════════════════════════════════════
+//  PRIME SPIRAL — RING VIEW
+// ══════════════════════════════════════════════════════════
+function drawRingPrimeSpiral(ctx,cW,cH){
+  const el=document.getElementById('ring-prime-spiral');
+  if(!el||!el.checked)return;
+  const pInput=document.getElementById('ring-spiral-p');
+  const p=parseInt(pInput?.value)||5;
+  if(!PS.has(p))return; // not a prime
+
+  const mMax=getRingM();
+  const R=Math.min(cW,cH)*0.44*rZoom;
+  const cx=cW/2+rPanX, cy=cH/2+rPanY;
+  const globalRot=getGlobalRotRing();
+  const dotSz=Math.max(1.5,parseFloat(document.getElementById('ring-dot')?.value)||1);
+
+  ctx.save();
+
+  // ── Draw the spiral path: prime p across all rings ──
+  let lastTop=null, lastBot=null;
+  for(let M=2;M<=mMax;M++){
+    if(gcd(p,M)!==1)continue; // gap at multiples of p
+    const rho=(M/mMax)*R;
+    const theta=-2*Math.PI*p/M - globalRot;
+    const x=cx+rho*Math.cos(theta), y=cy+rho*Math.sin(theta);
+    const isTop=p/M>0.5;
+    const lifts=gcd(p,M+1)===1;
+
+    // Connect with line
+    if(isTop&&lastTop){
+      ctx.beginPath();ctx.moveTo(lastTop.x,lastTop.y);ctx.lineTo(x,y);
+      ctx.strokeStyle='rgba(61,200,184,.4)';ctx.lineWidth=1.1;ctx.stroke();
+    }
+    if(!isTop&&lastBot){
+      ctx.beginPath();ctx.moveTo(lastBot.x,lastBot.y);ctx.lineTo(x,y);
+      ctx.strokeStyle='rgba(255,140,105,.4)';ctx.lineWidth=1.1;ctx.stroke();
+    }
+    if(isTop)lastTop={x,y}; else lastBot={x,y};
+
+    // Point
+    ctx.beginPath();ctx.arc(x,y,dotSz*1.2+1,0,Math.PI*2);
+    ctx.fillStyle=isTop?'#4ecdc4':'#ff8c69';ctx.fill();
+    // Dim if doesn't lift
+    if(!lifts){
+      ctx.beginPath();ctx.arc(x,y,dotSz*1.8,0,Math.PI*2);
+      ctx.strokeStyle='rgba(224,80,96,.7)';ctx.lineWidth=1;ctx.stroke();
+    }
+  }
+
+  // Mark equator gap at M=2p (the forced gap)
+  if(2*p<=mMax){
+    const rhoGap=(2*p/mMax)*R;
+    ctx.strokeStyle='rgba(224,80,96,.8)';ctx.lineWidth=2;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.arc(cx,cy,rhoGap,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    if(R>50){
+      ctx.fillStyle='rgba(224,80,96,.8)';ctx.font='bold 8px "JetBrains Mono",monospace';
+      ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillText(`M=2p=${2*p} gap`,cx+rhoGap+4,cy);
+    }
+  }
+
+  // Draw r=(M+n)/2 and r=(M-n)/2 barrier paths (lift theorem: Thm 8.4 / 8.5)
+  const n=getRingN();
+  [+1,-1].forEach((sign,si)=>{
+    ctx.beginPath();
+    let first=true;
+    for(let M=2;M<=mMax;M++){
+      const rHalf=(M+sign*Math.max(1,n))/2;
+      if(rHalf<1||rHalf>=M||Math.round(rHalf)!==rHalf)continue;
+      if(gcd(Math.round(rHalf),M)!==1)continue;
+      const rho=(M/mMax)*R;
+      const theta=-2*Math.PI*rHalf/M - globalRot;
+      const x=cx+rho*Math.cos(theta),y=cy+rho*Math.sin(theta);
+      if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=sign>0?'rgba(200,168,74,.75)':'rgba(155,127,232,.65)';
+    ctx.lineWidth=1.5;ctx.setLineDash([3,3]);
+    ctx.stroke();ctx.setLineDash([]);
+  });
+
+  // Label the lift barrier paths
+  if(R>60&&n>=1){
+    ctx.fillStyle='rgba(200,168,74,.7)';ctx.font='7.5px "JetBrains Mono",monospace';
+    ctx.textAlign='left';ctx.textBaseline='middle';
+    const theta0=-Math.PI/2 - globalRot;
+    ctx.fillText(`r=(M+${n})/2 barrier`,cx+8,cy-R*.45);
+    ctx.fillStyle='rgba(155,127,232,.7)';
+    ctx.fillText(`r=(M-${n})/2 path`,cx+8,cy-R*.38);
+  }
+
+  ctx.restore();
+}
+
+// ══════════════════════════════════════════════════════════
+//  PRIME SPIRAL — GRID VIEW (overlay on label canvas)
+// ══════════════════════════════════════════════════════════
+function drawGridPrimeSpiral(lctx,cW,cH){
+  const el=document.getElementById('grid-prime-spiral');
+  if(!el||!el.checked)return;
+  const pInput=document.getElementById('ring-spiral-p'); // reuse same p selector
+  const p=parseInt(pInput?.value)||5;
+  const G=getGridG();
+  const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
+  const cellW=cW/G*glZoom,cellH=cH/G*glZoom;
+  const n=getGridN();
+
+  lctx.save();
+
+  // Draw the spiral: prime p at position (p, M) for all valid M in [2,G]
+  // In grid: x=r/G, y=M/G. Spiral is the column r=p traced across M rows.
+  let lastTop=null,lastBot=null;
+  for(let M=2;M<=G;M++){
+    if(p>G)break;
+    if(gcd(p,M)!==1)continue; // gap
+    const px2=((p-.5)/G-x0)*cW*glZoom;
+    const py2=cH-((M-.5)/G-y0)*cH*glZoom;
+    if(px2<-cellW||px2>cW+cellW||py2<-cellH||py2>cH+cellH)continue;
+    const isTop=p/M>0.5;
+    const lifts=gcd(p,M+1)===1;
+
+    if(isTop&&lastTop){
+      lctx.beginPath();lctx.moveTo(lastTop.x,lastTop.y);lctx.lineTo(px2,py2);
+      lctx.strokeStyle='rgba(61,200,184,.5)';lctx.lineWidth=1.2;lctx.stroke();
+    }
+    if(!isTop&&lastBot){
+      lctx.beginPath();lctx.moveTo(lastBot.x,lastBot.y);lctx.lineTo(px2,py2);
+      lctx.strokeStyle='rgba(255,140,105,.5)';lctx.lineWidth=1.2;lctx.stroke();
+    }
+    if(isTop)lastTop={x:px2,y:py2};else lastBot={x:px2,y:py2};
+
+    const r2=Math.max(3,Math.min(cellW,cellH)*.3);
+    lctx.beginPath();lctx.arc(px2,py2,r2,0,Math.PI*2);
+    lctx.fillStyle=isTop?'#4ecdc4':'#ff8c69';lctx.fill();
+    if(!lifts){
+      lctx.beginPath();lctx.arc(px2,py2,r2+2,0,Math.PI*2);
+      lctx.strokeStyle='rgba(224,80,96,.8)';lctx.lineWidth=1.5;lctx.stroke();
+    }
+  }
+
+  // Draw r=(M±n)/2 barrier lines across grid (horizontal zigzag connecting the barrier points)
+  [1,-1].forEach((sign)=>{
+    lctx.beginPath();
+    let first=true;
+    for(let M=2;M<=G;M++){
+      const rHalf=(M+sign*Math.max(1,n))/2;
+      if(rHalf<1||rHalf>=G||Math.round(rHalf)!==rHalf)continue;
+      if(gcd(Math.round(rHalf),M)!==1)continue;
+      const px2=((rHalf-.5)/G-x0)*cW*glZoom;
+      const py2=cH-((M-.5)/G-y0)*cH*glZoom;
+      if(first){lctx.moveTo(px2,py2);first=false;}else lctx.lineTo(px2,py2);
+    }
+    lctx.strokeStyle=sign>0?'rgba(200,168,74,.7)':'rgba(155,127,232,.6)';
+    lctx.lineWidth=1.2;lctx.setLineDash([3,3]);
+    lctx.stroke();lctx.setLineDash([]);
+  });
+
+  lctx.restore();
+}
+
+// ══════════════════════════════════════════════════════════
+//  ALTERNATE GRID VIEW — Fermat (√M) and Farey strip
+// ══════════════════════════════════════════════════════════
+function renderGridAltView(){
+  // Used when view mode is "fermat" or "farey"
+  const wrap=document.getElementById('cv-gl-wrap');
+  const cW=Math.max(1,wrap.clientWidth),cH=Math.max(1,wrap.clientHeight);
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const lblCV=document.getElementById('cv-gl-lbl');
+  lblCV.width=Math.round(cW*dpr);lblCV.height=Math.round(cH*dpr);
+  const lctx=lblCV.getContext('2d');
+  lctx.setTransform(dpr,0,0,dpr,0,0);
+  lctx.clearRect(0,0,cW,cH);
+
+  // Clear the WebGL canvas using WebGL (don't touch it with 2d context)
+  if(gl&&!gl.isContextLost()){
+    const{W,H}=sizeGLCanvas();
+    gl.viewport(0,0,W,H);gl.clearColor(0.016,0.016,0.04,1);gl.clear(gl.COLOR_BUFFER_BIT);
+  }
+  // Use the label canvas for alt-view rendering
+  const viewMode=document.getElementById('grid-view-mode')?.value||'euclidean';
+  const G=getGridG();
+  const gridN=getGridN();
+  const cm=getGlobalCM();
+  const pad=36;
+  const xSc=(cW-2*pad)/G, ySc=(cH-2*pad)/G;
+
+  lctx.fillStyle='#04040d';lctx.fillRect(0,0,cW,cH);
+
+  // Helper: map (r,M) to canvas (px,py)
+  function toXY(r,M){
+    if(viewMode==='fermat'){
+      // x = r / G (linear), y = sqrt(M)/sqrt(G) (compressed)
+      const x=pad+((r-1)/G)*(cW-2*pad);
+      const y=cH-pad-(Math.sqrt(M)/Math.sqrt(G))*(cH-2*pad);
+      return{x,y};
+    } else {
+      // farey: x = r/M, y = 1/M (Ford/Farey)
+      const x=pad+(r/M)*(cW-2*pad);
+      const y=cH-pad-(1/M*G)*(cH-2*pad)/2;
+      return{x,y};
+    }
+  }
+
+  // Background axis labels
+  lctx.fillStyle='rgba(100,100,130,.35)';lctx.font='9px "JetBrains Mono",monospace';
+  lctx.textAlign='center';
+  if(viewMode==='fermat'){
+    lctx.fillText('r  (x-axis linear)',cW/2,cH-4);
+    lctx.save();lctx.translate(12,cH/2);lctx.rotate(-Math.PI/2);
+    lctx.fillText('M  (y-axis √M scaled)',0,0);lctx.restore();
+  } else {
+    lctx.fillText('r/M  (fraction)',cW/2,cH-4);
+    lctx.save();lctx.translate(12,cH/2);lctx.rotate(-Math.PI/2);
+    lctx.fillText('1/M  (Ford height)',0,0);lctx.restore();
+  }
+
+  // Draw all cells
+  const COLOR_MAP={gold:'#c8a84a',teal:'#3dc8b8',dark:'#111120'};
+  for(let M=2;M<=G;M++){
+    for(let r=1;r<M;r++){
+      let ok=true,ff=-1;
+      for(let j=0;j<=gridN&&ok;j++){if(gcd(r,M+j)>1){ok=false;ff=j;}}
+      const copM=gcd(r,M)===1;
+      let col;
+      if(cm===0)col=ok?COLOR_MAP.gold:copM?COLOR_MAP.teal:COLOR_MAP.dark;
+      else if(cm===3)col=ok?COLOR_MAP.gold:'#0a0a1a';
+      else{
+        const hue=ok?48:copM?175:240;
+        const sat=ok?80:copM?60:20;
+        const lit=ok?60:copM?45:18;
+        col=`hsl(${hue},${sat}%,${lit}%)`;
+      }
+      const{x,y}=toXY(r,M);
+      const dotR=viewMode==='fermat'?Math.max(1.2,2.5-G/100):Math.max(1,2-G/80);
+      lctx.beginPath();lctx.arc(x,y,dotR,0,Math.PI*2);
+      lctx.fillStyle=col;lctx.fill();
+    }
+  }
+
+  // Farey sector lines at 1/n
+  if(viewMode==='farey'){
+    [2,3,4,5,6].forEach(n=>{
+      const x=pad+(1/n)*(cW-2*pad);
+      lctx.strokeStyle=`rgba(100,150,200,.25)`;lctx.lineWidth=.5;lctx.setLineDash([4,5]);
+      lctx.beginPath();lctx.moveTo(x,pad);lctx.lineTo(x,cH-pad);lctx.stroke();lctx.setLineDash([]);
+      lctx.fillStyle='rgba(100,150,200,.45)';lctx.font='8px monospace';lctx.textAlign='center';
+      lctx.fillText(`1/${n}`,x,pad-4);
+    });
+  }
+  // Fermat ring circles
+  if(viewMode==='fermat'){
+    [2,3,5,7,11,13].forEach(M=>{
+      if(M>G)return;
+      lctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.18)':'rgba(50,50,80,.15)';
+      lctx.lineWidth=.5;
+      const y=cH-pad-(Math.sqrt(M)/Math.sqrt(G))*(cH-2*pad);
+      lctx.beginPath();lctx.moveTo(pad,y);lctx.lineTo(cW-pad,y);lctx.stroke();
+      lctx.fillStyle='rgba(61,200,184,.35)';lctx.font='7px monospace';lctx.textAlign='left';
+      lctx.fillText(`M=${M}`,2,y-2);
+    });
+  }
+
+  // Apply barrier/spiral overlays
+  if(document.getElementById('grid-barriers')?.checked) drawGridBarriers(lctx,cW,cH);
+  if(document.getElementById('grid-prime-spiral')?.checked) drawGridPrimeSpiral(lctx,cW,cH);
+
+  const G2=G;
+  const gridN2=gridN;
+  document.getElementById('badge-zoom-ext').textContent=`view: ${viewMode} · G=${G2} · n=${gridN2}`;
+}
 
 let _eulerAnimTO=null,_eulerStep=0;
 
@@ -4650,4 +4878,4 @@ init();
 </div>
 
 </body>
-  </html>
+</html>
