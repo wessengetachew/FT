@@ -211,6 +211,7 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 .cv-outer{position:relative;background:#030310;border:1px solid var(--edge);overflow:hidden;}
 .cv-outer canvas{display:block;width:100%;height:100%;}
 #cv-gl{height:60vh;min-height:420px;max-height:700px;cursor:grab;background:#04040d;}
+#cv-gl-wrap{aspect-ratio:1;max-height:80vh;height:auto!important;}
 #cv-ring{height:55vh;min-height:380px;max-height:650px;margin-top:20px;cursor:grab;background:#03030f;}
 
 /* Canvas overlays */
@@ -792,6 +793,11 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <span class="cv-lbl" id="grid-info" style="color:var(--teal);margin-left:4px;"></span>
     <div class="cv-sep"></div>
     <button class="cv-btn" id="grid-2x-btn" onclick="toggleCanvas2x('grid')" title="Double canvas height">⤢ 2×</button>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl" style="color:var(--violet)">a/b rot:</span>
+    <input type="number" id="grid-rot-a" min="0" value="0" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="a in a/b × 360°">
+    <span class="cv-lbl">/</span>
+    <input type="number" id="grid-rot-b" min="1" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="b in a/b × 360°">
   </div>
   <div class="cv-outer" id="cv-gl-wrap">
     <canvas id="cv-gl"></canvas>
@@ -841,6 +847,11 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <div class="cv-sep"></div>
     <button class="cv-btn" onclick="resetRingView()">↺ Reset</button>
     <button class="cv-btn" id="ring-2x-btn" onclick="toggleCanvas2x('ring')" title="Double canvas height">⤢ 2×</button>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl" style="color:var(--violet)">a/b rot:</span>
+    <input type="number" id="ring-rot-a" min="0" value="0" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderRing();" title="a in a/b × 360°">
+    <span class="cv-lbl">/</span>
+    <input type="number" id="ring-rot-b" min="1" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderRing();" title="b in a/b × 360°">
   </div>
   <div class="cv-outer" id="cv-ring-wrap">
     <canvas id="cv-ring"></canvas>
@@ -855,7 +866,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     </div>
     <table id="inspect-table">
       <thead><tr>
-        <th>#</th><th>M</th><th>r</th><th>r/M</th><th>Status</th><th>Failure</th><th></th>
+        <th>#</th><th>M</th><th>r</th><th>r/M</th><th>Status</th><th>Failure</th><th>a/b rot</th><th></th>
       </tr></thead>
       <tbody id="inspect-tbody"></tbody>
     </table>
@@ -950,6 +961,7 @@ uniform vec2 u_res;
 uniform int u_n;
 uniform int u_G;
 uniform int u_cm;
+uniform float u_rot;
 in vec2 v_uv;
 out vec4 frag;
 
@@ -969,6 +981,12 @@ bool ip(int n){
 void main(){
   vec2 uv=v_uv;uv.y=1.0-uv.y;
   vec2 t=u_panUV+(uv-0.5)/u_zoom;
+  // Apply global rotation around grid center (0.5, 0.5)
+  if(u_rot!=0.0){
+    vec2 c=t-0.5;
+    float cosR=cos(-u_rot),sinR=sin(-u_rot);
+    t=vec2(c.x*cosR-c.y*sinR,c.x*sinR+c.y*cosR)+0.5;
+  }
   if(t.x<0.0||t.x>1.0||t.y<0.0||t.y>1.0){frag=vec4(0.04,0.04,0.09,1);return;}
 
   int r=int(t.x*float(u_G))+1;
@@ -1052,15 +1070,25 @@ function initGL(){
   quadBuf=gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER,quadBuf);
   gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+
+  // Context loss recovery
+  glCV.addEventListener('webglcontextlost',e=>{e.preventDefault();},false);
+  glCV.addEventListener('webglcontextrestored',()=>{
+    gl=glCV.getContext('webgl2',{preserveDrawingBuffer:true});
+    useGL=initGL();
+    renderGrid();
+  },false);
+
   return true;
 }
 
 function sizeGLCanvas(){
   const wrap=document.getElementById('cv-gl-wrap');
-  const W=wrap.clientWidth,H=wrap.clientHeight;
+  const W=Math.max(1,wrap.clientWidth),H=Math.max(1,wrap.clientHeight);
   const dpr=Math.min(devicePixelRatio||1,2);
-  glCV.width=W*dpr; glCV.height=H*dpr;
-  return{W:glCV.width,H:glCV.height};
+  const nW=Math.round(W*dpr),nH=Math.round(H*dpr);
+  if(glCV.width!==nW||glCV.height!==nH){glCV.width=nW;glCV.height=nH;}
+  return{W:nW,H:nH};
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1150,9 +1178,10 @@ function initCanvas2DGrid(){
 function renderCanvas2DGrid(){
   if(!c2dCV)return;
   const wrap=document.getElementById('cv-gl-wrap');
-  const W=wrap.clientWidth,H=wrap.clientHeight;
+  const W=Math.max(1,wrap.clientWidth),H=Math.max(1,wrap.clientHeight);
   const dpr=Math.min(devicePixelRatio||1,2);
-  c2dCV.width=W*dpr; c2dCV.height=H*dpr;
+  const nW=Math.round(W*dpr),nH=Math.round(H*dpr);
+  if(c2dCV.width!==nW||c2dCV.height!==nH){c2dCV.width=nW;c2dCV.height=nH;}
   const ctx=c2dCV.getContext('2d');
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
@@ -1171,6 +1200,8 @@ function renderCanvas2DGrid(){
 
   ctx.fillStyle='#040409';
   ctx.fillRect(0,0,W,H);
+  const gridRot=getGlobalRotGrid();
+  if(gridRot!==0){ctx.save();ctx.translate(W/2,H/2);ctx.rotate(gridRot);ctx.translate(-W/2,-H/2);}
 
   const cellW=W/G/glZoom;
   const cellH=H/G/glZoom;
@@ -1242,6 +1273,7 @@ function renderCanvas2DGrid(){
   }
 
   // Badges
+  if(gridRot!==0)ctx.restore();
   document.getElementById('badge-zoom').textContent=`zoom ${glZoom.toFixed(1)}× · G=${G} · n=${n}`;
   const Dn=getCn(n)/ZETA2;
   document.getElementById('bd-theory').textContent='theory '+Dn.toFixed(5);
@@ -1255,7 +1287,7 @@ function renderCanvas2DGrid(){
   }
 }
 function estimateDensity(G,n){
-  const SAMPLES=2000;
+  const SAMPLES=Math.min(1200, Math.max(400, Math.round(40000/(G+1))));
   let g=0;
   for(let i=0;i<SAMPLES;i++){
     const r=Math.floor(Math.random()*G)+1;
@@ -1266,6 +1298,7 @@ function estimateDensity(G,n){
   }
   return g/SAMPLES;
 }
+let _densityRAF=null;
 
 let _lastRenderKey='';
 // ── GLOBAL CONTROL HELPERS ──
@@ -1336,10 +1369,9 @@ let _grid2x=false,_ring2x=false;
 function toggleCanvas2x(which){
   if(which==='grid'){
     _grid2x=!_grid2x;
-    const cv=document.getElementById('cv-gl');
     const wrap=document.getElementById('cv-gl-wrap');
-    cv.style.height=_grid2x?'120vh':'60vh';
-    wrap.style.maxHeight=_grid2x?'none':'';
+    wrap.style.aspectRatio=_grid2x?'2/1':'1';
+    wrap.style.maxHeight=_grid2x?'none':'80vh';
     document.getElementById('grid-2x-btn').classList.toggle('on',_grid2x);
     renderGrid();
   } else {
@@ -1352,11 +1384,29 @@ function toggleCanvas2x(which){
 }
 
 // ══════════════════════════════════════════════════════════
+//  ROTATION HELPERS
+// ══════════════════════════════════════════════════════════
+function getGlobalRotRing(){
+  const a=parseFloat(document.getElementById('ring-rot-a')?.value)||0;
+  const b=Math.max(1,parseFloat(document.getElementById('ring-rot-b')?.value)||1);
+  return (a/b)*2*Math.PI;
+}
+function getGlobalRotGrid(){
+  const a=parseFloat(document.getElementById('grid-rot-a')?.value)||0;
+  const b=Math.max(1,parseFloat(document.getElementById('grid-rot-b')?.value)||1);
+  return (a/b)*2*Math.PI;
+}
+// Per-inspect-point cumulative rotation state
+// Each entry: {a:numerator, b:denominator} → extra rotation (a/b)*2π
+let _inspectPtRot=[]; // indexed parallel to _inspectRingPts/_inspectGridPts
+
+// ══════════════════════════════════════════════════════════
 //  INSPECT MODE
 // ══════════════════════════════════════════════════════════
 let inspectMode=false;
 let _inspectGridPts=[];  // array of {r,M}
 let _inspectRingPts=[];  // array of {r,M}
+let _inspectRingActive=-1; // index of table-selected point (-1 = none)
 let _glClickX=0,_glClickY=0;
 let _rClickX=0,_rClickY=0;
 
@@ -1368,9 +1418,15 @@ function prevSatN(n){
 }
 
 function clearInspectPoints(){
-  _inspectRingPts=[];_inspectGridPts=[];
+  _inspectRingPts=[];_inspectGridPts=[];_inspectRingActive=-1;_inspectPtRot=[];
   _updateInspectTable();
   renderRing();renderGrid();
+}
+
+function _setRingInspectActive(idx){
+  _inspectRingActive=(_inspectRingActive===idx)?-1:idx;
+  _updateInspectTable();
+  renderRing();
 }
 
 function toggleInspect(){
@@ -1385,16 +1441,35 @@ function toggleInspect(){
 // Add or remove a ring point (toggle if same point clicked again)
 function _addRingInspectPt(r,M){
   const idx=_inspectRingPts.findIndex(p=>p.r===r&&p.M===M);
-  if(idx>=0)_inspectRingPts.splice(idx,1);
-  else _inspectRingPts.push({r,M});
+  if(idx>=0){
+    _inspectRingPts.splice(idx,1);
+    _inspectPtRot.splice(idx,1);
+    if(_inspectRingActive>=_inspectRingPts.length)_inspectRingActive=-1;
+  } else {
+    _inspectRingPts.push({r,M});
+    _inspectPtRot.push({a:0,b:1});
+  }
   _updateInspectTable();
   renderRing();
 }
 function _addGridInspectPt(r,M){
   const idx=_inspectGridPts.findIndex(p=>p.r===r&&p.M===M);
-  if(idx>=0)_inspectGridPts.splice(idx,1);
-  else _inspectGridPts.push({r,M});
+  if(idx>=0){_inspectGridPts.splice(idx,1);_inspectPtRot.splice(idx,1);}
+  else{_inspectGridPts.push({r,M});_inspectPtRot.push({a:0,b:1});}
   renderGrid();
+}
+
+// Update per-point rotation
+function _setInspectPtRot(idx,field,val){
+  if(!_inspectPtRot[idx])_inspectPtRot[idx]={a:0,b:1};
+  _inspectPtRot[idx][field]=parseFloat(val)||0;
+  if(field==='b')_inspectPtRot[idx].b=Math.max(1,_inspectPtRot[idx].b);
+  renderRing();renderGrid();
+}
+function _getInspectPtRotAngle(idx){
+  const rot=_inspectPtRot[idx];
+  if(!rot)return 0;
+  return (rot.a/Math.max(1,rot.b))*2*Math.PI;
 }
 
 // Update the inspect table below the ring canvas
@@ -1412,16 +1487,24 @@ function _updateInspectTable(){
     const{ok,ff,fp}=_ringCell(r,M,n);
     const frac=(r/M).toFixed(4);
     const col=COLS[i%COLS.length];
+    const isActive=_inspectRingActive===i;
     const status=ok?`<span class="ipt-pass">pass</span>`:`<span class="ipt-fail">fail</span>`;
     const failure=ok?'—':`j=${ff}, p=${fp}`;
-    return `<tr>
-      <td><span class="ipt-num" style="background:${col}22;color:${col};border:1px solid ${col}55;">${i+1}</span></td>
+    const activeBorder=isActive?`border-left:3px solid ${col};background:${col}12;`:'border-left:3px solid transparent;';
+    const rot=_inspectPtRot[i]||{a:0,b:1};
+    return `<tr style="cursor:pointer;${activeBorder}" onclick="_setRingInspectActive(${i})" title="Click to highlight on ring">
+      <td><span class="ipt-num" style="background:${col}22;color:${col};border:1px solid ${col}${isActive?'':'55'};${isActive?'box-shadow:0 0 6px '+col+'88;':''}">${i+1}</span></td>
       <td style="color:var(--cream)">${M}</td>
       <td style="color:var(--cream)">${r}</td>
       <td style="color:var(--cream3)">${frac}</td>
       <td>${status}</td>
       <td style="color:var(--cream3);font-size:8px;">${failure}</td>
-      <td><button class="ipt-rm" onclick="_addRingInspectPt(${r},${M})" title="Remove">x</button></td>
+      <td style="white-space:nowrap;">
+        <input type="number" value="${rot.a}" min="0" step="1" style="width:30px;background:rgba(155,127,232,.1);border:1px solid rgba(155,127,232,.3);color:var(--violet);font-family:var(--mono);font-size:8px;padding:1px 3px;text-align:center;" oninput="_setInspectPtRot(${i},'a',this.value)" onclick="event.stopPropagation()" title="a">
+        <span style="color:var(--cream3);font-size:9px;">/</span>
+        <input type="number" value="${rot.b}" min="1" step="1" style="width:30px;background:rgba(155,127,232,.1);border:1px solid rgba(155,127,232,.3);color:var(--violet);font-family:var(--mono);font-size:8px;padding:1px 3px;text-align:center;" oninput="_setInspectPtRot(${i},'b',this.value)" onclick="event.stopPropagation()" title="b">
+      </td>
+      <td><button class="ipt-rm" onclick="event.stopPropagation();_addRingInspectPt(${r},${M})" title="Remove">x</button></td>
     </tr>`;
   }).join('');
 }
@@ -1478,49 +1561,93 @@ function drawRingInspect(ctx,cW,cH){
   const cx=cW/2+rPanX,cy=cH/2+rPanY;
   const dotSz=Math.max(1.5,parseFloat(document.getElementById('ring-dot').value)||1);
   const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
-  // Center origin dot
+
+  // Precompute dot positions
+  const globalRot=getGlobalRotRing();
+  const pts=_inspectRingPts.map(({r,M},i)=>{
+    const rho=(M/mMax)*R;
+    const ptRot=_getInspectPtRotAngle(i);
+    const angle=-2*Math.PI*r/M - globalRot - ptRot;
+    return{r,M,rho,x:cx+rho*Math.cos(angle),y:cy+rho*Math.sin(angle),
+      col:COLS[i%COLS.length],res:_ringCell(r,M,n)};
+  });
+
+  // ── 1. Dotted connection lines in click order ──
+  if(pts.length>1){
+    ctx.save();
+    ctx.setLineDash([5,4]);
+    ctx.lineWidth=1.5;
+    for(let i=0;i<pts.length-1;i++){
+      const a=pts[i],b=pts[i+1];
+      const grad=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+      grad.addColorStop(0,a.col+'99');
+      grad.addColorStop(1,b.col+'99');
+      ctx.strokeStyle=grad;
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ── 2. Center origin dot ──
   ctx.fillStyle='rgba(200,168,74,.5)';
   ctx.beginPath();ctx.arc(cx,cy,3.5,0,Math.PI*2);ctx.fill();
-  // Draw each inspected point
-  _inspectRingPts.forEach(({r,M},idx)=>{
+
+  // ── 3. Draw each point ──
+  pts.forEach(({r,M,rho,x,y,col,res},idx)=>{
     if(M<2||M>mMax)return;
-    const{ok,ff,fp}=_ringCell(r,M,n);
-    const rho=(M/mMax)*R;
-    const angle=-2*Math.PI*r/M;
-    const dotX=cx+rho*Math.cos(angle);
-    const dotY=cy+rho*Math.sin(angle);
-    const col=COLS[idx%COLS.length];
-    // Ring circle (only if M is unique among points so far)
-    const isFirstM=!_inspectRingPts.slice(0,idx).some(p=>p.M===M);
+    const{ok,ff,fp}=res;
+    const isActive=_inspectRingActive===idx;
+
+    // Ring circle (once per unique M)
+    const isFirstM=!pts.slice(0,idx).some(p=>p.M===M);
     if(isFirstM){
-      ctx.save();ctx.strokeStyle=col+'60';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      ctx.save();ctx.strokeStyle=col+(isActive?'90':'50');
+      ctx.lineWidth=isActive?2:1;ctx.setLineDash([4,4]);
       ctx.beginPath();ctx.arc(cx,cy,rho,0,Math.PI*2);ctx.stroke();ctx.restore();
     }
+
     // Radial spoke
-    ctx.strokeStyle=col+'aa';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(dotX,dotY);ctx.stroke();
+    ctx.strokeStyle=col+(isActive?'cc':'88');ctx.lineWidth=isActive?2:1.5;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();
+
+    // Active point: large pulsing ring
+    if(isActive){
+      const r1=dotSz*2+14,r2=dotSz*2+20;
+      ctx.strokeStyle=col+'55';ctx.lineWidth=6;
+      ctx.beginPath();ctx.arc(x,y,r2,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle=col+'99';ctx.lineWidth=3;
+      ctx.beginPath();ctx.arc(x,y,r1,0,Math.PI*2);ctx.stroke();
+    }
+
     // Glow
     ctx.strokeStyle=col+'30';ctx.lineWidth=dotSz*2+10;
-    ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+8,0,Math.PI*2);ctx.stroke();
-    // Dot circle
-    ctx.strokeStyle=col;ctx.lineWidth=2.5;
-    ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+5,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,dotSz*2+8,0,Math.PI*2);ctx.stroke();
+
+    // Main circle
+    ctx.strokeStyle=col;ctx.lineWidth=isActive?3:2.5;
+    ctx.beginPath();ctx.arc(x,y,isActive?dotSz*2+8:dotSz*2+5,0,Math.PI*2);ctx.stroke();
+
     // Number badge
-    ctx.fillStyle=col+'ee';ctx.font=`bold 8px "JetBrains Mono",monospace`;
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(idx+1,dotX,dotY);ctx.textBaseline='alphabetic';
-    // Label
-    const lx=dotX+(dotX>cx?12:-12);const ly=dotY+(dotY>cy?-12:12);
-    const status=ok?'pass':`j=${ff} p=${fp}`;
-    const lbl=`M=${M} r=${r}`;
-    ctx.font=`bold 8.5px "JetBrains Mono",monospace`;ctx.textAlign=dotX>cx?'left':'right';
-    const lw=Math.max(ctx.measureText(lbl).width,ctx.measureText(status).width)+14;
-    ctx.fillStyle='rgba(4,4,13,.85)';
-    ctx.fillRect(dotX>cx?lx-4:lx-lw,ly-22,lw,26);
-    ctx.strokeStyle=col+'55';ctx.lineWidth=1;
-    ctx.strokeRect(dotX>cx?lx-4:lx-lw,ly-22,lw,26);
-    ctx.fillStyle=col;ctx.fillText(lbl,lx,ly-11);
-    ctx.font=`8px "JetBrains Mono",monospace`;
-    ctx.fillStyle=ok?'rgba(61,200,184,.9)':'rgba(255,120,120,.9)';ctx.fillText(status,lx,ly+1);
+    ctx.fillStyle=col+(isActive?'ff':'ee');
+    ctx.font=`bold ${isActive?9:8}px "JetBrains Mono",monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(idx+1,x,y);ctx.textBaseline='alphabetic';
+
+    // Label (always show for active, otherwise show if few points)
+    if(isActive||_inspectRingPts.length<=6){
+      const lx=x+(x>cx?12:-12);const ly=y+(y>cy?-12:12);
+      const status=ok?'pass':`j=${ff} p=${fp}`;
+      const lbl=`M=${M} r=${r}`;
+      ctx.font=`bold 8.5px "JetBrains Mono",monospace`;ctx.textAlign=x>cx?'left':'right';
+      const lw=Math.max(ctx.measureText(lbl).width,ctx.measureText(status).width)+14;
+      ctx.fillStyle='rgba(4,4,13,.88)';
+      ctx.fillRect(x>cx?lx-4:lx-lw,ly-22,lw,26);
+      ctx.strokeStyle=col+(isActive?'88':'44');ctx.lineWidth=isActive?1.5:1;
+      ctx.strokeRect(x>cx?lx-4:lx-lw,ly-22,lw,26);
+      ctx.fillStyle=col;ctx.fillText(lbl,lx,ly-11);
+      ctx.font=`8px "JetBrains Mono",monospace`;
+      ctx.fillStyle=ok?'rgba(61,200,184,.9)':'rgba(255,120,120,.9)';ctx.fillText(status,lx,ly+1);
+    }
   });
 }
 
@@ -1648,6 +1775,7 @@ function drawRingInspect(ctx,cW,cH){
 
 function renderGrid(){
   if(!useGL){ renderCanvas2DGrid(); return; }
+  if(!gl||gl.isContextLost()){ renderCanvas2DGrid(); return; }
   const{W,H}=sizeGLCanvas();
   gl.viewport(0,0,W,H);
   gl.clearColor(0.04,0.04,0.09,1);
@@ -1669,6 +1797,7 @@ function renderGrid(){
   gl.uniform1i(gl.getUniformLocation(gridProg,'u_n'),gridN);
   gl.uniform1i(gl.getUniformLocation(gridProg,'u_G'),G);
   gl.uniform1i(gl.getUniformLocation(gridProg,'u_cm'),cm);
+  gl.uniform1f(gl.getUniformLocation(gridProg,'u_rot'),getGlobalRotGrid());
 
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 
@@ -1742,18 +1871,19 @@ function renderGrid(){
     }
   }
 
-  // Density estimate (async so it doesn't block render)
+  // Density estimate (debounced so it doesn't block animation frames)
   const rk=`${gridN},${G}`;
   if(rk!==_lastRenderKey){
     _lastRenderKey=rk;
     document.getElementById('bd-val').textContent='…';
-    setTimeout(()=>{
+    if(_densityRAF)clearTimeout(_densityRAF);
+    _densityRAF=setTimeout(()=>{
+      _densityRAF=null;
       const rho=estimateDensity(G,gridN);
       document.getElementById('bd-val').textContent=rho.toFixed(4);
       document.getElementById('nb-rho').textContent=rho.toFixed(4);
       gridGold=Math.round(rho*G*G); gridTotal=G*G;
-      document.getElementById('bd-theory').textContent='theory '+(getCn(gridN)/ZETA2).toFixed(5);
-    },0);
+    },120);
   }
 
   const Dn=getCn(gridN)/ZETA2;
@@ -1962,6 +2092,7 @@ function drawRingImpl(ctx,cW,cH,zoom,panX,panY){
   ctx.fillStyle='#03030f';ctx.fillRect(0,0,cW,cH);
   const cx=cW/2+panX,cy=cH/2+panY;
   const R=Math.min(cW,cH)*0.44*zoom;
+  const globalRot=getGlobalRotRing();
   // Invalidate cache if n or mMax changed (pan/zoom leave these unchanged → cache reused)
   const _ck=`${n},${mMax}`;
   if(_ringCacheKey!==_ck){_ringCache=new Map();_ringCacheKey=_ck;}
@@ -1973,7 +2104,7 @@ function drawRingImpl(ctx,cW,cH,zoom,panX,panY){
       ctx.lineWidth=isPrime?.6:.3;ctx.stroke();
     }
   }
-  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*1.04,cy);
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+R*1.04*Math.cos(globalRot),cy-R*1.04*Math.sin(globalRot));
   ctx.strokeStyle='rgba(80,60,30,.2)';ctx.lineWidth=1;ctx.stroke();
   ctx.beginPath();ctx.arc(cx,cy,3,0,2*Math.PI);
   ctx.fillStyle='rgba(200,168,74,.4)';ctx.fill();
@@ -1987,7 +2118,7 @@ function drawRingImpl(ctx,cW,cH,zoom,panX,panY){
       if(ok)gold++;
       if(!copM&&!showDim)continue;
       if(!ok&&!copM&&!showDim)continue;
-      const theta=2*Math.PI*r/M;
+      const theta=2*Math.PI*r/M + globalRot;
       const x=cx+rho*Math.cos(theta),y=cy-rho*Math.sin(theta);
       let fillColor;
       const frac=r/M; // angle fraction for sector coloring
@@ -2111,7 +2242,8 @@ function _handleRingInspectClick(clientX,clientY){
   const mMax=parseInt(document.getElementById('ring-max').value)||60;
   const M=Math.round((dist/R)*mMax);
   if(M>=2&&M<=mMax){
-    const theta=Math.atan2(-dy,dx);
+    const globalRot=getGlobalRotRing();
+    const theta=Math.atan2(-dy,dx) + globalRot;
     const frac=((theta/(2*Math.PI))+1)%1;
     const r=Math.round(frac*M);
     if(r>=1&&r<M)_addRingInspectPt(r,M);
@@ -2183,7 +2315,7 @@ function showRingTip(e){
   const M=Math.round((dist/R)*mMax);
   if(M<2||M>mMax){tip.style.display='none';return;}
 
-  const theta=Math.atan2(-dy,dx);
+  const theta=Math.atan2(-dy,dx) + getGlobalRotRing();
   const frac=((theta/(2*Math.PI))+1)%1;
   const r=Math.round(frac*M);
   if(r<1||r>=M){tip.style.display='none';return;}
@@ -2529,9 +2661,9 @@ function _updateUIAnimFrame(){
   // Pills
   const pills=document.getElementById('sat-pills');
   if(pills)pills.innerHTML=PRIMES.slice(0,30).map(p=>`<div class="pill ${p<=n+1?'sat':'act'}">${p}</div>`).join('');
-  _lastRenderKey='';
   drawChart();
-  drawConvergenceChart();
+  // Note: drawConvergenceChart is NOT called here - too expensive for animation frames.
+  // It updates when animation stops (stopGlobalAnim) or n changes manually.
   renderGrid();
   renderRing();
 }
@@ -3143,7 +3275,7 @@ function buildSteps(){
   const el=document.getElementById('steps-container');
   if(!el)return;
   el.innerHTML=STEPS.map((s,i)=>`
-    <div class="step ${i===0?'open':''}" data-i="${i}">
+    <div class="step" data-i="${i}">
       <div class="step-hdr">
         <span class="step-num">0${i+1}</span>
         <span class="step-ttl">${s.t}</span>
@@ -3208,9 +3340,9 @@ function initHeroThree(){
   t3.rotation.x=Math.PI/3;
   scene.add(t3);
 
-  let raf;
+  let rafRef={id:null};
   function animate(){
-    raf=requestAnimationFrame(animate);
+    rafRef.id=requestAnimationFrame(animate);
     t1.rotation.x+=0.0025;t1.rotation.y+=0.0040;
     t2.rotation.y+=0.0055;t2.rotation.z+=0.0020;
     t3.rotation.z+=0.0012;t3.rotation.x+=0.0008;
@@ -3218,10 +3350,14 @@ function initHeroThree(){
   }
   animate();
 
-  // Pause when hero off-screen to save CPU
+  // Pause when hero off-screen to save CPU.
   if('IntersectionObserver' in window){
     const io=new IntersectionObserver(entries=>{
-      entries[0].isIntersecting ? animate() : (cancelAnimationFrame(raf),raf=null);
+      if(entries[0].isIntersecting){
+        if(!rafRef.id)animate();
+      }else{
+        if(rafRef.id){cancelAnimationFrame(rafRef.id);rafRef.id=null;}
+      }
     },{threshold:0.01});
     io.observe(hero);
   }
@@ -3487,7 +3623,7 @@ function toggleEulerAnim(){
 }
 
 function init(){
-  document.getElementById('cv-gl').style.height='60vh';
+  // cv-gl-wrap is now aspect-ratio:1 so cv-gl fills it automatically
   document.getElementById('cv-ring').style.height='55vh';
 
   useGL=initGL();
