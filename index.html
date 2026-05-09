@@ -75,7 +75,53 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 #hero{
   padding:56px 0 36px;text-align:center;
   border-bottom:1px solid var(--edge);margin-bottom:32px;
+  position:relative;overflow:hidden;
 }
+#hero-3d{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.2;}
+#hero>*:not(#hero-3d){position:relative;z-index:1;}
+
+/* ── PARCHMENT THEME ── */
+body.parchment{
+  --bg:#f5f0e8;--bg1:#ede8d8;--bg2:#e4ddd0;
+  --edge:rgba(110,80,40,.2);--edge2:rgba(110,80,40,.35);
+  --cream:#1c1510;--cream2:#2e1e10;--cream3:#6a5038;
+  --gold:#7a4a0e;--teal:#1a5c50;--coral:#8c2c20;--violet:#5a3070;--lime:#3a5e18;
+}
+body.parchment #nbar{background:rgba(245,240,232,.97)!important;border-bottom-color:rgba(110,80,40,.22)!important;}
+body.parchment .hero-formula{background:rgba(110,80,40,.06)!important;border-color:rgba(110,80,40,.2)!important;}
+body.parchment .hero-live{border-top-color:rgba(110,80,40,.18)!important;}
+body.parchment .cv-outer{background:#ede8d0!important;}
+body.parchment .step{border-color:rgba(110,80,40,.2)!important;}
+body.parchment table.dt tbody tr:hover{background:rgba(110,80,40,.06)!important;}
+body.parchment table.dt tbody tr.cur-row{background:rgba(110,80,40,.1)!important;}
+body.parchment .ibox{border-color:rgba(110,80,40,.2)!important;}
+body.parchment select.cv-sel,body.parchment input[type=number]{background:var(--bg2)!important;color:var(--cream)!important;}
+#theme-btn,#fs-btn{padding:5px 12px;height:32px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid var(--edge2);color:var(--cream3);flex-shrink:0;}
+#theme-btn:hover,#fs-btn:hover{color:var(--cream);border-color:var(--edge);}
+#fs-btn.active{color:var(--gold);border-color:rgba(200,168,74,.5);}
+
+/* ── INSPECT TABLE ── */
+#ring-inspect-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--edge);}
+.inspect-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.inspect-hd-lbl{font-size:8.5px;color:var(--cream3);letter-spacing:.1em;text-transform:uppercase;}
+#inspect-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:8.5px;}
+#inspect-table th{color:var(--cream3);font-weight:400;padding:4px 6px;text-align:left;border-bottom:1px solid var(--edge);}
+#inspect-table td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+#inspect-table tr:hover td{background:rgba(255,255,255,.03);}
+.ipt-pass{color:var(--gold);}
+.ipt-fail{color:var(--coral);}
+.ipt-rm{background:none;border:none;cursor:pointer;color:var(--cream3);font-size:11px;padding:0 2px;line-height:1;}
+.ipt-rm:hover{color:var(--coral);}
+.ipt-num{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:8px;font-weight:700;flex-shrink:0;}
+
+/* ── CARD NAV ARROWS ── */
+.rbox{position:relative;}
+.card-nav{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:2px;}
+.card-arr{background:transparent;border:1px solid var(--edge2);color:var(--cream3);font-size:9px;padding:2px 6px;cursor:pointer;line-height:1;transition:all .12s;}
+.card-arr:hover{color:var(--cream);border-color:var(--gold);background:rgba(200,168,74,.08);}
+#euler-cv{display:block;width:100%;height:240px;background:#04040d;border:1px solid var(--edge);}
+body.parchment #euler-cv{background:#1c1808;}
+.euler-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;}
 .hero-tag{font-size:7.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);opacity:.55;margin-bottom:14px;}
 .hero-title{font-family:var(--disp);font-size:clamp(1.6rem,4vw,2.5rem);font-weight:400;color:var(--cream);letter-spacing:.06em;line-height:1.2;margin-bottom:20px;}
 .hero-formula{
@@ -164,8 +210,8 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 
 .cv-outer{position:relative;background:#030310;border:1px solid var(--edge);overflow:hidden;}
 .cv-outer canvas{display:block;width:100%;height:100%;}
-#cv-gl{height:60vh;min-height:420px;max-height:700px;cursor:grab;}
-#cv-ring{height:55vh;min-height:380px;max-height:650px;margin-top:20px;cursor:grab;}
+#cv-gl{height:60vh;min-height:420px;max-height:700px;cursor:grab;background:#04040d;}
+#cv-ring{height:55vh;min-height:380px;max-height:650px;margin-top:20px;cursor:grab;background:#03030f;}
 
 /* Canvas overlays */
 .cv-badge{
@@ -263,6 +309,7 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 .em-panel-btn.on.grid-b{color:#c8a84a;border-color:rgba(200,168,74,.5);background:rgba(200,168,74,.08);}
 .em-panel-btn.on.ring-b{color:#3dc8b8;border-color:rgba(61,200,184,.4);background:rgba(61,200,184,.07);}
 .em-panel-btn.on.chart-b{color:#9b7fe8;border-color:rgba(155,127,232,.4);background:rgba(155,127,232,.07);}
+.em-panel-btn.on.euler-b{color:#f2c44a;border-color:rgba(242,196,74,.45);background:rgba(242,196,74,.07);}
 /* Preview */
 #em-preview-wrap{border:1px solid var(--edge);background:var(--bg2);padding:2px;margin-top:4px;}
 #em-preview{display:block;width:100%;}
@@ -469,6 +516,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 .dd-btn.sec:hover{color:var(--cream);}
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
@@ -493,6 +541,8 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <input id="nb-anim-spd" type="range" min="60" max="950" value="300" title="Animation speed (right=faster)">
     <div class="nb-sep"></div>
     <button id="nb-play" onclick="toggleGlobalAnim()">▶ Play</button>
+    <button id="theme-btn" onclick="toggleTheme()" title="Toggle parchment / dark theme">Parchment</button>
+    <button id="fs-btn" onclick="toggleFullscreen()" title="Toggle fullscreen">Full</button>
     <div class="nb-sep"></div>
     <div id="exp-dd-wrap">
       <button id="exp-dd-btn" onclick="toggleExpDD()">↓ Export ▾</button>
@@ -527,6 +577,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 
 <!-- HERO -->
 <div id="hero" class="sec-anchor">
+  <canvas id="hero-3d"></canvas>
   <div class="hero-tag">Analytic Number Theory · Wessen Getachew</div>
   <h1 class="hero-title">C(n) — The Generalized Feller–Tornier Constant</h1>
   <div class="hero-formula" id="hero-formula">
@@ -563,11 +614,19 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
       <div class="rl">Block length</div>
       <div class="rv" id="r-block" style="color:var(--cream);font-size:2.4rem;">2</div>
       <div class="rs">n+1 consecutive integers<br>checked for coprimality</div>
+      <div class="card-nav" title="Step n up/down">
+        <button class="card-arr" onclick="setN(N+1)" title="n + 1  →  block grows">▲</button>
+        <button class="card-arr" onclick="setN(Math.max(0,N-1))" title="n − 1  →  block shrinks">▼</button>
+      </div>
     </div>
     <div class="rbox">
       <div class="rl">Saturated primes</div>
       <div class="rv" id="r-sat" style="color:var(--coral);font-size:2.2rem;">1</div>
       <div class="rs">p ≤ n+1 → factor = 1−1/p<br>next at n = <span id="r-next">—</span></div>
+      <div class="card-nav" title="Jump to next/prev saturation event">
+        <button class="card-arr" onclick="setN(typeof nextSatN(N)==='number'?nextSatN(N):N)" title="Jump to next saturation (n = p−1)">▲</button>
+        <button class="card-arr" onclick="setN(prevSatN(N))" title="Jump to prev saturation">▼</button>
+      </div>
     </div>
   </div>
   <div class="ibox">
@@ -624,6 +683,30 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <button class="chart-export-btn" onclick="exportChartCSV()">↓ CSV</button>
   </div>
   <div id="chart-hover-bar">Hover chart to inspect values…</div>
+</div>
+
+<div class="card sec-anchor" id="s-euler">
+  <div class="card-title">Euler Product Convergence</div>
+  <div style="font-size:8px;color:var(--cream3);margin-bottom:10px;line-height:1.6;">
+    Partial product C<sub>P</sub>(n) = ζ(2)·∏<sub>p≤P</sub>(1 − min(n+1, p)/p²) converging to C(n) as P ranges over primes.
+    <span style="color:var(--teal);">Teal</span> = active primes (p > n+1),
+    <span style="color:var(--coral);">coral</span> = saturated (p ≤ n+1).
+  </div>
+  <canvas id="euler-cv"></canvas>
+  <div class="euler-controls">
+    <span class="cv-lbl">Primes shown:</span>
+    <input class="cv-sl" type="range" id="euler-nprimes" min="5" max="60" value="30" style="width:90px;"
+           oninput="document.getElementById('euler-nprimes-v').textContent=this.value;drawConvergenceChart();">
+    <span class="cv-lbl" id="euler-nprimes-v">30</span>
+    <div class="cv-sep"></div>
+    <button class="cv-btn on" id="euler-anim-btn" onclick="toggleEulerAnim()">▶ Animate</button>
+    <span id="euler-anim-frame" style="font-size:9px;color:var(--cream3);min-width:60px;">—</span>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl">Current:</span>
+    <span id="euler-cur-val" style="font-size:9px;color:var(--gold);font-weight:600;">—</span>
+    <span class="cv-lbl">Target C(n):</span>
+    <span id="euler-target-val" style="font-size:9px;color:var(--teal);">—</span>
+  </div>
 </div>
 
 <!-- SECTION 4: DATA TABLE -->
@@ -703,6 +786,9 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--cream2);">
       <input type="checkbox" id="grid-cell-labels" checked onchange="renderGrid()" style="accent-color:var(--teal);">Cell labels
     </label>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--violet);" title="Overlay Farey fraction barrier paths r/M = k/j">
+      <input type="checkbox" id="grid-barriers" onchange="renderGrid()" style="accent-color:var(--violet);">Barriers
+    </label>
     <span class="cv-lbl" id="grid-info" style="color:var(--teal);margin-left:4px;"></span>
     <div class="cv-sep"></div>
     <button class="cv-btn" id="grid-2x-btn" onclick="toggleCanvas2x('grid')" title="Double canvas height">⤢ 2×</button>
@@ -759,6 +845,20 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <div class="cv-outer" id="cv-ring-wrap">
     <canvas id="cv-ring"></canvas>
     <div class="cv-badge" id="badge-ring">M=2…128 · n=1</div>
+  </div>
+
+  <!-- Inspect points table — shown when inspect mode on -->
+  <div id="ring-inspect-section" style="display:none;">
+    <div class="inspect-hd">
+      <span class="inspect-hd-lbl">Inspected Points &nbsp;<span id="inspect-count" style="color:var(--gold);">0</span></span>
+      <button class="cv-btn" onclick="clearInspectPoints()">Clear all</button>
+    </div>
+    <table id="inspect-table">
+      <thead><tr>
+        <th>#</th><th>M</th><th>r</th><th>r/M</th><th>Status</th><th>Failure</th><th></th>
+      </tr></thead>
+      <tbody id="inspect-tbody"></tbody>
+    </table>
   </div>
 
   <!-- Animation -->
@@ -1255,17 +1355,173 @@ function toggleCanvas2x(which){
 //  INSPECT MODE
 // ══════════════════════════════════════════════════════════
 let inspectMode=false;
-let _inspectGrid=null; // {r,M}
-let _inspectRing=null; // {r,M}
-let _glClickX=0,_glClickY=0; // mousedown pos for click-vs-drag detection
+let _inspectGridPts=[];  // array of {r,M}
+let _inspectRingPts=[];  // array of {r,M}
+let _glClickX=0,_glClickY=0;
 let _rClickX=0,_rClickY=0;
+
+function prevSatN(n){
+  // Jump to the n just BEFORE the current saturation count decreases
+  let prev=0;
+  for(const p of PRIMES){if(p-1>=n)break;prev=p-1;}
+  return prev;
+}
+
+function clearInspectPoints(){
+  _inspectRingPts=[];_inspectGridPts=[];
+  _updateInspectTable();
+  renderRing();renderGrid();
+}
 
 function toggleInspect(){
   inspectMode=document.getElementById('inspect-cb').checked;
-  if(!inspectMode){_inspectGrid=null;_inspectRing=null;}
+  if(!inspectMode){_inspectRingPts=[];_inspectGridPts=[];}
   glCV.style.cursor=inspectMode?'crosshair':'grab';
   ringCV.style.cursor=inspectMode?'crosshair':'grab';
+  _updateInspectTable();
   renderGrid();renderRing();
+}
+
+// Add or remove a ring point (toggle if same point clicked again)
+function _addRingInspectPt(r,M){
+  const idx=_inspectRingPts.findIndex(p=>p.r===r&&p.M===M);
+  if(idx>=0)_inspectRingPts.splice(idx,1);
+  else _inspectRingPts.push({r,M});
+  _updateInspectTable();
+  renderRing();
+}
+function _addGridInspectPt(r,M){
+  const idx=_inspectGridPts.findIndex(p=>p.r===r&&p.M===M);
+  if(idx>=0)_inspectGridPts.splice(idx,1);
+  else _inspectGridPts.push({r,M});
+  renderGrid();
+}
+
+// Update the inspect table below the ring canvas
+function _updateInspectTable(){
+  const sec=document.getElementById('ring-inspect-section');
+  const tbody=document.getElementById('inspect-tbody');
+  const cnt=document.getElementById('inspect-count');
+  if(!sec||!tbody||!cnt)return;
+  const n=getRingN();
+  sec.style.display=(inspectMode&&_inspectRingPts.length>0)?'block':'none';
+  cnt.textContent=_inspectRingPts.length;
+  if(!_inspectRingPts.length){tbody.innerHTML='';return;}
+  const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
+  tbody.innerHTML=_inspectRingPts.map(({r,M},i)=>{
+    const{ok,ff,fp}=_ringCell(r,M,n);
+    const frac=(r/M).toFixed(4);
+    const col=COLS[i%COLS.length];
+    const status=ok?`<span class="ipt-pass">pass</span>`:`<span class="ipt-fail">fail</span>`;
+    const failure=ok?'—':`j=${ff}, p=${fp}`;
+    return `<tr>
+      <td><span class="ipt-num" style="background:${col}22;color:${col};border:1px solid ${col}55;">${i+1}</span></td>
+      <td style="color:var(--cream)">${M}</td>
+      <td style="color:var(--cream)">${r}</td>
+      <td style="color:var(--cream3)">${frac}</td>
+      <td>${status}</td>
+      <td style="color:var(--cream3);font-size:8px;">${failure}</td>
+      <td><button class="ipt-rm" onclick="_addRingInspectPt(${r},${M})" title="Remove">x</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Grid inspect overlay ──
+function drawGridInspect(lctx,cW,cH){
+  if(!_inspectGridPts.length)return;
+  const G=getGridG();const gridN=getGridN();
+  const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
+  const cellW=cW/G*glZoom,cellH=cH/G*glZoom;
+  const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
+  _inspectGridPts.forEach(({r,M},idx)=>{
+    if(r<1||r>G||M<1||M>G)return;
+    const px=((r-.5)/G-x0)*cW*glZoom;
+    const py=cH-((M-.5)/G-y0)*cH*glZoom;
+    const col=COLS[idx%COLS.length];
+    let ok=true,ff=-1,fp=0;
+    for(let j=0;j<=gridN&&ok;j++){const g=gcd(r,M+j);if(g>1){ok=false;ff=j;fp=spf(g);}}
+    // Crosshair (only for first point)
+    if(idx===0){
+      lctx.save();lctx.strokeStyle='rgba(61,200,184,.35)';lctx.lineWidth=1;lctx.setLineDash([4,4]);
+      lctx.beginPath();lctx.moveTo(0,py);lctx.lineTo(cW,py);lctx.moveTo(px,0);lctx.lineTo(px,cH);lctx.stroke();
+      lctx.restore();
+    }
+    // Cell fill
+    lctx.fillStyle=col+'22';
+    lctx.fillRect(px-cellW/2,py-cellH/2,cellW,cellH);
+    // Cell circle
+    const circR=Math.max(Math.min(cellW,cellH)*.46,5);
+    lctx.strokeStyle=col;lctx.lineWidth=2;
+    lctx.beginPath();lctx.arc(px,py,circR,0,Math.PI*2);lctx.stroke();
+    // Number badge
+    lctx.fillStyle=col+'dd';lctx.font=`bold ${Math.max(7,circR*.8)}px "JetBrains Mono",monospace`;
+    lctx.textAlign='center';lctx.textBaseline='middle';lctx.fillText(idx+1,px,py);
+    lctx.textBaseline='alphabetic';
+    // Label
+    const lbl=`r=${r} M=${M}  ${ok?'pass':('j='+ff)}`;
+    const lx=Math.max(circR+2,Math.min(cW-60,px));
+    const ly=py-circR-10 < 10 ? py+circR+12 : py-circR-10;
+    lctx.fillStyle='rgba(4,4,13,.8)';
+    const lw=lctx.measureText(lbl).width+10;
+    lctx.fillRect(lx-lw/2,ly-9,lw,14);
+    lctx.fillStyle=col;lctx.font=`8px "JetBrains Mono",monospace`;lctx.textAlign='center';
+    lctx.fillText(lbl,lx,ly+1);
+  });
+}
+
+// ── Ring inspect overlay ──
+function drawRingInspect(ctx,cW,cH){
+  if(!_inspectRingPts.length)return;
+  const n=getRingN();
+  const mMax=parseInt(document.getElementById('ring-max').value)||60;
+  const R=Math.min(cW,cH)*0.44*rZoom;
+  const cx=cW/2+rPanX,cy=cH/2+rPanY;
+  const dotSz=Math.max(1.5,parseFloat(document.getElementById('ring-dot').value)||1);
+  const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
+  // Center origin dot
+  ctx.fillStyle='rgba(200,168,74,.5)';
+  ctx.beginPath();ctx.arc(cx,cy,3.5,0,Math.PI*2);ctx.fill();
+  // Draw each inspected point
+  _inspectRingPts.forEach(({r,M},idx)=>{
+    if(M<2||M>mMax)return;
+    const{ok,ff,fp}=_ringCell(r,M,n);
+    const rho=(M/mMax)*R;
+    const angle=-2*Math.PI*r/M;
+    const dotX=cx+rho*Math.cos(angle);
+    const dotY=cy+rho*Math.sin(angle);
+    const col=COLS[idx%COLS.length];
+    // Ring circle (only if M is unique among points so far)
+    const isFirstM=!_inspectRingPts.slice(0,idx).some(p=>p.M===M);
+    if(isFirstM){
+      ctx.save();ctx.strokeStyle=col+'60';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      ctx.beginPath();ctx.arc(cx,cy,rho,0,Math.PI*2);ctx.stroke();ctx.restore();
+    }
+    // Radial spoke
+    ctx.strokeStyle=col+'aa';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(dotX,dotY);ctx.stroke();
+    // Glow
+    ctx.strokeStyle=col+'30';ctx.lineWidth=dotSz*2+10;
+    ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+8,0,Math.PI*2);ctx.stroke();
+    // Dot circle
+    ctx.strokeStyle=col;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(dotX,dotY,dotSz*2+5,0,Math.PI*2);ctx.stroke();
+    // Number badge
+    ctx.fillStyle=col+'ee';ctx.font=`bold 8px "JetBrains Mono",monospace`;
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(idx+1,dotX,dotY);ctx.textBaseline='alphabetic';
+    // Label
+    const lx=dotX+(dotX>cx?12:-12);const ly=dotY+(dotY>cy?-12:12);
+    const status=ok?'pass':`j=${ff} p=${fp}`;
+    const lbl=`M=${M} r=${r}`;
+    ctx.font=`bold 8.5px "JetBrains Mono",monospace`;ctx.textAlign=dotX>cx?'left':'right';
+    const lw=Math.max(ctx.measureText(lbl).width,ctx.measureText(status).width)+14;
+    ctx.fillStyle='rgba(4,4,13,.85)';
+    ctx.fillRect(dotX>cx?lx-4:lx-lw,ly-22,lw,26);
+    ctx.strokeStyle=col+'55';ctx.lineWidth=1;
+    ctx.strokeRect(dotX>cx?lx-4:lx-lw,ly-22,lw,26);
+    ctx.fillStyle=col;ctx.fillText(lbl,lx,ly-11);
+    ctx.font=`8px "JetBrains Mono",monospace`;
+    ctx.fillStyle=ok?'rgba(61,200,184,.9)':'rgba(255,120,120,.9)';ctx.fillText(status,lx,ly+1);
+  });
 }
 
 // ── Grid inspect overlay (drawn on cv-gl-lbl) ──
@@ -1468,20 +1724,21 @@ function renderGrid(){
     if(lblCV){const lctx=lblCV.getContext('2d');lctx.clearRect(0,0,lblCV.width,lblCV.height);}
   }
 
-  // Inspect overlay — always draw on top of label canvas when inspect mode active
-  if(inspectMode){
+  // Inspect + barrier overlay — always evaluate on label canvas
+  const _needOverlay=(_inspectGridPts.length>0)||(document.getElementById('grid-barriers')&&document.getElementById('grid-barriers').checked);
+  if(_needOverlay){
     const lblCV=document.getElementById('cv-gl-lbl');
     if(lblCV){
       const wrap=document.getElementById('cv-gl-wrap');
       const cW=Math.max(1,wrap.clientWidth),cH=Math.max(1,wrap.clientHeight);
       const dpr=Math.min(devicePixelRatio||1,2);
-      // Only re-size if not already sized (avoid clearing labels drawn above)
       if(lblCV.width!==Math.round(cW*dpr)||lblCV.height!==Math.round(cH*dpr)){
         lblCV.width=Math.round(cW*dpr);lblCV.height=Math.round(cH*dpr);
       }
       const lctx=lblCV.getContext('2d');
       lctx.setTransform(dpr,0,0,dpr,0,0);
       drawGridInspect(lctx,cW,cH);
+      drawGridBarriers(lctx,cW,cH);
     }
   }
 
@@ -1571,12 +1828,10 @@ window.addEventListener('mouseup',e=>{
       if(e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
         const mx=(e.clientX-rect.left)/rect.width;
         const my=1-(e.clientY-rect.top)/rect.height;
-        const u=glPanU+(mx-.5)/glZoom;
-        const v=glPanV+(my-.5)/glZoom;
+        const u=glPanU+(mx-.5)/glZoom,v=glPanV+(my-.5)/glZoom;
         const G=getGridG();
-        const r=Math.round(u*G);
-        const M=Math.round(v*G);
-        if(r>=1&&r<=G&&M>=1&&M<=G)_inspectGrid={r,M};
+        const r=Math.round(u*G),M=Math.round(v*G);
+        if(r>=1&&r<=G&&M>=1&&M<=G)_addGridInspectPt(r,M);
       }
     }
     renderGrid();
@@ -1817,7 +2072,7 @@ function renderRing(){
   const ctx=ringCtx;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const{rho2}=drawRingImpl(ctx,cW,cH,rZoom,rPanX,rPanY);
-  if(inspectMode)drawRingInspect(ctx,cW,cH);
+  if(_inspectRingPts.length>0)drawRingInspect(ctx,cW,cH);
   const mMax=parseInt(document.getElementById('ring-max').value)||60;
   const ringN=getRingN();
   const theory=(getCn(ringN)/ZETA2).toFixed(4);
@@ -1841,32 +2096,34 @@ window.addEventListener('mousemove',e=>{
   }
   showRingTip(e);
 });
+// Shared ring inspect click handler (called from both mouseup and touchend)
+function _handleRingInspectClick(clientX,clientY){
+  const rect=ringCV.getBoundingClientRect();
+  if(clientX<rect.left||clientX>rect.right||clientY<rect.top||clientY>rect.bottom)return;
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const cW=Math.max(1,ringCV.width)/dpr,cH=Math.max(1,ringCV.height)/dpr;
+  const R=Math.min(cW,cH)*0.44*rZoom;
+  const cx=cW/2+rPanX,cy=cH/2+rPanY;
+  const mx=(clientX-rect.left)*(Math.max(1,ringCV.width)/Math.max(1,rect.width))/dpr;
+  const my=(clientY-rect.top)*(Math.max(1,ringCV.height)/Math.max(1,rect.height))/dpr;
+  const dx=mx-cx,dy=my-cy;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const mMax=parseInt(document.getElementById('ring-max').value)||60;
+  const M=Math.round((dist/R)*mMax);
+  if(M>=2&&M<=mMax){
+    const theta=Math.atan2(-dy,dx);
+    const frac=((theta/(2*Math.PI))+1)%1;
+    const r=Math.round(frac*M);
+    if(r>=1&&r<M)_addRingInspectPt(r,M);
+  }
+}
+
 window.addEventListener('mouseup',e=>{
   if(rDragging){
     const wasDrag=Math.hypot(e.clientX-_rClickX,e.clientY-_rClickY)>4;
     rDragging=false;
     ringCV.style.cursor=inspectMode?'crosshair':'';
-    if(inspectMode&&!wasDrag){
-      const rect=ringCV.getBoundingClientRect();
-      if(e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
-        const dpr=Math.min(devicePixelRatio||1,2);
-        const cW=Math.max(1,ringCV.width)/dpr,cH=Math.max(1,ringCV.height)/dpr;
-        const R=Math.min(cW,cH)*0.44*rZoom;
-        const cx=cW/2+rPanX,cy=cH/2+rPanY;
-        const mx=(e.clientX-rect.left)*(Math.max(1,ringCV.width)/Math.max(1,rect.width))/dpr;
-        const my=(e.clientY-rect.top)*(Math.max(1,ringCV.height)/Math.max(1,rect.height))/dpr;
-        const dx=mx-cx,dy=my-cy;
-        const dist=Math.sqrt(dx*dx+dy*dy);
-        const mMax=parseInt(document.getElementById('ring-max').value)||60;
-        const M=Math.round((dist/R)*mMax);
-        if(M>=2&&M<=mMax){
-          const theta=Math.atan2(-dy,dx);
-          const frac=((theta/(2*Math.PI))+1)%1;
-          const r=Math.round(frac*M);
-          if(r>=1&&r<M)_inspectRing={r,M};
-        }
-      }
-    }
+    if(inspectMode&&!wasDrag)_handleRingInspectClick(e.clientX,e.clientY);
     renderRing();
   }
 });
@@ -1895,7 +2152,18 @@ ringCV.addEventListener('touchmove',e=>{
     _rTX=tx;_rTY=ty; renderRing();
   }
 },{passive:false});
-ringCV.addEventListener('touchend',()=>{_rTouchDist=0;});
+ringCV.addEventListener('touchend',e=>{
+  const wasDrag=_rTouchDist>0||Math.hypot(
+    (e.changedTouches[0]?.clientX||_rTX)-_rTX,
+    (e.changedTouches[0]?.clientY||_rTY)-_rTY
+  )>10;
+  _rTouchDist=0;
+  // On Android, e.preventDefault() in touchstart blocks synthesized mouse events,
+  // so we must handle inspect taps directly in touchend.
+  if(inspectMode&&!wasDrag&&e.changedTouches.length===1){
+    _handleRingInspectClick(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+  }
+});
 
 function showRingTip(e){
   const rect=ringCV.getBoundingClientRect();
@@ -2263,6 +2531,7 @@ function _updateUIAnimFrame(){
   if(pills)pills.innerHTML=PRIMES.slice(0,30).map(p=>`<div class="pill ${p<=n+1?'sat':'act'}">${p}</div>`).join('');
   _lastRenderKey='';
   drawChart();
+  drawConvergenceChart();
   renderGrid();
   renderRing();
 }
@@ -2295,14 +2564,18 @@ function exportChartPNG(){
   const cv=document.createElement('canvas');cv.width=EW;cv.height=EH;
   const ctx=cv.getContext('2d');
   const hH=64;
+  const isParch=document.body.classList.contains('parchment');
+  const bg=isParch?'#f5f0e8':'#04040d';
+  const textCol=isParch?'#1c1510':'#c8a84a';
+  const subCol=isParch?'#6a5038':'#6a6560';
   // Header
-  ctx.fillStyle='#04040d';ctx.fillRect(0,0,EW,EH);
-  ctx.fillStyle='rgba(200,168,74,.08)';ctx.fillRect(0,0,EW,hH);
-  ctx.fillStyle='rgba(200,168,74,.25)';ctx.fillRect(0,hH-1,EW,1);
+  ctx.fillStyle=bg;ctx.fillRect(0,0,EW,EH);
+  ctx.fillStyle=isParch?'rgba(110,80,40,.07)':'rgba(200,168,74,.08)';ctx.fillRect(0,0,EW,hH);
+  ctx.fillStyle=isParch?'rgba(110,80,40,.2)':'rgba(200,168,74,.25)';ctx.fillRect(0,hH-1,EW,1);
   ctx.font=`bold 18px 'JetBrains Mono',monospace`;
-  ctx.fillStyle='#c8a84a';ctx.textAlign='left';
+  ctx.fillStyle=textCol;ctx.textAlign='left';
   ctx.fillText(`C(n) vs n  ·  n = ${N}  ·  C(${N}) = ${_cn[N].toFixed(8)}`,40,40);
-  ctx.font=`13px 'JetBrains Mono',monospace`;ctx.fillStyle='#6a6560';ctx.textAlign='right';
+  ctx.font=`13px 'JetBrains Mono',monospace`;ctx.fillStyle=subCol;ctx.textAlign='right';
   ctx.fillText('Wessen Getachew · wessengetachew.github.io  ·  '+new Date().toLocaleDateString(),EW-40,40);
   // Chart
   const opts={
@@ -2826,6 +3099,7 @@ function updateUI(){
   buildPrimeTable();
   drawChart();
   buildDataTable();
+  drawConvergenceChart();
   _lastRenderKey=''; // force density recompute
   renderGrid();
   renderRing();
@@ -2898,6 +3172,320 @@ ro.observe(document.getElementById('cv-ring-wrap'));
 // ══════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+//  FEATURE 1 — THREE.JS HERO TORUS
+// ══════════════════════════════════════════════════════════
+function initHeroThree(){
+  const cv=document.getElementById('hero-3d');
+  if(!cv||!window.THREE)return;
+  const hero=document.getElementById('hero');
+  const W=Math.max(hero.clientWidth,200),H=Math.max(hero.clientHeight,160);
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(55,W/H,0.1,100);
+  cam.position.set(0,0,6.5);
+  const renderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+  renderer.setSize(W,H,false);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setClearColor(0x000000,0);
+
+  // Outer gold wireframe torus
+  const g1=new THREE.TorusGeometry(2.2,0.55,64,160);
+  const m1=new THREE.MeshBasicMaterial({color:0xc8a84a,wireframe:true,transparent:true,opacity:.32});
+  const t1=new THREE.Mesh(g1,m1);
+  scene.add(t1);
+
+  // Inner teal torus, perpendicular
+  const g2=new THREE.TorusGeometry(1.1,0.28,32,80);
+  const m2=new THREE.MeshBasicMaterial({color:0x3dc8b8,wireframe:true,transparent:true,opacity:.22});
+  const t2=new THREE.Mesh(g2,m2);
+  t2.rotation.x=Math.PI/2;
+  scene.add(t2);
+
+  // Tiny orbit ring
+  const g3=new THREE.TorusGeometry(3.2,0.08,8,80);
+  const m3=new THREE.MeshBasicMaterial({color:0xc8a84a,wireframe:false,transparent:true,opacity:.12});
+  const t3=new THREE.Mesh(g3,m3);
+  t3.rotation.x=Math.PI/3;
+  scene.add(t3);
+
+  let raf;
+  function animate(){
+    raf=requestAnimationFrame(animate);
+    t1.rotation.x+=0.0025;t1.rotation.y+=0.0040;
+    t2.rotation.y+=0.0055;t2.rotation.z+=0.0020;
+    t3.rotation.z+=0.0012;t3.rotation.x+=0.0008;
+    renderer.render(scene,cam);
+  }
+  animate();
+
+  // Pause when hero off-screen to save CPU
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(entries=>{
+      entries[0].isIntersecting ? animate() : (cancelAnimationFrame(raf),raf=null);
+    },{threshold:0.01});
+    io.observe(hero);
+  }
+
+  // Responsive resize
+  const ro2=new ResizeObserver(()=>{
+    const w=Math.max(hero.clientWidth,200),h=Math.max(hero.clientHeight,160);
+    cam.aspect=w/h;cam.updateProjectionMatrix();
+    renderer.setSize(w,h,false);
+  });
+  ro2.observe(hero);
+}
+
+// ══════════════════════════════════════════════════════════
+//  FEATURE 2 — PARCHMENT THEME TOGGLE
+// ══════════════════════════════════════════════════════════
+let _parchment=false;
+function toggleTheme(){
+  _parchment=!_parchment;
+  document.body.classList.toggle('parchment',_parchment);
+  document.getElementById('theme-btn').textContent=_parchment?'Dark':'Parchment';
+  renderGrid();renderRing();drawConvergenceChart();
+}
+
+function toggleFullscreen(){
+  const btn=document.getElementById('fs-btn');
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+    btn.textContent='Exit Full';btn.classList.add('active');
+  }else{
+    document.exitFullscreen().catch(()=>{});
+    btn.textContent='Full';btn.classList.remove('active');
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const btn=document.getElementById('fs-btn');
+  if(!btn)return;
+  if(!document.fullscreenElement){btn.textContent='Full';btn.classList.remove('active');}
+  else{btn.textContent='Exit Full';btn.classList.add('active');}
+});
+
+// ══════════════════════════════════════════════════════════
+//  FEATURE 3 — GRID BARRIER PATHS (Farey fraction strata)
+// ══════════════════════════════════════════════════════════
+function drawGridBarriers(lctx,cW,cH){
+  const el=document.getElementById('grid-barriers');
+  if(!el||!el.checked)return;
+  const G=getGridG();
+  const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
+  // Farey fractions: lines of constant r/M = k, drawn in (r/G, M/G) space
+  const barriers=[
+    {k:1/2,c:'rgba(200,168,74,.45)',lbl:'½'},
+    {k:1/3,c:'rgba(61,200,184,.35)',lbl:'⅓'},
+    {k:2/3,c:'rgba(61,200,184,.35)',lbl:'⅔'},
+    {k:1/4,c:'rgba(155,127,232,.30)',lbl:'¼'},
+    {k:3/4,c:'rgba(155,127,232,.30)',lbl:'¾'},
+    {k:1/5,c:'rgba(200,168,74,.20)',lbl:'⅕'},
+    {k:2/5,c:'rgba(200,168,74,.20)',lbl:'⅖'},
+    {k:3/5,c:'rgba(200,168,74,.20)',lbl:'⅗'},
+    {k:4/5,c:'rgba(200,168,74,.20)',lbl:'⅘'},
+  ];
+  // Also draw r=(M+1)/2 and r=(M-1)/2 (barrier paths from lift theorem)
+  // These are lines r/G = (M/G ± 1/G)/2 ≈ M/(2G), essentially r/M=1/2 offset by ±1/(2M)
+  // They appear as the same k=1/2 line shifted by a pixel — draw them dashed
+  lctx.save();
+  barriers.forEach(({k,c,lbl})=>{
+    // Line: u = k*v in normalized space (r/G = k * M/G)
+    const vA=Math.max(0,y0), vB=Math.min(1,y0+1/glZoom);
+    const uA=k*vA, uB=k*vB;
+    if(uB<x0||uA>x0+1/glZoom)return;
+    const px1=(uA-x0)*cW*glZoom, py1=cH-(vA-y0)*cH*glZoom;
+    const px2=(uB-x0)*cW*glZoom, py2=cH-(vB-y0)*cH*glZoom;
+    lctx.strokeStyle=c;lctx.lineWidth=1.2;
+    lctx.beginPath();lctx.moveTo(px1,py1);lctx.lineTo(px2,py2);lctx.stroke();
+    // Label near middle-right
+    const mx=(px1+px2)/2,my=(py1+py2)/2;
+    if(mx>8&&mx<cW-8&&my>8&&my<cH-8){
+      lctx.fillStyle=c;lctx.font='9px "JetBrains Mono",monospace';lctx.textAlign='left';
+      lctx.fillText(lbl,mx+3,my-2);
+    }
+  });
+  // Barrier pair: r=(M±1)/2 (dashed offset lines around k=1/2)
+  [{k:1/2,off:1},{k:1/2,off:-1}].forEach(({k,off})=>{
+    // Slight pixel offset in screen space from the k=1/2 line
+    const vA=Math.max(0,y0),vB=Math.min(1,y0+1/glZoom);
+    const uA=k*vA+off/(2*G),uB=k*vB+off/(2*G);
+    const px1=(uA-x0)*cW*glZoom,py1=cH-(vA-y0)*cH*glZoom;
+    const px2=(uB-x0)*cW*glZoom,py2=cH-(vB-y0)*cH*glZoom;
+    lctx.strokeStyle='rgba(200,168,74,.55)';lctx.lineWidth=1;lctx.setLineDash([3,3]);
+    lctx.beginPath();lctx.moveTo(px1,py1);lctx.lineTo(px2,py2);lctx.stroke();
+    lctx.setLineDash([]);
+  });
+  lctx.restore();
+}
+
+// ══════════════════════════════════════════════════════════
+//  FEATURE 4 — EULER PRODUCT CONVERGENCE CHART
+// ══════════════════════════════════════════════════════════
+let _eulerAnimTO=null,_eulerStep=0;
+
+function drawConvergenceChart(highlightStep=-1, targetCV=null){
+  const cv=targetCV||document.getElementById('euler-cv');
+  if(!cv)return;
+  const W=Math.max(1,(targetCV?targetCV.width:0)||cv.clientWidth||600);
+  const H=Math.max(1,(targetCV?targetCV.height:0)||cv.clientHeight||240);
+  const dpr=targetCV?1:Math.min(devicePixelRatio||1,2);
+  const nW=Math.round(W*dpr),nH=Math.round(H*dpr);
+  if(!targetCV&&(cv.width!==nW||cv.height!==nH)){cv.width=nW;cv.height=nH;}
+  const ctx=cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const isDark=!document.body.classList.contains('parchment');
+
+  const n=N;
+  const numP=parseInt(document.getElementById('euler-nprimes')?document.getElementById('euler-nprimes').value:30)||30;
+  const primes=PRIMES.slice(0,numP);
+  const Cn=getCn(n),Dn=Cn/ZETA2;
+  const pad={l:54,r:16,t:24,b:36};
+  const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+
+  // Background
+  ctx.fillStyle=isDark?'#04040d':'#1c1808';ctx.fillRect(0,0,W,H);
+
+  // Compute partial C(n) products
+  const partials=[ZETA2]; // C_0 = ζ(2) (just the prefix, before any prime factor)
+  let dprod=1.0;
+  for(const p of primes){
+    dprod*=1-Math.min(n+1,p)/(p*p);
+    partials.push(dprod*ZETA2);
+  }
+
+  const yMin=Math.max(0,Dn*.6);
+  const yMax=Math.min(ZETA2*1.08,1.68);
+  const toX=i=>pad.l+i/primes.length*cW;
+  const toY=v=>pad.t+cH-Math.max(0,Math.min(1,(v-yMin)/(yMax-yMin)))*cH;
+
+  // Subtle grid
+  ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+  for(let g=0;g<=4;g++){
+    const v=yMin+g*(yMax-yMin)/4;
+    const y=toY(v);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
+    ctx.fillStyle='rgba(200,200,200,.45)';ctx.font='7.5px "JetBrains Mono",monospace';
+    ctx.textAlign='right';ctx.fillText(v.toFixed(3),pad.l-3,y+3);
+  }
+
+  // C(n) target line (gold)
+  const yCn=toY(Cn);
+  ctx.strokeStyle='rgba(200,168,74,.65)';ctx.lineWidth=1.5;ctx.setLineDash([7,4]);
+  ctx.beginPath();ctx.moveTo(pad.l,yCn);ctx.lineTo(pad.l+cW,yCn);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(200,168,74,.85)';ctx.font='bold 8px "JetBrains Mono",monospace';
+  ctx.textAlign='left';ctx.fillText(`C(${n})=${Cn.toFixed(4)}`,pad.l+4,yCn-4);
+
+  // ζ(2) start line (faint)
+  const yZ2=toY(ZETA2);
+  if(yZ2>=pad.t&&yZ2<=pad.t+cH){
+    ctx.strokeStyle='rgba(200,200,200,.15)';ctx.lineWidth=1;ctx.setLineDash([3,5]);
+    ctx.beginPath();ctx.moveTo(pad.l,yZ2);ctx.lineTo(pad.l+cW,yZ2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(200,200,200,.3)';ctx.font='7px "JetBrains Mono",monospace';
+    ctx.textAlign='left';ctx.fillText('ζ(2)',pad.l+3,yZ2-3);
+  }
+
+  // Saturation boundary
+  const firstActive=primes.findIndex(p=>p>n+1);
+  if(firstActive>=0){
+    const xSat=toX(firstActive);
+    ctx.strokeStyle='rgba(204,80,80,.35)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(xSat,pad.t);ctx.lineTo(xSat,pad.t+cH);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(204,80,80,.6)';ctx.font='7.5px "JetBrains Mono",monospace';
+    ctx.textAlign='left';ctx.fillText(`active→`,xSat+2,pad.t+9);
+    if(firstActive>0){ctx.textAlign='right';ctx.fillText(`sat←`,xSat-2,pad.t+9);}
+  }
+
+  // Bars
+  const lim=highlightStep>=0?Math.min(highlightStep+1,primes.length):primes.length;
+  for(let i=0;i<lim;i++){
+    const p=primes[i];
+    const isSat=p<=n+1;
+    const x0=toX(i),x1=toX(i+1),bW=x1-x0;
+    const yTop=toY(partials[i]),yBot=toY(partials[i+1]);
+    const base=toY(Math.max(yMin,0));
+    const col=isSat?[204,80,80]:[61,200,184];
+
+    // Bar fill from yBot to yTop (area under step)
+    ctx.fillStyle=`rgba(${col.join(',')},${i===highlightStep?.28:.14})`;
+    ctx.fillRect(x0,yTop,bW,base-yTop);
+
+    // Horizontal step line
+    ctx.strokeStyle=`rgba(${col.join(',')},${i===highlightStep?1:.72})`;
+    ctx.lineWidth=i===highlightStep?2.5:1.5;
+    ctx.beginPath();ctx.moveTo(x0,yTop);ctx.lineTo(x1,yTop);ctx.stroke();
+
+    // Vertical drop
+    ctx.strokeStyle=`rgba(${col.join(',')},${i===highlightStep?.85:.35})`;
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x1,yTop);ctx.lineTo(x1,yBot);ctx.stroke();
+
+    // Highlight annotation
+    if(i===highlightStep){
+      const drop=((partials[i]-partials[i+1])/partials[i]*100).toFixed(2);
+      ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='bold 9px "JetBrains Mono",monospace';
+      ctx.textAlign='center';
+      const lx=Math.max(30,Math.min(cW+pad.l-40,(x0+x1)/2));
+      ctx.fillStyle='rgba(4,4,13,.82)';ctx.fillRect(lx-34,yBot-26,68,18);
+      ctx.fillStyle=isSat?'#ff8080':'#3dc8b8';
+      ctx.fillText(`p=${p}  −${drop}%`,lx,yBot-14);
+    }
+
+    // Prime label (every 5 or highlighted)
+    if(i%5===0||i===highlightStep||i===primes.length-1){
+      ctx.fillStyle='rgba(200,200,200,.4)';ctx.font='7px "JetBrains Mono",monospace';
+      ctx.textAlign='center';ctx.fillText(`${p}`,(x0+x1)/2,pad.t+cH+14);
+    }
+  }
+
+  // Axes
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+cH);
+  ctx.lineTo(pad.l+cW,pad.t+cH);ctx.stroke();
+
+  // Axis labels
+  ctx.fillStyle='rgba(200,200,200,.45)';ctx.font='7.5px "JetBrains Mono",monospace';
+  ctx.textAlign='center';ctx.fillText('prime  p',pad.l+cW/2,H-4);
+  ctx.save();ctx.translate(11,pad.t+cH/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('C(n) partial product',0,0);ctx.restore();
+
+  // Update summary labels
+  const curVal=partials[Math.min(lim,primes.length)];
+  const el1=document.getElementById('euler-cur-val');
+  const el2=document.getElementById('euler-target-val');
+  if(el1)el1.textContent=curVal!==undefined?curVal.toFixed(6):'—';
+  if(el2)el2.textContent=Cn.toFixed(6);
+}
+
+function toggleEulerAnim(){
+  if(_eulerAnimTO){
+    clearTimeout(_eulerAnimTO);_eulerAnimTO=null;
+    document.getElementById('euler-anim-btn').textContent='▶ Animate';
+    document.getElementById('euler-anim-frame').textContent='—';
+    drawConvergenceChart();
+    return;
+  }
+  _eulerStep=0;
+  document.getElementById('euler-anim-btn').textContent='■ Stop';
+  function step(){
+    const nP=parseInt(document.getElementById('euler-nprimes').value)||30;
+    drawConvergenceChart(_eulerStep);
+    const frEl=document.getElementById('euler-anim-frame');
+    if(frEl)frEl.textContent=`p=${PRIMES[_eulerStep]||'?'}`;
+    _eulerStep++;
+    if(_eulerStep<nP){
+      _eulerAnimTO=setTimeout(step,140);
+    }else{
+      _eulerAnimTO=null;
+      document.getElementById('euler-anim-btn').textContent='▶ Animate';
+      const frEl2=document.getElementById('euler-anim-frame');
+      if(frEl2)frEl2.textContent='converged';
+    }
+  }
+  step();
+}
+
 function init(){
   document.getElementById('cv-gl').style.height='60vh';
   document.getElementById('cv-ring').style.height='55vh';
@@ -2908,14 +3496,16 @@ function init(){
   }
   buildSteps();
   setupChartHover();
+  initHeroThree();
   setN(0);
+  drawConvergenceChart();
 }
 
 // ══════════════════════════════════════════════════════════
 //  EXPORT SYSTEM
 // ══════════════════════════════════════════════════════════
 let _emLayout='3main';
-const _emPanels={grid:true,ring:true,chart:true};
+const _emPanels={grid:true,ring:true,chart:true,euler:true};
 
 function openEM(){document.getElementById('em-overlay').classList.add('open');updateEMPreview();}
 function closeEM(){document.getElementById('em-overlay').classList.remove('open');}
@@ -2934,7 +3524,7 @@ function setEMLayout(l,btn){
 }
 
 function getSelectedPanels(){
-  const order=['chart','grid','ring'];
+  const order=['chart','euler','grid','ring'];
   return order.filter(p=>_emPanels[p]);
 }
 
@@ -2994,11 +3584,11 @@ function computeExportRegions(panels,x0,y0,W,H){
 // Render a panel to an offscreen canvas at W×H
 function renderPanelToCanvas(panel,W,H){
   if(panel==='grid'){
-    const cv=document.createElement('canvas');
-    cv.width=W;cv.height=H;
-    const g=cv.getContext('webgl2',{preserveDrawingBuffer:true});
+    const glcv=document.createElement('canvas');
+    glcv.width=W;glcv.height=H;
+    const g=glcv.getContext('webgl2',{preserveDrawingBuffer:true});
     if(!g){
-      const c2=cv.getContext('2d');c2.fillStyle='#04040d';c2.fillRect(0,0,W,H);return cv;
+      const c2=glcv.getContext('2d');c2.fillStyle='#04040d';c2.fillRect(0,0,W,H);return glcv;
     }
     const sh=(t,s)=>{const x=g.createShader(t);g.shaderSource(x,s);g.compileShader(x);return x;};
     const prog=g.createProgram();
@@ -3021,7 +3611,14 @@ function renderPanelToCanvas(panel,W,H){
     g.uniform1i(ul('u_G'),parseInt(document.getElementById('grid-g').value)||120);
     g.uniform1i(ul('u_cm'),getGlobalCM());
     g.drawArrays(g.TRIANGLE_STRIP,0,4);
-    return cv;
+    // Composite barrier paths on top (barriers use a separate Canvas2D pass)
+    const showBarriers=document.getElementById('grid-barriers')&&document.getElementById('grid-barriers').checked;
+    if(!showBarriers)return glcv;
+    const comp=document.createElement('canvas');comp.width=W;comp.height=H;
+    const cctx=comp.getContext('2d');
+    cctx.drawImage(glcv,0,0,W,H);
+    drawGridBarriers(cctx,W,H);
+    return comp;
   }
   if(panel==='ring'){
     const cv=document.createElement('canvas');cv.width=W;cv.height=H;
@@ -3042,6 +3639,11 @@ function renderPanelToCanvas(panel,W,H){
       xMax:     parseInt(document.getElementById('chart-xmax')?document.getElementById('chart-xmax').value:100)||100
     };
     drawChartImpl(cv.getContext('2d'),W,H,N,opts);
+    return cv;
+  }
+  if(panel==='euler'){
+    const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    drawConvergenceChart(-1,cv);
     return cv;
   }
   return null;
@@ -3076,7 +3678,7 @@ function updateEMPreview(){
   const panels=getSelectedPanels();
   const regs=computeExportRegions(panels,0,headerH,PW,panelH);
   const colors={grid:'rgba(200,168,74,.28)',ring:'rgba(61,200,184,.28)',chart:'rgba(155,127,232,.28)'};
-  const labels={grid:'Grid',ring:'Ring',chart:'Chart'};
+  const labels={grid:'Grid',ring:'Ring',chart:'Chart',euler:'Euler'};
   regs.forEach(r=>{
     ctx.fillStyle=colors[r.panel]||'rgba(100,100,100,.2)';
     ctx.fillRect(r.x+.5,r.y+.5,r.w-1,r.h-1);
@@ -3171,7 +3773,7 @@ async function doExport(){
   // ── PANELS ──
   const panels=getSelectedPanels();
   const regs=computeExportRegions(panels,0,headerH,eW,panelH);
-  const PANEL_NAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart'};
+  const PANEL_NAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart',euler:'Euler Convergence'};
   const PANEL_COLORS={grid:GOLD,ring:TEAL,chart:'#9b7fe8'};
 
   for(let i=0;i<regs.length;i++){
@@ -3601,8 +4203,8 @@ async function doExportWithPreview(){
     // Panels
     const panels=getSelectedPanels();
     const regs=computeExportRegions(panels,0,headerH,PW,panelH);
-    const PNAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart'};
-    const PCOLORS={grid:GOLD,ring:TEAL,chart:'#9b7fe8'};
+    const PNAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart',euler:'Euler Convergence'};
+    const PCOLORS={grid:GOLD,ring:TEAL,chart:'#9b7fe8',euler:'#f2c44a'};
     for(const reg of regs){
       await new Promise(r=>setTimeout(r,0));
       if(reg.w<2||reg.h<2)continue;
@@ -3691,6 +4293,7 @@ init();
         <button class="em-panel-btn grid-b on" id="emp-grid" onclick="toggleEMPanel('grid')">⊞ Grid</button>
         <button class="em-panel-btn ring-b on" id="emp-ring" onclick="toggleEMPanel('ring')">◎ Ring</button>
         <button class="em-panel-btn chart-b on" id="emp-chart" onclick="toggleEMPanel('chart')">∿ Chart</button>
+        <button class="em-panel-btn euler-b on" id="emp-euler" onclick="toggleEMPanel('euler')">∏ Euler</button>
       </div>
 
       <div class="em-sec">Layout</div>
