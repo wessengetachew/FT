@@ -795,9 +795,9 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <button class="cv-btn" id="grid-2x-btn" onclick="toggleCanvas2x('grid')" title="Double canvas height">⤢ 2×</button>
     <div class="cv-sep"></div>
     <span class="cv-lbl" style="color:var(--violet)">a/b rot:</span>
-    <input type="number" id="grid-rot-a" min="0" value="0" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="a in a/b × 360°">
+    <input type="number" id="grid-rot-a" min="0" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="a in a/b × 360°">
     <span class="cv-lbl">/</span>
-    <input type="number" id="grid-rot-b" min="1" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="b in a/b × 360°">
+    <input type="number" id="grid-rot-b" min="1" value="4" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="b in a/b × 360°">
   </div>
   <div class="cv-outer" id="cv-gl-wrap">
     <canvas id="cv-gl"></canvas>
@@ -830,7 +830,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     </label>
     <div class="cv-sep"></div>
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--cream2);">
-      <input type="checkbox" id="ring-labels" checked onchange="renderRing()" style="accent-color:var(--teal);">M labels
+      <input type="checkbox" id="ring-labels" onchange="renderRing()" style="accent-color:var(--teal);">M labels
     </label>
     <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--cream2);">
       <input type="checkbox" id="ring-circles" checked onchange="renderRing()" style="accent-color:var(--teal);">Circles
@@ -844,14 +844,17 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <input class="cv-sl" type="range" id="ring-zoom-sl" min="0" max="100" value="19" step="1" style="width:80px;" oninput="setRingZoom(_sliderToRingZoom(+this.value))">
     <button class="cv-btn" style="padding:2px 9px;font-size:14px;line-height:1;" onclick="setRingZoom(rZoom*1.5)" title="Zoom in">+</button>
     <span class="cv-lbl" id="ring-zoom-v" style="min-width:34px;text-align:right;color:var(--teal);">1.0×</span>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--violet);" title="Farey radial spokes + lift arcs on ring">
+      <input type="checkbox" id="ring-barriers" onchange="renderRing()" style="accent-color:var(--violet);">Barriers
+    </label>
     <div class="cv-sep"></div>
     <button class="cv-btn" onclick="resetRingView()">↺ Reset</button>
     <button class="cv-btn" id="ring-2x-btn" onclick="toggleCanvas2x('ring')" title="Double canvas height">⤢ 2×</button>
     <div class="cv-sep"></div>
     <span class="cv-lbl" style="color:var(--violet)">a/b rot:</span>
-    <input type="number" id="ring-rot-a" min="0" value="0" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderRing();" title="a in a/b × 360°">
+    <input type="number" id="ring-rot-a" min="0" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderRing();" title="a in a/b × 360°">
     <span class="cv-lbl">/</span>
-    <input type="number" id="ring-rot-b" min="1" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderRing();" title="b in a/b × 360°">
+    <input type="number" id="ring-rot-b" min="1" value="4" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderRing();" title="b in a/b × 360°">
   </div>
   <div class="cv-outer" id="cv-ring-wrap">
     <canvas id="cv-ring"></canvas>
@@ -2203,6 +2206,7 @@ function renderRing(){
   const ctx=ringCtx;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const{rho2}=drawRingImpl(ctx,cW,cH,rZoom,rPanX,rPanY);
+  drawRingBarriers(ctx,cW,cH);
   if(_inspectRingPts.length>0)drawRingInspect(ctx,cW,cH);
   const mMax=parseInt(document.getElementById('ring-max').value)||60;
   const ringN=getRingN();
@@ -3423,6 +3427,9 @@ function drawGridBarriers(lctx,cW,cH){
   // These are lines r/G = (M/G ± 1/G)/2 ≈ M/(2G), essentially r/M=1/2 offset by ±1/(2M)
   // They appear as the same k=1/2 line shifted by a pixel — draw them dashed
   lctx.save();
+  // Rotate overlay to match WebGL rotated grid
+  const gridRot=getGlobalRotGrid();
+  if(gridRot!==0){lctx.translate(cW/2,cH/2);lctx.rotate(gridRot);lctx.translate(-cW/2,-cH/2);}
   barriers.forEach(({k,c,lbl})=>{
     // Line: u = k*v in normalized space (r/G = k * M/G)
     const vA=Math.max(0,y0), vB=Math.min(1,y0+1/glZoom);
@@ -3450,12 +3457,143 @@ function drawGridBarriers(lctx,cW,cH){
     lctx.beginPath();lctx.moveTo(px1,py1);lctx.lineTo(px2,py2);lctx.stroke();
     lctx.setLineDash([]);
   });
+
+  // ── Saturation diagonal: r = M (k=1) — gcd(r,M)=M boundary ──
+  {
+    const vA=Math.max(0,y0),vB=Math.min(1,y0+1/glZoom);
+    const uA=vA,uB=vB;
+    const px1=(uA-x0)*cW*glZoom,py1=cH-(vA-y0)*cH*glZoom;
+    const px2=(uB-x0)*cW*glZoom,py2=cH-(vB-y0)*cH*glZoom;
+    lctx.strokeStyle='rgba(224,80,96,.35)';lctx.lineWidth=1;lctx.setLineDash([4,4]);
+    lctx.beginPath();lctx.moveTo(px1,py1);lctx.lineTo(px2,py2);lctx.stroke();
+    lctx.setLineDash([]);
+    const mx=(px1+px2)/2,my=(py1+py2)/2;
+    if(mx>4&&mx<cW-4&&my>4&&my<cH-4){
+      lctx.fillStyle='rgba(224,80,96,.5)';lctx.font='8px "JetBrains Mono",monospace';
+      lctx.textAlign='left';lctx.fillText('r=M',mx+3,my-2);
+    }
+  }
+
   lctx.restore();
 }
 
 // ══════════════════════════════════════════════════════════
-//  FEATURE 4 — EULER PRODUCT CONVERGENCE CHART
+//  RING BARRIERS — Farey spokes · lift arcs · Ford projections
 // ══════════════════════════════════════════════════════════
+function drawRingBarriers(ctx,cW,cH){
+  const el=document.getElementById('ring-barriers');
+  if(!el||!el.checked)return;
+  const mMax=getRingM();
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const R=Math.min(cW,cH)*0.44*rZoom;
+  const cx=cW/2+rPanX, cy=cH/2+rPanY;
+  const globalRot=getGlobalRotRing();
+
+  ctx.save();
+
+  // ── 1. Farey radial spokes at r/M = k ──
+  // Each spoke is a ray from center at angle θ = 2π·k + globalRot
+  const spokes=[
+    {k:1/2,  c:'rgba(200,168,74,.70)',  lbl:'½',  w:1.4},
+    {k:1/3,  c:'rgba(61,200,184,.55)',  lbl:'⅓',  w:1.1},
+    {k:2/3,  c:'rgba(61,200,184,.55)',  lbl:'⅔',  w:1.1},
+    {k:1/4,  c:'rgba(155,127,232,.55)', lbl:'¼',  w:1.1},
+    {k:3/4,  c:'rgba(155,127,232,.55)', lbl:'¾',  w:1.1},
+    {k:1/5,  c:'rgba(200,168,74,.30)',  lbl:'⅕',  w:.8},
+    {k:2/5,  c:'rgba(200,168,74,.30)',  lbl:'⅖',  w:.8},
+    {k:3/5,  c:'rgba(200,168,74,.30)',  lbl:'⅗',  w:.8},
+    {k:4/5,  c:'rgba(200,168,74,.30)',  lbl:'⅘',  w:.8},
+    {k:1/6,  c:'rgba(126,200,122,.25)', lbl:'⅙',  w:.6},
+    {k:5/6,  c:'rgba(126,200,122,.25)', lbl:'⅚',  w:.6},
+  ];
+  spokes.forEach(({k,c,lbl,w})=>{
+    const theta=2*Math.PI*k + globalRot;
+    const ex=cx+R*1.08*Math.cos(theta), ey=cy-R*1.08*Math.sin(theta);
+    ctx.strokeStyle=c; ctx.lineWidth=w; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(ex,ey); ctx.stroke();
+    ctx.setLineDash([]);
+    // Label at rim
+    if(R>40){
+      ctx.fillStyle=c; ctx.font=`bold 8px 'JetBrains Mono',monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      const lx=cx+R*1.16*Math.cos(theta), ly=cy-R*1.16*Math.sin(theta);
+      if(lx>4&&lx<cW-4&&ly>4&&ly<cH-4) ctx.fillText(lbl,lx,ly);
+    }
+  });
+
+  // ── 2. Lift-condition arcs: r=(M±1)/2  (the half-integer barrier) ──
+  // At each ring radius rho = (M/mMax)*R, mark the two points r=(M+1)/2 and r=(M-1)/2
+  // These trace a wobbling path near the θ=π spoke (k=1/2 sector boundary).
+  // Draw as a connected arc-curve through all M values.
+  [+1,-1].forEach(sign=>{
+    ctx.beginPath();
+    let first=true;
+    for(let M=2;M<=mMax;M++){
+      // Only valid when M is odd (so (M±1)/2 is an integer)
+      const rHalf=(M+sign)/2;
+      if(rHalf<1||rHalf>=M||Math.round(rHalf)!==rHalf)continue;
+      const rho=(M/mMax)*R;
+      const theta=2*Math.PI*rHalf/M + globalRot;
+      const x=cx+rho*Math.cos(theta), y=cy-rho*Math.sin(theta);
+      if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle='rgba(200,168,74,.65)';
+    ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+    ctx.stroke(); ctx.setLineDash([]);
+  });
+  // Label the lift arcs
+  if(R>60){
+    ctx.fillStyle='rgba(200,168,74,.7)'; ctx.font='7.5px "JetBrains Mono",monospace';
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    const theta0=2*Math.PI*(1/2) + globalRot;
+    ctx.fillText('lift r=(M±1)/2', cx+R*.55*Math.cos(theta0)+6, cy-R*.55*Math.sin(theta0)-6);
+  }
+
+  // ── 3. Ford-circle projections: tangency dots at Farey level ──
+  // For Farey fraction p/q, the Ford circle of radius 1/(2q²) is tangent to the real line.
+  // In our ring, project p/q to: angle θ=2π(p/q), radius = q/mMax · R (ring at M=q).
+  // Draw a small resonance circle at each Farey node — captures the Ford packing geometry.
+  const fareyFracs=[
+    {p:1,q:2},{p:1,q:3},{p:2,q:3},{p:1,q:4},{p:3,q:4},
+    {p:1,q:5},{p:2,q:5},{p:3,q:5},{p:4,q:5},
+    {p:1,q:6},{p:5,q:6},{p:1,q:7},{p:2,q:7},{p:3,q:7},{p:4,q:7},{p:5,q:7},{p:6,q:7},
+  ];
+  fareyFracs.forEach(({p,q})=>{
+    if(q>mMax)return;
+    const rho=(q/mMax)*R;
+    const theta=2*Math.PI*p/q + globalRot;
+    const x=cx+rho*Math.cos(theta), y=cy-rho*Math.sin(theta);
+    // Ford circle radius projected to screen: r_ford = R/(2*mMax*q²), scaled for visibility
+    const fordR=Math.max(2, R/(mMax*q*q)*mMax*.5);
+    ctx.strokeStyle='rgba(224,80,96,.75)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(x,y,fordR,0,2*Math.PI); ctx.stroke();
+    // Tangency line to outer boundary
+    if(fordR>4&&R>60){
+      ctx.strokeStyle='rgba(224,80,96,.20)'; ctx.lineWidth=.5; ctx.setLineDash([2,4]);
+      ctx.beginPath(); ctx.moveTo(x,y);
+      ctx.lineTo(cx+R*1.02*Math.cos(theta), cy-R*1.02*Math.sin(theta));
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+  });
+
+  // ── 4. Saturation ring: highlight the M = n+1 circle ──
+  // At M=n+1 all residues saturate; it's the critical orbit.
+  const n=getRingN();
+  if(n+1>=2&&n+1<=mMax){
+    const rhoSat=((n+1)/mMax)*R;
+    ctx.strokeStyle='rgba(224,80,96,.55)'; ctx.lineWidth=2; ctx.setLineDash([6,3]);
+    ctx.beginPath(); ctx.arc(cx,cy,rhoSat,0,2*Math.PI); ctx.stroke(); ctx.setLineDash([]);
+    if(R>50){
+      ctx.fillStyle='rgba(224,80,96,.7)'; ctx.font='bold 8px "JetBrains Mono",monospace';
+      ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.fillText(`M=n+1=${n+1} sat.`, cx+rhoSat+4, cy);
+    }
+  }
+
+  ctx.restore();
+}
+
+
 let _eulerAnimTO=null,_eulerStep=0;
 
 function drawConvergenceChart(highlightStep=-1, targetCV=null){
@@ -4512,4 +4650,4 @@ init();
 </div>
 
 </body>
-</html>
+  </html>
