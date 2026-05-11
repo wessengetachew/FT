@@ -191,9 +191,15 @@ canvas.chart-cv{display:block;width:100%;height:380px;}
 
 /* ── CANVAS SECTION ── */
 #s-canvas .cv-controls{
-  display:flex;flex-wrap:wrap;align-items:center;gap:8px;
-  margin-bottom:12px;padding:10px 14px;
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  margin-bottom:10px;padding:8px 10px;
   background:var(--bg2);border:1px solid var(--edge);
+}
+@media(max-width:500px){
+  #s-canvas .cv-controls{gap:5px 8px;padding:6px 8px;}
+  .cv-sep{display:none;} /* hide vertical separators on mobile — too narrow */
+  .cv-lbl{font-size:7.5px;}
+  select.cv-sel{font-size:8px;padding:3px 4px;}
 }
 .cv-btn{
   background:none;border:1px solid var(--edge2);color:var(--cream3);
@@ -210,9 +216,33 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 
 .cv-outer{position:relative;background:#030310;border:1px solid var(--edge);overflow:hidden;}
 .cv-outer canvas{display:block;width:100%;height:100%;}
-#cv-gl{height:60vh;min-height:420px;max-height:700px;cursor:grab;background:#04040d;}
-#cv-gl-wrap{aspect-ratio:1;max-height:80vh;height:auto!important;}
-#cv-ring{height:55vh;min-height:380px;max-height:650px;margin-top:20px;cursor:grab;background:#03030f;}
+
+/* Grid canvas — square driven by wrap width, no height on the canvas itself */
+#cv-gl{cursor:grab;background:#04040d;}
+#cv-gl-wrap{
+  aspect-ratio:1/1;
+  width:100%;
+  /* Clamp so it doesn't get absurdly large on big screens */
+  max-width:min(80vh, 900px);
+  height:auto!important;
+}
+
+/* Ring canvas — tall rectangle, scales with viewport */
+#cv-ring{cursor:grab;background:#03030f;}
+#cv-ring-wrap{
+  width:100%;
+  height:clamp(300px, 55vw, 650px);
+}
+
+/* Mobile overrides — phones ≤ 500px wide */
+@media(max-width:500px){
+  #cv-gl-wrap{
+    max-width:100%;  /* full width on phone */
+  }
+  #cv-ring-wrap{
+    height:clamp(260px, 90vw, 420px);
+  }
+}
 
 /* Canvas overlays */
 .cv-badge{
@@ -267,7 +297,7 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 #em-overlay.open{display:flex;}
 #em-box{
   background:var(--bg1);border:1px solid var(--edge2);
-  width:min(760px,95vw);max-height:90vh;overflow-y:auto;
+  width:min(840px,96vw);max-height:92vh;overflow-y:auto;
   box-shadow:0 16px 60px rgba(0,0,0,.9);
 }
 #em-box::-webkit-scrollbar{width:4px;}
@@ -290,23 +320,25 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 .em-chk{display:flex;align-items:center;gap:5px;font-size:8.5px;color:var(--cream2);cursor:pointer;white-space:nowrap;}
 .em-chk input{accent-color:var(--gold);cursor:pointer;}
 /* Layout selector */
-.em-layouts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px;}
+.em-layouts{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:4px;}
 .em-layout-btn{
-  border:1px solid var(--edge2);background:transparent;padding:6px 4px;cursor:pointer;
+  border:1px solid var(--edge2);background:transparent;padding:5px 3px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .12s;
 }
 .em-layout-btn:hover{border-color:var(--edge2);background:rgba(255,255,255,.03);}
 .em-layout-btn.on{border-color:rgba(200,168,74,.5);background:rgba(200,168,74,.08);}
-.em-layout-btn span{font-family:var(--mono);font-size:7.5px;color:var(--cream3);}
+.em-layout-btn span{font-family:var(--mono);font-size:7px;color:var(--cream3);}
 .em-layout-btn.on span{color:var(--gold);}
-.em-layout-thumb{width:44px;height:28px;background:var(--bg2);border:1px solid var(--edge);display:flex;gap:1px;padding:2px;}
+.em-layout-thumb{width:40px;height:26px;background:var(--bg2);border:1px solid var(--edge);display:flex;gap:1px;padding:2px;}
 /* Panel selection */
-.em-panels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px;}
+.em-panels{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px;}
 .em-panel-btn{
-  flex:1;padding:7px 6px;border:1px solid var(--edge2);background:transparent;
+  padding:7px 6px;border:1px solid var(--edge2);background:transparent;
   font-family:var(--mono);font-size:8px;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--cream3);cursor:pointer;text-align:center;transition:all .12s;min-width:70px;
+  color:var(--cream3);cursor:pointer;text-align:center;transition:all .12s;
 }
+.em-panel-btn:hover{border-color:var(--edge2);background:rgba(255,255,255,.03);}
+.em-panel-btn.on{color:var(--cream);}
 .em-panel-btn.on.grid-b{color:#c8a84a;border-color:rgba(200,168,74,.5);background:rgba(200,168,74,.08);}
 .em-panel-btn.on.ring-b{color:#3dc8b8;border-color:rgba(61,200,184,.4);background:rgba(61,200,184,.07);}
 .em-panel-btn.on.chart-b{color:#9b7fe8;border-color:rgba(155,127,232,.4);background:rgba(155,127,232,.07);}
@@ -1396,14 +1428,16 @@ function toggleCanvas2x(which){
   if(which==='grid'){
     _grid2x=!_grid2x;
     const wrap=document.getElementById('cv-gl-wrap');
-    wrap.style.aspectRatio=_grid2x?'2/1':'1';
-    wrap.style.maxHeight=_grid2x?'none':'80vh';
+    // 2x: switch to wide rectangle (2:1), normal: square (1:1)
+    wrap.style.aspectRatio=_grid2x?'2/1':'';
+    wrap.style.maxWidth=_grid2x?'min(160vh,1800px)':'';
     document.getElementById('grid-2x-btn').classList.toggle('on',_grid2x);
     renderGrid();
   } else {
     _ring2x=!_ring2x;
-    const cv=document.getElementById('cv-ring');
-    cv.style.height=_ring2x?'110vh':'55vh';
+    const wrap=document.getElementById('cv-ring-wrap');
+    // Double (or restore) the ring wrap height via inline override
+    wrap.style.height=_ring2x?'min(110vw, 1200px)':'';
     document.getElementById('ring-2x-btn').classList.toggle('on',_ring2x);
     renderRing();
   }
@@ -1535,48 +1569,6 @@ function _updateInspectTable(){
   }).join('');
 }
 
-// ── Grid inspect overlay ──
-function drawGridInspect(lctx,cW,cH){
-  if(!_inspectGridPts.length)return;
-  const G=getGridG();const gridN=getGridN();
-  const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
-  const cellW=cW/G*glZoom,cellH=cH/G*glZoom;
-  const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
-  _inspectGridPts.forEach(({r,M},idx)=>{
-    if(r<1||r>G||M<1||M>G)return;
-    const px=((r-.5)/G-x0)*cW*glZoom;
-    const py=cH-((M-.5)/G-y0)*cH*glZoom;
-    const col=COLS[idx%COLS.length];
-    let ok=true,ff=-1,fp=0;
-    for(let j=0;j<=gridN&&ok;j++){const g=gcd(r,M+j);if(g>1){ok=false;ff=j;fp=spf(g);}}
-    // Crosshair (only for first point)
-    if(idx===0){
-      lctx.save();lctx.strokeStyle='rgba(61,200,184,.35)';lctx.lineWidth=1;lctx.setLineDash([4,4]);
-      lctx.beginPath();lctx.moveTo(0,py);lctx.lineTo(cW,py);lctx.moveTo(px,0);lctx.lineTo(px,cH);lctx.stroke();
-      lctx.restore();
-    }
-    // Cell fill
-    lctx.fillStyle=col+'22';
-    lctx.fillRect(px-cellW/2,py-cellH/2,cellW,cellH);
-    // Cell circle
-    const circR=Math.max(Math.min(cellW,cellH)*.46,5);
-    lctx.strokeStyle=col;lctx.lineWidth=2;
-    lctx.beginPath();lctx.arc(px,py,circR,0,Math.PI*2);lctx.stroke();
-    // Number badge
-    lctx.fillStyle=col+'dd';lctx.font=`bold ${Math.max(7,circR*.8)}px "JetBrains Mono",monospace`;
-    lctx.textAlign='center';lctx.textBaseline='middle';lctx.fillText(idx+1,px,py);
-    lctx.textBaseline='alphabetic';
-    // Label
-    const lbl=`r=${r} M=${M}  ${ok?'pass':('j='+ff)}`;
-    const lx=Math.max(circR+2,Math.min(cW-60,px));
-    const ly=py-circR-10 < 10 ? py+circR+12 : py-circR-10;
-    lctx.fillStyle='rgba(4,4,13,.8)';
-    const lw=lctx.measureText(lbl).width+10;
-    lctx.fillRect(lx-lw/2,ly-9,lw,14);
-    lctx.fillStyle=col;lctx.font=`8px "JetBrains Mono",monospace`;lctx.textAlign='center';
-    lctx.fillText(lbl,lx,ly+1);
-  });
-}
 
 // ── Ring inspect overlay ──
 function drawRingInspect(ctx,cW,cH){
@@ -3534,7 +3526,7 @@ function drawRingBarriers(ctx,cW,cH){
   });
 
   // ── 4. Saturation ring: highlight the M = n+1 circle ──
-  // At M=n+1 all residues saturate; it's the critical orbit.
+  // At M=n+1 all residues saturate; this is the critical orbit.
   const n=getRingN();
   if(n+1>=2&&n+1<=mMax){
     const rhoSat=((n+1)/mMax)*R;
@@ -3714,112 +3706,236 @@ function drawGridPrimeSpiral(lctx,cW,cH){
 //  ALTERNATE GRID VIEW — Fermat (√M) and Farey strip
 // ══════════════════════════════════════════════════════════
 function renderGridAltView(){
-  // Used when view mode is "fermat" or "farey"
   const wrap=document.getElementById('cv-gl-wrap');
-  const cW=Math.max(1,wrap.clientWidth),cH=Math.max(1,wrap.clientHeight);
+  const cW=Math.max(1,wrap.clientWidth);
+  const cH=Math.max(1,wrap.clientHeight);
   const dpr=Math.min(devicePixelRatio||1,2);
-  const lblCV=document.getElementById('cv-gl-lbl');
-  lblCV.width=Math.round(cW*dpr);lblCV.height=Math.round(cH*dpr);
-  const lctx=lblCV.getContext('2d');
-  lctx.setTransform(dpr,0,0,dpr,0,0);
-  lctx.clearRect(0,0,cW,cH);
 
-  // Clear the WebGL canvas using WebGL (don't touch it with 2d context)
+  // Size and acquire the label canvas (we draw everything here for alt modes)
+  const lblCV=document.getElementById('cv-gl-lbl');
+  lblCV.width=Math.round(cW*dpr);
+  lblCV.height=Math.round(cH*dpr);
+  const ctx=lblCV.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  // Clear WebGL canvas to background (keep it live, don't steal its context)
   if(gl&&!gl.isContextLost()){
-    const{W,H}=sizeGLCanvas();
-    gl.viewport(0,0,W,H);gl.clearColor(0.016,0.016,0.04,1);gl.clear(gl.COLOR_BUFFER_BIT);
+    try{
+      const{W,H}=sizeGLCanvas();
+      gl.viewport(0,0,W,H);
+      gl.clearColor(0.016,0.016,0.051,1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    }catch(e){}
   }
-  // Use the label canvas for alt-view rendering
+
   const viewMode=document.getElementById('grid-view-mode')?.value||'euclidean';
   const G=getGridG();
-  const gridN=getGridN();
+  const n=getGridN();
   const cm=getGlobalCM();
-  const pad=36;
-  const xSc=(cW-2*pad)/G, ySc=(cH-2*pad)/G;
 
-  lctx.fillStyle='#04040d';lctx.fillRect(0,0,cW,cH);
+  // ── Padding and plot area ──────────────────────────────────────────
+  // We want a true square plot area centred in the canvas.
+  // The canvas itself is square (aspect-ratio:1 in CSS) but we still
+  // leave a left/right margin for axis labels.
+  const PAD_L=38, PAD_R=14, PAD_T=14, PAD_B=30;
+  const PW=cW-PAD_L-PAD_R;  // plot width  (fills the canvas)
+  const PH=cH-PAD_T-PAD_B;  // plot height (fills the canvas)
+  const PX=PAD_L, PY=PAD_T; // top-left of plot area
 
-  // Helper: map (r,M) to canvas (px,py)
-  function toXY(r,M){
-    if(viewMode==='fermat'){
-      // x = r / G (linear), y = sqrt(M)/sqrt(G) (compressed)
-      const x=pad+((r-1)/G)*(cW-2*pad);
-      const y=cH-pad-(Math.sqrt(M)/Math.sqrt(G))*(cH-2*pad);
-      return{x,y};
-    } else {
-      // farey: x = r/M, y = 1/M (Ford/Farey)
-      const x=pad+(r/M)*(cW-2*pad);
-      const y=cH-pad-(1/M*G)*(cH-2*pad)/2;
-      return{x,y};
+  // ── Background ────────────────────────────────────────────────────
+  ctx.fillStyle='#04040d';
+  ctx.fillRect(0,0,cW,cH);
+
+  // ── Colour helper (same logic as WebGL shader) ─────────────────────
+  function cellColor(ok,copM,r,M){
+    if(cm===0) return ok?'#c8a84a':copM?'#3dc8b8':'#111120';
+    if(cm===1) return ok?'#c8a84a':'#cc3a3a';
+    if(cm===2){
+      if(!ok){const p=spf(gcd(r,M));const h=p===2?0:p===3?22:p===5?55:p===7?160:200;return `hsl(${h},70%,38%)`;}
+      return '#c8a84a';
     }
+    if(cm===3) return ok?'#c8a84a':'#0a0a1a';
+    if(cm===4) return ok?'hsl(210,80%,55%)':'#08081e';
+    // cm=5 sector hue by r/M
+    const hue=Math.round((r/M)*300);
+    return ok?`hsl(${hue},75%,55%)`:copM?`hsla(${hue},40%,22%,.7)`:'#100f1a';
   }
 
-  // Background axis labels
-  lctx.fillStyle='rgba(100,100,130,.35)';lctx.font='9px "JetBrains Mono",monospace';
-  lctx.textAlign='center';
+  // ══════════════════════════════════════════════════════════════════
+  //  FERMAT VIEW  — x = (r-½)/M  ∈ (0,1),  y = √M / √G  ∈ (0,1)
+  //  Points live in the triangular Farey region: 0 < r < M, r/M ∈ (0,1).
+  //  Each ring M has φ(M) visible dots spread across x ∈ (0,1).
+  //  The y-axis is compressed by √M so equal Δ(√M) steps share equal
+  //  hyperbolic area, matching the Poincaré half-plane metric.
+  // ══════════════════════════════════════════════════════════════════
   if(viewMode==='fermat'){
-    lctx.fillText('r  (x-axis linear)',cW/2,cH-4);
-    lctx.save();lctx.translate(12,cH/2);lctx.rotate(-Math.PI/2);
-    lctx.fillText('M  (y-axis √M scaled)',0,0);lctx.restore();
-  } else {
-    lctx.fillText('r/M  (fraction)',cW/2,cH-4);
-    lctx.save();lctx.translate(12,cH/2);lctx.rotate(-Math.PI/2);
-    lctx.fillText('1/M  (Ford height)',0,0);lctx.restore();
-  }
+    // Domain: x ∈ (0,1) for r/M, y ∈ (√2/√G, 1) for √M/√G
+    // Map: px = PX + (r/M)*PW,  py = PY + PH*(1 - √M/√G)
+    const sqG=Math.sqrt(G);
+    const sqMin=Math.sqrt(2);         // M starts at 2
+    const yRange=sqG-sqMin;           // denominator for normalised y
 
-  // Draw all cells
-  const COLOR_MAP={gold:'#c8a84a',teal:'#3dc8b8',dark:'#111120'};
-  for(let M=2;M<=G;M++){
-    for(let r=1;r<M;r++){
-      let ok=true,ff=-1;
-      for(let j=0;j<=gridN&&ok;j++){if(gcd(r,M+j)>1){ok=false;ff=j;}}
-      const copM=gcd(r,M)===1;
-      let col;
-      if(cm===0)col=ok?COLOR_MAP.gold:copM?COLOR_MAP.teal:COLOR_MAP.dark;
-      else if(cm===3)col=ok?COLOR_MAP.gold:'#0a0a1a';
-      else{
-        const hue=ok?48:copM?175:240;
-        const sat=ok?80:copM?60:20;
-        const lit=ok?60:copM?45:18;
-        col=`hsl(${hue},${sat}%,${lit}%)`;
-      }
-      const{x,y}=toXY(r,M);
-      const dotR=viewMode==='fermat'?Math.max(1.2,2.5-G/100):Math.max(1,2-G/80);
-      lctx.beginPath();lctx.arc(x,y,dotR,0,Math.PI*2);
-      lctx.fillStyle=col;lctx.fill();
-    }
-  }
+    // Dot radius: denser for large G
+    const dotR=Math.max(1, Math.min(3.5, PW/(G*1.4)));
 
-  // Farey sector lines at 1/n
-  if(viewMode==='farey'){
-    [2,3,4,5,6].forEach(n=>{
-      const x=pad+(1/n)*(cW-2*pad);
-      lctx.strokeStyle=`rgba(100,150,200,.25)`;lctx.lineWidth=.5;lctx.setLineDash([4,5]);
-      lctx.beginPath();lctx.moveTo(x,pad);lctx.lineTo(x,cH-pad);lctx.stroke();lctx.setLineDash([]);
-      lctx.fillStyle='rgba(100,150,200,.45)';lctx.font='8px monospace';lctx.textAlign='center';
-      lctx.fillText(`1/${n}`,x,pad-4);
-    });
-  }
-  // Fermat ring circles
-  if(viewMode==='fermat'){
-    [2,3,5,7,11,13].forEach(M=>{
+    // ── Reference grid lines at M = primes and powers ──
+    const refMs=[2,3,4,5,7,9,11,13,17,19,23,29,31,37,41,43,47];
+    refMs.forEach(M=>{
       if(M>G)return;
-      lctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.18)':'rgba(50,50,80,.15)';
-      lctx.lineWidth=.5;
-      const y=cH-pad-(Math.sqrt(M)/Math.sqrt(G))*(cH-2*pad);
-      lctx.beginPath();lctx.moveTo(pad,y);lctx.lineTo(cW-pad,y);lctx.stroke();
-      lctx.fillStyle='rgba(61,200,184,.35)';lctx.font='7px monospace';lctx.textAlign='left';
-      lctx.fillText(`M=${M}`,2,y-2);
+      const py=PY+PH*(1-(Math.sqrt(M)-sqMin)/yRange);
+      ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.14)':'rgba(80,80,120,.1)';
+      ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(PX,py);ctx.lineTo(PX+PW,py);ctx.stroke();
+      // Label on the left
+      ctx.fillStyle=PS.has(M)?'rgba(61,200,184,.55)':'rgba(100,100,150,.4)';
+      ctx.font=`7px "JetBrains Mono",monospace`;ctx.textAlign='right';
+      ctx.fillText(`M=${M}`,PX-2,py+2.5);
     });
+
+    // ── Vertical sector lines at r/M = k/p for small primes ──
+    [2,3,5,7].forEach(p=>{
+      for(let k=1;k<p;k++){
+        const px2=PX+(k/p)*PW;
+        ctx.strokeStyle='rgba(200,168,74,.06)';ctx.lineWidth=.4;ctx.setLineDash([3,5]);
+        ctx.beginPath();ctx.moveTo(px2,PY);ctx.lineTo(px2,PY+PH);ctx.stroke();
+      }
+    });
+    ctx.setLineDash([]);
+
+    // ── Plot points ──
+    for(let M=2;M<=G;M++){
+      const py=PY+PH*(1-(Math.sqrt(M)-sqMin)/yRange);
+      if(py<PY-dotR||py>PY+PH+dotR)continue;
+      for(let r=1;r<M;r++){
+        const px2=PX+(r/M)*PW;
+        if(px2<PX-dotR||px2>PX+PW+dotR)continue;
+        let ok=true;
+        for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1)ok=false;
+        const copM=gcd(r,M)===1;
+        ctx.beginPath();ctx.arc(px2,py,dotR,0,Math.PI*2);
+        ctx.fillStyle=cellColor(ok,copM,r,M);ctx.fill();
+      }
+    }
+
+    // ── Axis labels ──
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.font=`8.5px "JetBrains Mono",monospace`;
+    ctx.textAlign='center';
+    ctx.fillText('r / M',PX+PW/2,PY+PH+PAD_B-4);
+    // x-axis ticks 0, ¼, ½, ¾, 1
+    [0,.25,.5,.75,1].forEach(t=>{
+      const px2=PX+t*PW;
+      ctx.strokeStyle='rgba(150,140,120,.2)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(px2,PY+PH);ctx.lineTo(px2,PY+PH+4);ctx.stroke();
+      ctx.fillStyle='rgba(150,140,120,.45)';ctx.textAlign='center';
+      ctx.fillText(t===0?'0':t===1?'1':`${t}`,px2,PY+PH+12);
+    });
+    ctx.save();ctx.translate(10,PY+PH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.textAlign='center';
+    ctx.fillText('√M  (hyperbolic y)',0,0);ctx.restore();
+
+    // ── View label ──
+    ctx.fillStyle='rgba(200,168,74,.4)';ctx.font=`8px "JetBrains Mono",monospace`;
+    ctx.textAlign='right';
+    ctx.fillText(`H²/√M view · G=${G} · n=${n}`,cW-4,cH-4);
+
+  // ══════════════════════════════════════════════════════════════════
+  //  FAREY STRIP VIEW  — x = r/M  ∈ (0,1),  y = 1/M  ∈ (0, ½)
+  //  This is the Ford circle / Farey accumulation geometry.
+  //  Each fraction r/M sits at height 1/M.  The strip top is y=½
+  //  (M=2), the bottom y→0 (M→∞).  We normalise so M=G maps to
+  //  the bottom of the plot and M=2 maps to the top.
+  // ══════════════════════════════════════════════════════════════════
+  }else if(viewMode==='farey'){
+    // Normalised y: u = (1/M - 1/G) / (1/2 - 1/G)  → u∈[0,1]
+    // py = PY + PH*(1-u)  so M=2 → top, M=G → bottom
+    const yTop=0.5;       // 1/M at M=2
+    const yBot=1/G;       // 1/M at M=G
+    const ySpan=yTop-yBot;
+
+    const dotR=Math.max(1, Math.min(3, PW/G*0.6));
+
+    // ── Reference lines at y=1/M for key M values ──
+    const refMs=[2,3,4,5,6,7,8,10,12,16,20];
+    refMs.forEach(M=>{
+      if(M>G)return;
+      const u=(1/M-yBot)/ySpan;
+      const py=PY+PH*(1-u);
+      ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.18)':'rgba(80,80,120,.12)';
+      ctx.lineWidth=.5;ctx.setLineDash(PS.has(M)?[]:[3,4]);
+      ctx.beginPath();ctx.moveTo(PX,py);ctx.lineTo(PX+PW,py);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=PS.has(M)?'rgba(61,200,184,.6)':'rgba(100,100,150,.45)';
+      ctx.font=`7px "JetBrains Mono",monospace`;ctx.textAlign='right';
+      ctx.fillText(`1/${M}`,PX-2,py+2.5);
+    });
+
+    // ── Vertical Farey fraction lines at r/M = p/q for small q ──
+    [[1,2],[1,3],[2,3],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5]].forEach(([p,q])=>{
+      const px2=PX+(p/q)*PW;
+      ctx.strokeStyle='rgba(200,168,74,.08)';ctx.lineWidth=.4;ctx.setLineDash([2,5]);
+      ctx.beginPath();ctx.moveTo(px2,PY);ctx.lineTo(px2,PY+PH);ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    // ── Plot points ──
+    for(let M=2;M<=G;M++){
+      const u=(1/M-yBot)/ySpan;
+      const py=PY+PH*(1-u);
+      if(py<PY-dotR||py>PY+PH+dotR)continue;
+      for(let r=1;r<M;r++){
+        if(gcd(r,M)!==1)continue; // Farey view: only reduced fractions (r/M in lowest terms)
+        const px2=PX+(r/M)*PW;
+        if(px2<PX-dotR||px2>PX+PW+dotR)continue;
+        let ok=true;
+        for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1)ok=false;
+        const dotRscaled=Math.max(dotR, Math.min(4, PH*ySpan/M*0.4));
+        ctx.beginPath();ctx.arc(px2,py,Math.min(dotRscaled,4),0,Math.PI*2);
+        ctx.fillStyle=cellColor(ok,true,r,M);ctx.fill();
+      }
+    }
+
+    // ── Ford circle tangent arcs for key fractions ──
+    if(G<=80){
+      ctx.save();
+      for(let M=2;M<=Math.min(G,20);M++){
+        for(let r=1;r<M;r++){
+          if(gcd(r,M)!==1)continue;
+          const u=(1/M-yBot)/ySpan;
+          const py=PY+PH*(1-u);
+          const px2=PX+(r/M)*PW;
+          // Ford circle radius in screen coords: r_screen = (1/(2M²)) / ySpan * PH
+          const rScr=(1/(2*M*M))/ySpan*PH;
+          if(rScr<1.5)break;
+          ctx.strokeStyle='rgba(200,168,74,.09)';ctx.lineWidth=.5;
+          ctx.beginPath();ctx.arc(px2,py-rScr,rScr,0,Math.PI*2);ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    // ── Axis labels ──
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.font=`8.5px "JetBrains Mono",monospace`;
+    ctx.textAlign='center';
+    ctx.fillText('r / M  (Farey fraction)',PX+PW/2,PY+PH+PAD_B-4);
+    [0,.25,.5,.75,1].forEach(t=>{
+      const px2=PX+t*PW;
+      ctx.strokeStyle='rgba(150,140,120,.2)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(px2,PY+PH);ctx.lineTo(px2,PY+PH+4);ctx.stroke();
+      ctx.fillStyle='rgba(150,140,120,.45)';ctx.textAlign='center';
+      ctx.fillText(t===0?'0':t===1?'1':`${t}`,px2,PY+PH+12);
+    });
+    ctx.save();ctx.translate(10,PY+PH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.textAlign='center';
+    ctx.fillText('1 / M  (Ford height)',0,0);ctx.restore();
+
+    ctx.fillStyle='rgba(61,200,184,.4)';ctx.font=`8px "JetBrains Mono",monospace`;
+    ctx.textAlign='right';
+    ctx.fillText(`Farey strip · G=${G} · n=${n}`,cW-4,cH-4);
   }
 
-  // Apply barrier/spiral overlays
-  if(document.getElementById('grid-barriers')?.checked) drawGridBarriers(lctx,cW,cH);
-  if(document.getElementById('grid-prime-spiral')?.checked) drawGridPrimeSpiral(lctx,cW,cH);
-
-  const G2=G;
-  const gridN2=gridN;
-  document.getElementById('badge-zoom-ext').textContent=`view: ${viewMode} · G=${G2} · n=${gridN2}`;
+  // Badge
+  document.getElementById('badge-zoom-ext').textContent=
+    `view: ${viewMode==='fermat'?'H²/√M':'Farey strip'} · G=${G} · n=${n}`;
 }
 
 let _eulerAnimTO=null,_eulerStep=0;
@@ -3989,8 +4105,8 @@ function toggleEulerAnim(){
 }
 
 function init(){
-  // cv-gl-wrap is now aspect-ratio:1 so cv-gl fills it automatically
-  document.getElementById('cv-ring').style.height='55vh';
+  // cv-gl-wrap uses aspect-ratio:1 so cv-gl fills it automatically
+  // cv-ring-wrap height is set via CSS (no inline override needed)
 
   useGL=initGL();
   if(!useGL){
@@ -4006,8 +4122,8 @@ function init(){
 // ══════════════════════════════════════════════════════════
 //  EXPORT SYSTEM
 // ══════════════════════════════════════════════════════════
-let _emLayout='3main';
-const _emPanels={grid:true,ring:true,chart:true,euler:true};
+let _emLayout='4grid';
+const _emPanels={grid:true,ring:true,chart:true,euler:true,datatable:false,primetable:false};
 
 function openEM(){document.getElementById('em-overlay').classList.add('open');updateEMPreview();}
 function closeEM(){document.getElementById('em-overlay').classList.remove('open');}
@@ -4026,7 +4142,7 @@ function setEMLayout(l,btn){
 }
 
 function getSelectedPanels(){
-  const order=['chart','euler','grid','ring'];
+  const order=['grid','ring','chart','euler','datatable','primetable'];
   return order.filter(p=>_emPanels[p]);
 }
 
@@ -4070,7 +4186,19 @@ function computeExportRegions(panels,x0,y0,W,H){
       {panel:ps[2]||ps[1],x:x0+hw,y:y0+topH,w:W-hw,h:botH}
     ];
   }
+  if(_emLayout==='4grid'){
+    // True 2×2: all 4 panels equal quarters
+    const hw=Math.floor(W/2), hh=Math.floor(H/2);
+    const ps=panels.length>=4?panels:['grid','ring','chart','euler'];
+    return[
+      {panel:ps[0],x:x0,      y:y0,      w:hw,   h:hh},
+      {panel:ps[1],x:x0+hw,   y:y0,      w:W-hw, h:hh},
+      {panel:ps[2],x:x0,      y:y0+hh,   w:hw,   h:H-hh},
+      {panel:ps[3]||ps[2],x:x0+hw,y:y0+hh,w:W-hw,h:H-hh}
+    ];
+  }
   if(_emLayout==='4'){
+    // Old 4: 2 top + 1 wide bottom
     const ps=panels.length>=3?panels:['grid','ring','chart'];
     const hw=Math.floor(W/2);
     const topH=Math.round(H*.5);
@@ -4080,75 +4208,528 @@ function computeExportRegions(panels,x0,y0,W,H){
       {panel:ps[2]||ps[0],x:x0,y:y0+topH,w:W,h:H-topH}
     ];
   }
+  if(_emLayout==='triptych'){
+    // 1 tall left + 2 stacked right
+    const lw=Math.floor(W*.55), rw=W-lw, hh=Math.floor(H/2);
+    const ps=panels.length>=3?panels:['grid','chart','ring'];
+    return[
+      {panel:ps[0],x:x0,    y:y0,    w:lw, h:H},
+      {panel:ps[1],x:x0+lw, y:y0,    w:rw, h:hh},
+      {panel:ps[2]||ps[1],x:x0+lw,y:y0+hh,w:rw,h:H-hh}
+    ];
+  }
+  if(_emLayout==='table-right'){
+    // Visual left 65% + table right 35%
+    const lw=Math.floor(W*.65), rw=W-lw;
+    const ps=panels.length>=2?panels:['grid','datatable'];
+    return[
+      {panel:ps[0],x:x0,   y:y0,w:lw,h:H},
+      {panel:ps[1]||'datatable',x:x0+lw,y:y0,w:rw,h:H}
+    ];
+  }
   return[{panel:panels[0],x:x0,y:y0,w:W,h:H}];
 }
 
-// Render a panel to an offscreen canvas at W×H
+// ══════════════════════════════════════════════════════════
+//  renderPanelToCanvas — captures exactly what is on screen
+//  for the given panel, at the requested W×H resolution.
+// ══════════════════════════════════════════════════════════
 function renderPanelToCanvas(panel,W,H){
+
+  // ── GRID ──────────────────────────────────────────────────────────
   if(panel==='grid'){
-    const glcv=document.createElement('canvas');
-    glcv.width=W;glcv.height=H;
-    const g=glcv.getContext('webgl2',{preserveDrawingBuffer:true});
-    if(!g){
-      const c2=glcv.getContext('2d');c2.fillStyle='#04040d';c2.fillRect(0,0,W,H);return glcv;
+    const viewMode=document.getElementById('grid-view-mode')?.value||'euclidean';
+
+    // ── Euclidean: WebGL pass + 2D overlay ──
+    if(viewMode==='euclidean'){
+      // WebGL base pass
+      const glcv=document.createElement('canvas');
+      glcv.width=W; glcv.height=H;
+      const g=glcv.getContext('webgl2',{preserveDrawingBuffer:true});
+      if(g){
+        const sh=(t,s)=>{const x=g.createShader(t);g.shaderSource(x,s);g.compileShader(x);return x;};
+        const prog=g.createProgram();
+        g.attachShader(prog,sh(g.VERTEX_SHADER,GRID_VS));
+        g.attachShader(prog,sh(g.FRAGMENT_SHADER,GRID_FS));
+        g.linkProgram(prog);
+        const buf=g.createBuffer();
+        g.bindBuffer(g.ARRAY_BUFFER,buf);
+        g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),g.STATIC_DRAW);
+        g.viewport(0,0,W,H);
+        g.clearColor(0.016,0.016,0.051,1); g.clear(g.COLOR_BUFFER_BIT);
+        g.useProgram(prog);
+        const ap=g.getAttribLocation(prog,'a_pos');
+        g.enableVertexAttribArray(ap); g.vertexAttribPointer(ap,2,g.FLOAT,false,0,0);
+        const ul=n=>g.getUniformLocation(prog,n);
+        g.uniform2f(ul('u_panUV'),glPanU,glPanV);
+        g.uniform1f(ul('u_zoom'),glZoom);
+        g.uniform2f(ul('u_res'),W,H);
+        g.uniform1i(ul('u_n'),N);
+        g.uniform1i(ul('u_G'),getGridG());
+        g.uniform1i(ul('u_cm'),getGlobalCM());
+        g.drawArrays(g.TRIANGLE_STRIP,0,4);
+      } else {
+        const c2=glcv.getContext('2d');
+        c2.fillStyle='#04040d'; c2.fillRect(0,0,W,H);
+      }
+
+      // 2D overlay pass — barriers + prime spiral + inspect
+      const showBarriers =document.getElementById('grid-barriers')?.checked;
+      const showSpiral   =document.getElementById('grid-prime-spiral')?.checked;
+      const showInspect  =_inspectGridPts.length>0;
+      if(showBarriers||showSpiral||showInspect){
+        const comp=document.createElement('canvas'); comp.width=W; comp.height=H;
+        const cctx=comp.getContext('2d');
+        cctx.drawImage(glcv,0,0,W,H);
+        if(showBarriers)  drawGridBarriers(cctx,W,H);
+        if(showSpiral)    drawGridPrimeSpiral(cctx,W,H);
+        if(showInspect)   drawGridInspect(cctx,W,H);
+        return comp;
+      }
+      return glcv;
     }
-    const sh=(t,s)=>{const x=g.createShader(t);g.shaderSource(x,s);g.compileShader(x);return x;};
-    const prog=g.createProgram();
-    g.attachShader(prog,sh(g.VERTEX_SHADER,GRID_VS));
-    g.attachShader(prog,sh(g.FRAGMENT_SHADER,GRID_FS));
-    g.linkProgram(prog);
-    const buf=g.createBuffer();
-    g.bindBuffer(g.ARRAY_BUFFER,buf);
-    g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),g.STATIC_DRAW);
-    g.viewport(0,0,W,H);
-    g.clearColor(0.04,0.04,0.09,1);g.clear(g.COLOR_BUFFER_BIT);
-    g.useProgram(prog);
-    const ap=g.getAttribLocation(prog,'a_pos');
-    g.enableVertexAttribArray(ap);g.vertexAttribPointer(ap,2,g.FLOAT,false,0,0);
-    const ul=n=>g.getUniformLocation(prog,n);
-    g.uniform2f(ul('u_panUV'),glPanU,glPanV);
-    g.uniform1f(ul('u_zoom'),glZoom);
-    g.uniform2f(ul('u_res'),W,H);
-    g.uniform1i(ul('u_n'),N);
-    g.uniform1i(ul('u_G'),parseInt(document.getElementById('grid-g').value)||120);
-    g.uniform1i(ul('u_cm'),getGlobalCM());
-    g.drawArrays(g.TRIANGLE_STRIP,0,4);
-    // Composite barrier paths on top (barriers use a separate Canvas2D pass)
-    const showBarriers=document.getElementById('grid-barriers')&&document.getElementById('grid-barriers').checked;
-    if(!showBarriers)return glcv;
-    const comp=document.createElement('canvas');comp.width=W;comp.height=H;
-    const cctx=comp.getContext('2d');
-    cctx.drawImage(glcv,0,0,W,H);
-    drawGridBarriers(cctx,W,H);
-    return comp;
+
+    // ── Alt views (Fermat / Farey): full 2D software render ──
+    // We temporarily redirect renderGridAltView to draw onto our export canvas
+    // by swapping out the label canvas reference.
+    const expCV=document.createElement('canvas'); expCV.width=W; expCV.height=H;
+    // Save live canvas sizes and swap
+    const savedW=lblCV.width, savedH=lblCV.height;
+    const realLbl=document.getElementById('cv-gl-lbl');
+
+    // renderGridAltView draws to document.getElementById('cv-gl-lbl')
+    // We create a temporary canvas and point getElementById to it via a brief override.
+    // Simpler: call the drawing logic directly with a detached canvas.
+    _renderAltViewToCanvas(expCV, viewMode, W, H);
+    return expCV;
   }
+
+  // ── RING ───────────────────────────────────────────────────────────
   if(panel==='ring'){
-    const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+    const ctx=cv.getContext('2d');
     const dpr=Math.min(devicePixelRatio||1,2);
     const liveW=ringCV.width||1, liveH=ringCV.height||1;
     const scaledPanX=rPanX*(W/(liveW/dpr));
     const scaledPanY=rPanY*(H/(liveH/dpr));
-    drawRingImpl(cv.getContext('2d'),W,H,rZoom,scaledPanX,scaledPanY);
+    // Base ring dots
+    drawRingImpl(ctx,W,H,rZoom,scaledPanX,scaledPanY);
+    // Overlays — same order as live renderRing()
+    const showBarriers =document.getElementById('ring-barriers')?.checked;
+    const showSpiral   =document.getElementById('ring-prime-spiral')?.checked;
+    const showInspect  =_inspectRingPts.length>0;
+    // Temporarily adjust pan for the export canvas scale
+    const _savedPanX=rPanX, _savedPanY=rPanY;
+    rPanX=scaledPanX; rPanY=scaledPanY;
+    if(showBarriers)  drawRingBarriers(ctx,W,H);
+    if(showSpiral)    drawRingPrimeSpiral(ctx,W,H);
+    if(showInspect)   drawRingInspect(ctx,W,H);
+    rPanX=_savedPanX; rPanY=_savedPanY;
     return cv;
   }
+
+  // ── CHART ──────────────────────────────────────────────────────────
   if(panel==='chart'){
-    const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
     const opts={
-      showDn:   document.getElementById('chart-dn')&&document.getElementById('chart-dn').checked,
-      showAsymp:document.getElementById('chart-asymp')&&document.getElementById('chart-asymp').checked,
-      logY:     document.getElementById('chart-log')&&document.getElementById('chart-log').checked,
-      showJumps:!document.getElementById('chart-jumps')||document.getElementById('chart-jumps').checked,
-      xMax:     parseInt(document.getElementById('chart-xmax')?document.getElementById('chart-xmax').value:100)||100
+      showDn:    document.getElementById('chart-dn')?.checked,
+      showAsymp: document.getElementById('chart-asymp')?.checked,
+      logY:      document.getElementById('chart-log')?.checked,
+      showJumps: document.getElementById('chart-jumps')?.checked!==false,
+      xMax:      parseInt(document.getElementById('chart-xmax')?.value)||100
     };
     drawChartImpl(cv.getContext('2d'),W,H,N,opts);
     return cv;
   }
+
+  // ── EULER CONVERGENCE ──────────────────────────────────────────────
   if(panel==='euler'){
-    const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
     drawConvergenceChart(-1,cv);
     return cv;
   }
+
+  // ── DATA TABLE ─────────────────────────────────────────────────────
+  if(panel==='datatable') return renderDataTableToCanvas(W,H);
+
+  // ── PRIME TABLE ────────────────────────────────────────────────────
+  if(panel==='primetable') return renderPrimeTableToCanvas(W,H);
+
   return null;
+}
+
+// ── Standalone alt-view renderer for export (no live DOM canvas needed) ──
+function _renderAltViewToCanvas(cv, viewMode, W, H){
+  const ctx=cv.getContext('2d');
+  const G=getGridG();
+  const n=getGridN();
+  const cm=getGlobalCM();
+
+  const PAD_L=38, PAD_R=14, PAD_T=14, PAD_B=30;
+  const PW=W-PAD_L-PAD_R;
+  const PH=H-PAD_T-PAD_B;
+  const PX=PAD_L, PY=PAD_T;
+
+  ctx.fillStyle='#04040d';
+  ctx.fillRect(0,0,W,H);
+
+  // colour helper — same as in renderGridAltView
+  function cellColor(ok,copM,r,M){
+    if(cm===0) return ok?'#c8a84a':copM?'#3dc8b8':'#111120';
+    if(cm===1) return ok?'#c8a84a':'#cc3a3a';
+    if(cm===2){
+      if(!ok){const p=spf(gcd(r,M));const h=p===2?0:p===3?22:p===5?55:p===7?160:200;return `hsl(${h},70%,38%)`;}
+      return '#c8a84a';
+    }
+    if(cm===3) return ok?'#c8a84a':'#0a0a1a';
+    if(cm===4) return ok?'hsl(210,80%,55%)':'#08081e';
+    const hue=Math.round((r/M)*300);
+    return ok?`hsl(${hue},75%,55%)`:copM?`hsla(${hue},40%,22%,.7)`:'#100f1a';
+  }
+
+  if(viewMode==='fermat'){
+    const sqG=Math.sqrt(G), sqMin=Math.sqrt(2), yRange=sqG-sqMin;
+    const dotR=Math.max(1,Math.min(3.5,PW/(G*1.4)));
+    // Reference lines
+    [2,3,4,5,7,9,11,13,17,19,23,29,31,37,41,43,47].forEach(M=>{
+      if(M>G)return;
+      const py=PY+PH*(1-(Math.sqrt(M)-sqMin)/yRange);
+      ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.14)':'rgba(80,80,120,.1)';
+      ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(PX,py);ctx.lineTo(PX+PW,py);ctx.stroke();
+      ctx.fillStyle=PS.has(M)?'rgba(61,200,184,.55)':'rgba(100,100,150,.4)';
+      ctx.font='7px "JetBrains Mono",monospace';ctx.textAlign='right';
+      ctx.fillText('M='+M,PX-2,py+2.5);
+    });
+    [2,3,5,7].forEach(p=>{
+      for(let k=1;k<p;k++){
+        const px2=PX+(k/p)*PW;
+        ctx.strokeStyle='rgba(200,168,74,.06)';ctx.lineWidth=.4;ctx.setLineDash([3,5]);
+        ctx.beginPath();ctx.moveTo(px2,PY);ctx.lineTo(px2,PY+PH);ctx.stroke();
+      }
+    });
+    ctx.setLineDash([]);
+    // Points
+    for(let M=2;M<=G;M++){
+      const py=PY+PH*(1-(Math.sqrt(M)-sqMin)/yRange);
+      if(py<PY-dotR||py>PY+PH+dotR)continue;
+      for(let r=1;r<M;r++){
+        const px2=PX+(r/M)*PW;
+        if(px2<PX-dotR||px2>PX+PW+dotR)continue;
+        let ok=true;
+        for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1)ok=false;
+        ctx.beginPath();ctx.arc(px2,py,dotR,0,Math.PI*2);
+        ctx.fillStyle=cellColor(ok,gcd(r,M)===1,r,M);ctx.fill();
+      }
+    }
+    // Prime spiral overlay — shared helper used by export too
+    if(document.getElementById('grid-prime-spiral')?.checked){
+      _drawAltSpiralOverlay(ctx,PX,PY,PW,PH,'fermat',G,n);
+    }
+    // Axis
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.font='8.5px "JetBrains Mono",monospace';
+    ctx.textAlign='center';ctx.fillText('r / M',PX+PW/2,PY+PH+PAD_B-4);
+    [0,.25,.5,.75,1].forEach(t=>{
+      const px2=PX+t*PW;
+      ctx.strokeStyle='rgba(150,140,120,.2)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(px2,PY+PH);ctx.lineTo(px2,PY+PH+4);ctx.stroke();
+      ctx.fillStyle='rgba(150,140,120,.45)';ctx.textAlign='center';
+      ctx.fillText(t===0?'0':t===1?'1':String(t),px2,PY+PH+12);
+    });
+    ctx.save();ctx.translate(10,PY+PH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.textAlign='center';
+    ctx.fillText('√M  (hyperbolic y)',0,0);ctx.restore();
+    ctx.fillStyle='rgba(200,168,74,.4)';ctx.font='8px "JetBrains Mono",monospace';
+    ctx.textAlign='right';ctx.fillText('H²/√M · G='+G+' · n='+n,W-4,H-4);
+
+  } else { // farey
+    const yTop=0.5, yBot=1/G, ySpan=yTop-yBot;
+    const dotR=Math.max(1,Math.min(3,PW/G*0.6));
+    // Reference lines
+    [2,3,4,5,6,7,8,10,12,16,20].forEach(M=>{
+      if(M>G)return;
+      const u=(1/M-yBot)/ySpan;
+      const py=PY+PH*(1-u);
+      ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.18)':'rgba(80,80,120,.12)';
+      ctx.lineWidth=.5;ctx.setLineDash(PS.has(M)?[]:[3,4]);
+      ctx.beginPath();ctx.moveTo(PX,py);ctx.lineTo(PX+PW,py);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=PS.has(M)?'rgba(61,200,184,.6)':'rgba(100,100,150,.45)';
+      ctx.font='7px "JetBrains Mono",monospace';ctx.textAlign='right';
+      ctx.fillText('1/'+M,PX-2,py+2.5);
+    });
+    [[1,2],[1,3],[2,3],[1,4],[3,4],[1,5],[2,5],[3,5],[4,5]].forEach(([p,q])=>{
+      const px2=PX+(p/q)*PW;
+      ctx.strokeStyle='rgba(200,168,74,.08)';ctx.lineWidth=.4;ctx.setLineDash([2,5]);
+      ctx.beginPath();ctx.moveTo(px2,PY);ctx.lineTo(px2,PY+PH);ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    // Points
+    for(let M=2;M<=G;M++){
+      const u=(1/M-yBot)/ySpan;
+      const py=PY+PH*(1-u);
+      if(py<PY-dotR||py>PY+PH+dotR)continue;
+      for(let r=1;r<M;r++){
+        if(gcd(r,M)!==1)continue;
+        const px2=PX+(r/M)*PW;
+        if(px2<PX-dotR||px2>PX+PW+dotR)continue;
+        let ok=true;
+        for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1)ok=false;
+        const dotRs=Math.max(dotR,Math.min(4,PH*ySpan/M*0.4));
+        ctx.beginPath();ctx.arc(px2,py,Math.min(dotRs,4),0,Math.PI*2);
+        ctx.fillStyle=cellColor(ok,true,r,M);ctx.fill();
+      }
+    }
+    // Ford circles
+    if(G<=80){
+      ctx.save();
+      for(let M=2;M<=Math.min(G,20);M++){
+        for(let r=1;r<M;r++){
+          if(gcd(r,M)!==1)continue;
+          const u=(1/M-yBot)/ySpan;
+          const py=PY+PH*(1-u);
+          const px2=PX+(r/M)*PW;
+          const rScr=(1/(2*M*M))/ySpan*PH;
+          if(rScr<1.5)break;
+          ctx.strokeStyle='rgba(200,168,74,.09)';ctx.lineWidth=.5;
+          ctx.beginPath();ctx.arc(px2,py-rScr,rScr,0,Math.PI*2);ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+    // Prime spiral overlay — shared helper used by export too
+    if(document.getElementById('grid-prime-spiral')?.checked){
+      _drawAltSpiralOverlay(ctx,PX,PY,PW,PH,'farey',G,n);
+    }
+    // Axis
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.font='8.5px "JetBrains Mono",monospace';
+    ctx.textAlign='center';ctx.fillText('r / M  (Farey fraction)',PX+PW/2,PY+PH+PAD_B-4);
+    [0,.25,.5,.75,1].forEach(t=>{
+      const px2=PX+t*PW;
+      ctx.strokeStyle='rgba(150,140,120,.2)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(px2,PY+PH);ctx.lineTo(px2,PY+PH+4);ctx.stroke();
+      ctx.fillStyle='rgba(150,140,120,.45)';ctx.textAlign='center';
+      ctx.fillText(t===0?'0':t===1?'1':String(t),px2,PY+PH+12);
+    });
+    ctx.save();ctx.translate(10,PY+PH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.textAlign='center';
+    ctx.fillText('1 / M  (Ford height)',0,0);ctx.restore();
+    ctx.fillStyle='rgba(61,200,184,.4)';ctx.font='8px "JetBrains Mono",monospace';
+    ctx.textAlign='right';ctx.fillText('Farey strip · G='+G+' · n='+n,W-4,H-4);
+  }
+}
+
+// ── Prime spiral overlay shared by both alt view modes (export + live) ──
+// Called from both _renderAltViewToCanvas and renderGridAltView.
+function _drawAltSpiralOverlay(ctx,PX,PY,PW,PH,viewMode,G,n){
+  const p=parseInt(document.getElementById('ring-spiral-p')?.value)||5;
+  if(!PS.has(p)) return;
+
+  const yTop=0.5, yBot=1/G, ySpan=yTop-yBot;
+  const sqG=Math.sqrt(G), sqMin=Math.sqrt(2), yRange=sqG-sqMin;
+
+  function toXY(r,M){
+    const px=PX+(r/M)*PW;
+    let py;
+    if(viewMode==='fermat'){
+      py=PY+PH*(1-(Math.sqrt(M)-sqMin)/yRange);
+    } else {
+      const u=(1/M-yBot)/ySpan;
+      py=PY+PH*(1-u);
+    }
+    return{x:px,y:py};
+  }
+
+  ctx.save();
+  let lastTop=null, lastBot=null;
+  const barrierN=Math.max(1,n);
+
+  for(let M=2;M<=G;M++){
+    if(p>=M)continue; // r must be < M
+    if(gcd(p,M)!==1)continue;
+    const{x,y}=toXY(p,M);
+    if(x<PX-4||x>PX+PW+4||y<PY-4||y>PY+PH+4)continue;
+    const isTop=p/M>0.5;
+    const lifts=gcd(p,M+1)===1;
+
+    // Connect
+    if(isTop&&lastTop){
+      ctx.beginPath();ctx.moveTo(lastTop.x,lastTop.y);ctx.lineTo(x,y);
+      ctx.strokeStyle='rgba(61,200,184,.45)';ctx.lineWidth=1.2;ctx.stroke();
+    }
+    if(!isTop&&lastBot){
+      ctx.beginPath();ctx.moveTo(lastBot.x,lastBot.y);ctx.lineTo(x,y);
+      ctx.strokeStyle='rgba(255,140,105,.45)';ctx.lineWidth=1.2;ctx.stroke();
+    }
+    if(isTop)lastTop={x,y}; else lastBot={x,y};
+
+    const dotR=Math.max(2.5,Math.min(4,PW/G*0.5));
+    ctx.beginPath();ctx.arc(x,y,dotR,0,Math.PI*2);
+    ctx.fillStyle=isTop?'#4ecdc4':'#ff8c69';ctx.fill();
+    if(!lifts){
+      ctx.beginPath();ctx.arc(x,y,dotR+2,0,Math.PI*2);
+      ctx.strokeStyle='rgba(224,80,96,.8)';ctx.lineWidth=1.2;ctx.stroke();
+    }
+  }
+
+  // r=(M±n)/2 barrier paths in the alt coordinate space
+  [+1,-1].forEach(sign=>{
+    ctx.beginPath();
+    let first=true;
+    for(let M=2;M<=G;M++){
+      const rHalf=(M+sign*barrierN)/2;
+      if(rHalf<1||rHalf>=M||Math.round(rHalf)!==rHalf)continue;
+      if(gcd(Math.round(rHalf),M)!==1)continue;
+      const{x,y}=toXY(rHalf,M);
+      if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=sign>0?'rgba(200,168,74,.65)':'rgba(155,127,232,.55)';
+    ctx.lineWidth=1.2;ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);
+  });
+
+  // Label
+  ctx.fillStyle='rgba(200,168,74,.65)';ctx.font='7.5px "JetBrains Mono",monospace';
+  ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.fillText('p='+p+' spiral  ·  r=(M±'+barrierN+')/2 barriers',PX+2,PY+2);
+  ctx.textBaseline='alphabetic';
+
+  ctx.restore();
+}
+
+// ── Render the C(n) data table (n=0..N) to an offscreen canvas ──
+function renderDataTableToCanvas(W,H){
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+  const isDark=!document.body.classList.contains('parchment');
+  const BG=isDark?'#04040d':'#f5f0e8';
+  const BG2=isDark?'#07071a':'#ede8d8';
+  const EDGE=isDark?'rgba(255,255,255,.06)':'rgba(110,80,40,.15)';
+  const GOLD='#c8a84a',TEAL='#3dc8b8',DIM=isDark?'#6a6560':'#7a6040',TEXT=isDark?'#ddd8cc':'#1c1710';
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+
+  // Header band
+  ctx.fillStyle=isDark?'rgba(200,168,74,.09)':'rgba(200,168,74,.12)';
+  ctx.fillRect(0,0,W,Math.round(H*.06));
+  ctx.fillStyle=GOLD;ctx.font=`bold ${Math.round(H*.022)}px 'JetBrains Mono',monospace`;
+  ctx.textAlign='left';ctx.fillText(`Data Table — C(n) & D(n)  ·  n = 0 to ${N}`,Math.round(W*.02),Math.round(H*.042));
+  ctx.fillStyle=DIM;ctx.font=`${Math.round(H*.014)}px 'JetBrains Mono',monospace`;
+  ctx.textAlign='right';ctx.fillText(`G=${getGridG()} · C(${N})=${getCn(N).toFixed(6)}`,W-Math.round(W*.02),Math.round(H*.042));
+  ctx.fillStyle=GOLD;ctx.fillRect(0,Math.round(H*.06),W,1);
+
+  const cols=['n','Block','C(n)','D(n)','C(n)/C(n-1)','Sat.','Event'];
+  const colW=[.06,.07,.16,.16,.16,.06,.13];
+  const rowH=Math.min(Math.round(H*.032), Math.round((H*.9)/(N+2)));
+  const fSz=Math.max(7,Math.min(12,rowH*.6));
+  const startY=Math.round(H*.065);
+
+  // Column headers
+  ctx.fillStyle=BG2;ctx.fillRect(0,startY,W,rowH);
+  ctx.strokeStyle=EDGE;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,startY+rowH);ctx.lineTo(W,startY+rowH);ctx.stroke();
+  let cx2=Math.round(W*.01);
+  cols.forEach((c,i)=>{
+    const cw=Math.round(W*colW[i]);
+    ctx.font=`${Math.round(fSz*.85)}px 'JetBrains Mono',monospace`;
+    ctx.fillStyle=DIM;ctx.textAlign='right';
+    ctx.fillText(c,cx2+cw-3,startY+rowH*.72);
+    cx2+=cw;
+  });
+
+  // Rows
+  for(let i=0;i<=N;i++){
+    const y=startY+rowH*(i+1);
+    if(y+rowH>H)break;
+    const Ci=getCn(i),Di=Ci/ZETA2;
+    const sat=numSat(i);
+    const isPrimeSat=(i>0&&PS.has(i+1));
+    const ev=isPrimeSat?`p=${i+1}`:(i===0?'start':'');
+    const ratio=i===0?'—':(_cn[i]/_cn[i-1]).toFixed(5);
+    const isHi=(i===N);
+    if(isHi){ctx.fillStyle=isDark?'rgba(200,168,74,.07)':'rgba(200,168,74,.1)';ctx.fillRect(0,y,W,rowH);}
+    else if(i%2===0){ctx.fillStyle=isDark?'rgba(255,255,255,.015)':'rgba(0,0,0,.02)';ctx.fillRect(0,y,W,rowH);}
+    ctx.strokeStyle=EDGE;ctx.lineWidth=.3;
+    ctx.beginPath();ctx.moveTo(0,y+rowH);ctx.lineTo(W,y+rowH);ctx.stroke();
+    ctx.font=`${fSz}px 'JetBrains Mono',monospace`;
+    let dx=Math.round(W*.01);
+    const vals=[String(i),String(i+1),Ci.toFixed(6),Di.toFixed(6),ratio,String(sat),ev];
+    const clrs=[DIM,DIM,GOLD,TEAL,isDark?'#b8b2a6':'#4a3828',isDark?'#e05060':'#8c2c20',isDark?'#3dc8b8':'#1a5c50'];
+    vals.forEach((v,vi)=>{
+      const cw=Math.round(W*colW[vi]);
+      ctx.fillStyle=clrs[vi];ctx.textAlign='right';
+      ctx.fillText(v,dx+cw-3,y+rowH*.72);
+      dx+=cw;
+    });
+  }
+  return cv;
+}
+
+// ── Render the prime factor table to an offscreen canvas ──
+function renderPrimeTableToCanvas(W,H){
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const ctx=cv.getContext('2d');
+  const isDark=!document.body.classList.contains('parchment');
+  const BG=isDark?'#04040d':'#f5f0e8';
+  const BG2=isDark?'#07071a':'#ede8d8';
+  const EDGE=isDark?'rgba(255,255,255,.06)':'rgba(110,80,40,.15)';
+  const GOLD='#c8a84a',TEAL='#3dc8b8',CORAL='#e05060',DIM=isDark?'#6a6560':'#7a6040';
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+
+  // Header
+  ctx.fillStyle=isDark?'rgba(200,168,74,.09)':'rgba(200,168,74,.12)';
+  ctx.fillRect(0,0,W,Math.round(H*.06));
+  ctx.fillStyle=GOLD;ctx.font=`bold ${Math.round(H*.022)}px 'JetBrains Mono',monospace`;
+  ctx.textAlign='left';ctx.fillText(`Prime Factor Table  ·  n = ${N}  ·  block = ${N+1}`,Math.round(W*.02),Math.round(H*.042));
+  ctx.fillStyle=DIM;ctx.font=`${Math.round(H*.013)}px 'JetBrains Mono',monospace`;
+  ctx.textAlign='right';ctx.fillText(`C(n)=ζ(2)·∏(1−min(n+1,p)/p²)`,W-Math.round(W*.02),Math.round(H*.042));
+  ctx.fillStyle=GOLD;ctx.fillRect(0,Math.round(H*.06),W,1);
+
+  const primesToShow=PRIMES.filter(p=>{const y=Math.round(H*.065)+Math.round(H*.03)*(PRIMES.indexOf(p)+1);return y<H-.02*H;}).slice(0,Math.min(60,PRIMES.length));
+  const cols=['p','Status','min(n+1,p)','p²','Local factor','log factor','Partial D(n)','Partial C(n)'];
+  const colW=[.07,.09,.1,.1,.15,.15,.15,.15];
+  const rowH=Math.min(Math.round(H*.032),Math.round((H*.9)/(primesToShow.length+2)));
+  const fSz=Math.max(7,Math.min(11,rowH*.62));
+  const startY=Math.round(H*.065);
+
+  // Headers
+  ctx.fillStyle=BG2;ctx.fillRect(0,startY,W,rowH);
+  ctx.strokeStyle=EDGE;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,startY+rowH);ctx.lineTo(W,startY+rowH);ctx.stroke();
+  let cx2=Math.round(W*.01);
+  cols.forEach((c,i)=>{
+    const cw=Math.round(W*colW[i]);
+    ctx.font=`${Math.round(fSz*.82)}px 'JetBrains Mono',monospace`;
+    ctx.fillStyle=DIM;ctx.textAlign='right';
+    ctx.fillText(c,cx2+cw-3,startY+rowH*.72);
+    cx2+=cw;
+  });
+
+  let ld=0;
+  primesToShow.forEach((p,idx)=>{
+    const y=startY+rowH*(idx+1);
+    if(y+rowH>H)return;
+    const m=Math.min(N+1,p),p2=p*p,fac=1-m/p2,lf=Math.log(fac);
+    ld+=lf;
+    const pD=Math.exp(ld),pC=ZETA2*pD;
+    const isSat=p<=N+1;
+    if(idx%2===0){ctx.fillStyle=isDark?'rgba(255,255,255,.015)':'rgba(0,0,0,.02)';ctx.fillRect(0,y,W,rowH);}
+    if(isSat){ctx.fillStyle=isDark?'rgba(224,80,96,.06)':'rgba(224,80,96,.05)';ctx.fillRect(0,y,W,rowH);}
+    ctx.strokeStyle=EDGE;ctx.lineWidth=.3;
+    ctx.beginPath();ctx.moveTo(0,y+rowH);ctx.lineTo(W,y+rowH);ctx.stroke();
+    ctx.font=`${fSz}px 'JetBrains Mono',monospace`;
+    let dx=Math.round(W*.01);
+    const vals=[String(p),isSat?'SAT':'ACT',String(m),String(p2),fac.toFixed(8),lf.toFixed(8),pD.toFixed(8),pC.toFixed(8)];
+    vals.forEach((v,vi)=>{
+      const cw=Math.round(W*colW[vi]);
+      let col=DIM;
+      if(vi===0)col=isSat?CORAL:TEAL;
+      else if(vi===1)col=isSat?CORAL:TEAL;
+      else if(vi===7)col=GOLD;
+      ctx.fillStyle=col;ctx.textAlign='right';
+      ctx.fillText(v,dx+cw-3,y+rowH*.72);
+      dx+=cw;
+    });
+  });
+  return cv;
 }
 
 // ── PREVIEW ──
@@ -4179,8 +4760,8 @@ function updateEMPreview(){
 
   const panels=getSelectedPanels();
   const regs=computeExportRegions(panels,0,headerH,PW,panelH);
-  const colors={grid:'rgba(200,168,74,.28)',ring:'rgba(61,200,184,.28)',chart:'rgba(155,127,232,.28)'};
-  const labels={grid:'Grid',ring:'Ring',chart:'Chart',euler:'Euler'};
+  const colors={grid:'rgba(200,168,74,.28)',ring:'rgba(61,200,184,.28)',chart:'rgba(155,127,232,.28)',euler:'rgba(242,196,74,.22)',datatable:'rgba(100,180,255,.22)',primetable:'rgba(180,100,255,.22)'};
+  const labels={grid:'Grid',ring:'Ring',chart:'Chart',euler:'Euler',datatable:'Data Table',primetable:'Prime Table'};
   regs.forEach(r=>{
     ctx.fillStyle=colors[r.panel]||'rgba(100,100,100,.2)';
     ctx.fillRect(r.x+.5,r.y+.5,r.w-1,r.h-1);
@@ -4275,8 +4856,8 @@ async function doExport(){
   // ── PANELS ──
   const panels=getSelectedPanels();
   const regs=computeExportRegions(panels,0,headerH,eW,panelH);
-  const PANEL_NAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart',euler:'Euler Convergence'};
-  const PANEL_COLORS={grid:GOLD,ring:TEAL,chart:'#9b7fe8'};
+  const PANEL_NAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart',euler:'Euler Convergence',datatable:'Data Table',primetable:'Prime Table'};
+  const PANEL_COLORS={grid:GOLD,ring:TEAL,chart:'#9b7fe8',euler:'#f2c44a',datatable:'#64b4ff',primetable:'#b464ff'};
 
   for(let i=0;i<regs.length;i++){
     const reg=regs[i];
@@ -4705,8 +5286,8 @@ async function doExportWithPreview(){
     // Panels
     const panels=getSelectedPanels();
     const regs=computeExportRegions(panels,0,headerH,PW,panelH);
-    const PNAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart',euler:'Euler Convergence'};
-    const PCOLORS={grid:GOLD,ring:TEAL,chart:'#9b7fe8',euler:'#f2c44a'};
+    const PNAMES={grid:'Grid View',ring:'Ring View',chart:'C(n) Chart',euler:'Euler Convergence',datatable:'Data Table',primetable:'Prime Table'};
+    const PCOLORS={grid:GOLD,ring:TEAL,chart:'#9b7fe8',euler:'#f2c44a',datatable:'#64b4ff',primetable:'#b464ff'};
     for(const reg of regs){
       await new Promise(r=>setTimeout(r,0));
       if(reg.w<2||reg.h<2)continue;
@@ -4748,7 +5329,7 @@ init();
 <div id="em-box">
   <div class="em-head">
     <span class="em-head-title">Export PNG</span>
-    <button class="em-close" onclick="closeEM()">x</button>
+    <button class="em-close" onclick="closeEM()">✕</button>
   </div>
   <div class="em-body">
     <!-- LEFT COLUMN -->
@@ -4761,12 +5342,16 @@ init();
       <div class="em-sec">Resolution</div>
       <div class="em-field">
         <select id="em-res" onchange="updateEMPreview()">
-          <option value="1920x1080">1080p — 1920 × 1080</option>
+          <option value="3840x2160" selected>4K — 3840 × 2160 ★</option>
+          <option value="5120x2880">5K — 5120 × 2880</option>
+          <option value="7680x4320">8K — 7680 × 4320</option>
           <option value="2560x1440">1440p — 2560 × 1440</option>
-          <option value="3840x2160">4K — 3840 × 2160</option>
-          <option value="2160x2160">Square — 2160 × 2160</option>
+          <option value="1920x1080">1080p — 1920 × 1080</option>
+          <option value="2160x2160">Square 4K — 2160 × 2160</option>
+          <option value="3840x3840">Square 8K — 3840 × 3840</option>
           <option value="1080x1920">Portrait — 1080 × 1920</option>
           <option value="2400x1350">Presentation — 2400 × 1350</option>
+          <option value="4800x2700">Presentation 4K — 4800 × 2700</option>
         </select>
       </div>
 
@@ -4786,51 +5371,120 @@ init();
         <label class="em-chk"><input type="checkbox" id="em-author" checked onchange="updateEMPreview()"> Author</label>
         <label class="em-chk"><input type="checkbox" id="em-gridlines-exp" onchange="updateEMPreview()"> Grid lines overlay</label>
       </div>
-    </div>
 
-    <!-- RIGHT COLUMN -->
-    <div class="em-col">
       <div class="em-sec">Panels to Include</div>
       <div class="em-panels">
         <button class="em-panel-btn grid-b on" id="emp-grid" onclick="toggleEMPanel('grid')">⊞ Grid</button>
         <button class="em-panel-btn ring-b on" id="emp-ring" onclick="toggleEMPanel('ring')">◎ Ring</button>
         <button class="em-panel-btn chart-b on" id="emp-chart" onclick="toggleEMPanel('chart')">∿ Chart</button>
         <button class="em-panel-btn euler-b on" id="emp-euler" onclick="toggleEMPanel('euler')">∏ Euler</button>
+        <button class="em-panel-btn" id="emp-datatable" style="color:var(--teal);border-color:rgba(61,200,184,.35);" onclick="toggleEMPanel('datatable')">⊟ Data Table</button>
+        <button class="em-panel-btn" id="emp-primetable" style="color:var(--violet);border-color:rgba(155,127,232,.35);" onclick="toggleEMPanel('primetable')">∑ Prime Table</button>
       </div>
+    </div>
 
+    <!-- RIGHT COLUMN -->
+    <div class="em-col">
       <div class="em-sec">Layout</div>
       <div class="em-layouts" id="em-layouts">
+
         <button class="em-layout-btn" data-layout="single" onclick="setEMLayout('single',this)" title="Single panel">
           <div class="em-layout-thumb" style="flex-direction:column;"><div style="flex:1;background:rgba(200,168,74,.3);"></div></div>
           <span>Single</span>
         </button>
-        <button class="em-layout-btn" data-layout="2h" onclick="setEMLayout('2h',this)" title="Two horizontal">
-          <div class="em-layout-thumb"><div style="flex:1;background:rgba(200,168,74,.25);"></div><div style="flex:1;background:rgba(61,200,184,.25);"></div></div>
+
+        <button class="em-layout-btn" data-layout="2h" onclick="setEMLayout('2h',this)" title="Two side by side">
+          <div class="em-layout-thumb">
+            <div style="flex:1;background:rgba(200,168,74,.25);"></div>
+            <div style="flex:1;background:rgba(61,200,184,.25);"></div>
+          </div>
           <span>2 Side</span>
         </button>
-        <button class="em-layout-btn" data-layout="2v" onclick="setEMLayout('2v',this)" title="Two vertical">
-          <div class="em-layout-thumb" style="flex-direction:column;"><div style="flex:1;background:rgba(200,168,74,.25);"></div><div style="flex:1;background:rgba(61,200,184,.25);"></div></div>
+
+        <button class="em-layout-btn" data-layout="2v" onclick="setEMLayout('2v',this)" title="Two stacked">
+          <div class="em-layout-thumb" style="flex-direction:column;">
+            <div style="flex:1;background:rgba(200,168,74,.25);"></div>
+            <div style="flex:1;background:rgba(61,200,184,.25);"></div>
+          </div>
           <span>2 Stack</span>
         </button>
-        <button class="em-layout-btn on" data-layout="3main" onclick="setEMLayout('3main',this)" title="Chart top + 2 below">
-          <div class="em-layout-thumb" style="flex-direction:column;"><div style="flex:1;background:rgba(155,127,232,.3);"></div><div style="flex:1;display:flex;gap:1px;"><div style="flex:1;background:rgba(200,168,74,.25);"></div><div style="flex:1;background:rgba(61,200,184,.25);"></div></div></div>
-          <span>3 Main</span>
-        </button>
+
         <button class="em-layout-btn" data-layout="3h" onclick="setEMLayout('3h',this)" title="Three in a row">
-          <div class="em-layout-thumb"><div style="flex:1;background:rgba(200,168,74,.25);"></div><div style="flex:1;background:rgba(61,200,184,.25);"></div><div style="flex:1;background:rgba(155,127,232,.25);"></div></div>
+          <div class="em-layout-thumb">
+            <div style="flex:1;background:rgba(200,168,74,.25);"></div>
+            <div style="flex:1;background:rgba(61,200,184,.25);"></div>
+            <div style="flex:1;background:rgba(155,127,232,.25);"></div>
+          </div>
           <span>3 Row</span>
         </button>
-        <button class="em-layout-btn" data-layout="4" onclick="setEMLayout('4',this)" title="2×2 grid">
-          <div class="em-layout-thumb" style="flex-direction:column;"><div style="flex:1;display:flex;gap:1px;"><div style="flex:1;background:rgba(200,168,74,.25);"></div><div style="flex:1;background:rgba(61,200,184,.25);"></div></div><div style="flex:1;background:rgba(155,127,232,.25);"></div></div>
-          <span>4-panel</span>
+
+        <button class="em-layout-btn" data-layout="3main" onclick="setEMLayout('3main',this)" title="One top, two below">
+          <div class="em-layout-thumb" style="flex-direction:column;">
+            <div style="flex:1;background:rgba(155,127,232,.3);"></div>
+            <div style="flex:1;display:flex;gap:1px;">
+              <div style="flex:1;background:rgba(200,168,74,.25);"></div>
+              <div style="flex:1;background:rgba(61,200,184,.25);"></div>
+            </div>
+          </div>
+          <span>3 Main</span>
         </button>
+
+        <button class="em-layout-btn" data-layout="4" onclick="setEMLayout('4',this)" title="Two top + one full-width bottom">
+          <div class="em-layout-thumb" style="flex-direction:column;">
+            <div style="flex:1;display:flex;gap:1px;">
+              <div style="flex:1;background:rgba(200,168,74,.25);"></div>
+              <div style="flex:1;background:rgba(61,200,184,.25);"></div>
+            </div>
+            <div style="flex:1;background:rgba(155,127,232,.25);"></div>
+          </div>
+          <span>2+1</span>
+        </button>
+
+        <button class="em-layout-btn on" data-layout="4grid" onclick="setEMLayout('4grid',this)" title="True 2×2 grid — all 4 panels equal">
+          <div class="em-layout-thumb" style="flex-direction:column;">
+            <div style="flex:1;display:flex;gap:1px;">
+              <div style="flex:1;background:rgba(200,168,74,.3);"></div>
+              <div style="flex:1;background:rgba(61,200,184,.3);"></div>
+            </div>
+            <div style="flex:1;display:flex;gap:1px;">
+              <div style="flex:1;background:rgba(155,127,232,.3);"></div>
+              <div style="flex:1;background:rgba(242,196,74,.25);"></div>
+            </div>
+          </div>
+          <span>2×2 Grid ★</span>
+        </button>
+
+        <button class="em-layout-btn" data-layout="triptych" onclick="setEMLayout('triptych',this)" title="One wide left + two stacked right">
+          <div class="em-layout-thumb">
+            <div style="flex:1.4;background:rgba(200,168,74,.25);"></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:1px;">
+              <div style="flex:1;background:rgba(61,200,184,.25);"></div>
+              <div style="flex:1;background:rgba(155,127,232,.25);"></div>
+            </div>
+          </div>
+          <span>Triptych</span>
+        </button>
+
+        <button class="em-layout-btn" data-layout="table-right" onclick="setEMLayout('table-right',this)" title="Visual left + table right">
+          <div class="em-layout-thumb">
+            <div style="flex:1.8;background:rgba(200,168,74,.25);"></div>
+            <div style="flex:1;background:rgba(100,180,255,.25);border-left:1px solid rgba(100,180,255,.4);">
+              <div style="font-size:6px;color:rgba(100,180,255,.6);padding:2px;line-height:1.3;">n C(n)<br>0 1.000<br>1 .530<br>2 .412</div>
+            </div>
+          </div>
+          <span>+ Table</span>
+        </button>
+
       </div>
 
       <div class="em-sec">Preview</div>
       <div id="em-preview-wrap">
         <canvas id="em-preview" height="120"></canvas>
       </div>
-      <div style="font-size:8px;color:var(--cream3);margin-top:5px;">Layout preview — not full fidelity</div>
+      <div style="font-size:8px;color:var(--cream3);margin-top:5px;line-height:1.6;">
+        Layout preview — not full fidelity<br>
+        <span style="color:var(--gold)">★ 2×2 Grid</span> needs 4 panels selected · <span style="color:var(--teal)">Triptych</span> needs 3
+      </div>
     </div>
   </div>
   <div class="em-foot">
