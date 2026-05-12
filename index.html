@@ -362,6 +362,15 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 #em-prog{font-family:var(--mono);font-size:9px;color:var(--teal);display:none;margin-left:6px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+/* ── LOCAL FACTOR MATRIX TABS ── */
+.lfm-tab{
+  background:none;border:1px solid var(--edge2);color:var(--cream3);
+  font-family:var(--mono);font-size:8px;letter-spacing:.07em;text-transform:uppercase;
+  padding:5px 13px;cursor:pointer;transition:all .12s;white-space:nowrap;
+}
+.lfm-tab:hover{color:var(--cream2);border-color:rgba(200,168,74,.3);}
+.lfm-tab.on{color:var(--gold);border-color:rgba(200,168,74,.55);background:rgba(200,168,74,.08);}
+
 /* ── FOCUS INDICATORS ── */
 table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-offset:-1px;background:rgba(200,168,74,.04)!important;}
 .cv-btn:focus-visible,.nb-step:focus-visible,.dd-nav-btn:focus-visible,.pd-btn:focus-visible,.dd-btn:focus-visible,.px-back:focus-visible,.px-dl:focus-visible{outline:1px solid rgba(61,200,184,.55);outline-offset:2px;}
@@ -560,7 +569,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <span class="nb-label">n</span>
   <button class="nb-step" onclick="stepN(-10)" title="-10">−10</button>
   <button class="nb-step" onclick="stepN(-1)">−</button>
-  <input id="nb-sl" type="range" min="0" max="500" value="0" oninput="setN(+this.value)">
+  <input id="nb-sl" type="range" min="0" max="1000" value="0" oninput="setN(+this.value)">
   <input id="nb-num" type="number" min="0" value="0" oninput="setN(+this.value||0)">
   <button class="nb-step" onclick="stepN(1)">+</button>
   <button class="nb-step" onclick="stepN(10)" title="+10">+10</button>
@@ -569,6 +578,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <span class="nb-stat teal">D(n) = <b id="nb-dn">—</b></span>
   <span class="nb-stat coral">Sat. p = <b id="nb-sat">—</b></span>
   <span class="nb-stat">ρ = <b id="nb-rho" style="color:var(--cream)">—</b></span>
+  <span class="nb-stat" title="Next prime saturation event — jump to it" style="cursor:pointer;" onclick="jumpToNextSat()">next sat @ n = <b id="nb-next-sat" style="color:var(--violet)">—</b></span>
   <div style="margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0;padding-left:10px;">
     <span class="nb-label" style="font-size:7px;">SPD</span>
     <input id="nb-anim-spd" type="range" min="60" max="950" value="300" title="Animation speed (right=faster)">
@@ -665,7 +675,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <div class="ibox">
     <strong>Saturation:</strong> prime p is <span style="color:var(--teal)">active</span> (p&nbsp;&gt;&nbsp;n+1) contributing 1−(n+1)/p², or
     <span style="color:var(--coral)">saturated</span> (p&nbsp;≤&nbsp;n+1) contributing 1−1/p.
-    As n→∞, C(n)→0 at rate e<sup>−γ</sup>/log(n+1).
+    As n→∞, D(n)=C(n)/ζ(2) ∼ e<sup>−γ</sup>/ln(n+1) (Mertens), hence C(n) ∼ ζ(2)·e<sup>−γ</sup>/ln(n+1).
   </div>
   <div class="pills" id="sat-pills"></div>
 </div>
@@ -682,7 +692,37 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
       <tbody id="prime-tbody"></tbody>
     </table>
   </div>
-  <div style="margin-top:8px;font-size:8px;color:var(--cream3);">First 60 primes. Partial C(n) = ζ(2) × running product. Converges from below.</div>
+  <div style="margin-top:8px;font-size:8px;color:var(--cream3);">First 60 primes. Partial C(n) = ζ(2) × running product. Converges from below. <span style="color:var(--violet)">Click any row to see its local factor matrix (p×p binary grid) and step-by-step detail.</span></div>
+  <!-- ══ MODULAR OPERATOR PANEL ══ -->
+  <div id="lfm-panel" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--edge);">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div>
+        <span style="font-family:var(--disp);font-size:.68rem;letter-spacing:.08em;color:var(--gold);">Modular Operator — p = <b id="lfm-p">?</b>, n = <b id="lfm-n">?</b></span>
+        <span style="margin-left:12px;font-size:8px;color:var(--cream3);">A<sub>p</sub><sup>(n)</sup> = (1/p) B<sub>p</sub><sup>(n)</sup></span>
+      </div>
+      <button onclick="closeLFM()" style="background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:8px;padding:3px 10px;cursor:pointer;">✕ Close</button>
+    </div>
+    <!-- Conceptual line -->
+    <div id="lfm-concept" style="font-size:8.5px;color:var(--cream3);line-height:1.75;margin-bottom:10px;padding:8px 12px;background:rgba(200,168,74,.04);border-left:2px solid rgba(200,168,74,.3);"></div>
+    <!-- Tab bar -->
+    <div style="display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="lfm-tab on" id="lfm-tab-B"   onclick="lfmTab('B')"   title="Binary matrix B_p^(n): 1=survives, 0=blocked">B — Binary</button>
+      <button class="lfm-tab"    id="lfm-tab-A"   onclick="lfmTab('A')"   title="Normalized operator A=(1/p)B: each cell is a survival probability">A = B/p</button>
+      <button class="lfm-tab"    id="lfm-tab-eig" onclick="lfmTab('eig')" title="Eigenvalue spectrum of A over ℝ — encodes graph connectivity">Eigenvalues</button>
+      <button class="lfm-tab"    id="lfm-tab-ent" onclick="lfmTab('ent')" title="Modular entropy H_p(n) = −Σ λᵢ log λᵢ across n">Entropy H(n)</button>
+    </div>
+    <!-- Canvas area -->
+    <div id="lfm-canvas-wrap" style="position:relative;">
+      <canvas id="lfm-cv" style="display:block;border:1px solid var(--edge);background:#04040d;image-rendering:pixelated;max-width:100%;"></canvas>
+    </div>
+    <!-- Stat bar -->
+    <div id="lfm-stat" style="margin-top:8px;font-size:8.5px;color:var(--cream3);line-height:1.7;"></div>
+    <!-- Axis labels -->
+    <div style="font-size:7.5px;color:var(--cream3);margin-top:4px;opacity:.7;">
+      Rows = r mod p (0 … p−1) · Columns = M mod p (0 … p−1)
+    </div>
+  </div>
 </div>
 
 <!-- SECTION 3: CHART -->
@@ -692,14 +732,14 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;font-size:9px;color:var(--cream3);align-items:center;">
     <span>— <span style="color:var(--gold)">C(n)</span></span>
     <span id="chart-dn-leg" style="display:none;">-- <span style="color:var(--teal)">D(n)</span></span>
-    <span id="chart-asymp-leg" style="display:none;">··· <span style="color:var(--violet)">e<sup>−γ</sup>/ln(n+1)</span></span>
+    <span id="chart-asymp-leg" style="display:none;">··· <span style="color:var(--violet)">ζ(2)·e<sup>−γ</sup>/ln(n+1)</span></span>
     <span>--- 6/π² ≈ 0.6079</span>
     <span>| Saturation events</span>
     <span>● n = <span id="chart-leg-n" style="color:var(--gold)">current</span></span>
   </div>
   <div class="chart-ctrls">
     <label title="Overlay raw density D(n)=C(n)/ζ(2)"><input type="checkbox" id="chart-dn" onchange="onChartOptChange()"> Show D(n)</label>
-    <label title="Mertens asymptotic bound e^{-γ}/ln(n+1)"><input type="checkbox" id="chart-asymp" onchange="onChartOptChange()"> Asymptotic</label>
+    <label title="C(n) asymptotic: ζ(2)·e^{-γ}/ln(n+1)"><input type="checkbox" id="chart-asymp" onchange="onChartOptChange()"> Asymptotic</label>
     <label title="Logarithmic Y axis"><input type="checkbox" id="chart-log" onchange="onChartOptChange()"> Log Y</label>
     <label title="Jump Δ brackets at saturation events"><input type="checkbox" id="chart-jumps" checked onchange="onChartOptChange()" style="accent-color:var(--coral)"> Jumps</label>
     <div class="cc-sep"></div>
@@ -749,7 +789,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <table class="dt">
       <thead><tr>
         <th>n</th><th>Block</th><th>C(n)</th><th>D(n)</th>
-        <th>C(n)/C(n−1)</th><th>Sat. primes</th><th>Event</th>
+        <th>C(n)/C(n−1)</th><th title="Signed difference C(n)−C(n−1); spikes mark saturation events">ΔC</th><th>Sat. primes</th><th>Event</th>
       </tr></thead>
       <tbody id="dt-body"></tbody>
     </table>
@@ -831,6 +871,9 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
       <option value="euclidean" selected>Euclidean (r,M)</option>
       <option value="fermat">H² / √M (Fermat)</option>
       <option value="farey">Farey strip (r/M)</option>
+      <option value="logm">Log-M strip</option>
+      <option value="linear">Linear density</option>
+      <option value="ulam">Ulam spiral</option>
     </select>
     <span class="cv-lbl" id="grid-info" style="color:var(--teal);margin-left:4px;"></span>
     <div class="cv-sep"></div>
@@ -1176,15 +1219,13 @@ function initCanvas2DGrid(){
   c2dCV.addEventListener('wheel',e=>{
     e.preventDefault();
     const f=e.deltaY>0?.83:1.2;
-    const nz=Math.max(1,Math.min(80,glZoom*f));
+    const nz=Math.max(0.25,Math.min(80,glZoom*f));
     const rect=c2dCV.getBoundingClientRect();
     const mx=(e.clientX-rect.left)/rect.width;
     const my=1-(e.clientY-rect.top)/rect.height;
     const ux=glPanU+(mx-.5)/glZoom, uy=glPanV+(my-.5)/glZoom;
     glPanU=ux-(mx-.5)/nz; glPanV=uy-(my-.5)/nz;
-    const h=.5/nz;
-    glPanU=Math.max(h,Math.min(1-h,glPanU));
-    glPanV=Math.max(h,Math.min(1-h,glPanV));
+    if(nz>1){const h=.5/nz;glPanU=Math.max(h,Math.min(1-h,glPanU));glPanV=Math.max(h,Math.min(1-h,glPanV));}else{glPanU=0.5;glPanV=0.5;}
     glZoom=nz; renderGrid();
   },{passive:false});
   c2dCV.addEventListener('mousedown',e=>{dragging=true;lx=e.clientX;ly=e.clientY;c2dCV.style.cursor='grabbing';});
@@ -1193,9 +1234,7 @@ function initCanvas2DGrid(){
       const r=c2dCV.getBoundingClientRect();
       glPanU-=(e.clientX-lx)/r.width/glZoom;
       glPanV+=(e.clientY-ly)/r.height/glZoom;
-      const h=.5/glZoom;
-      glPanU=Math.max(h,Math.min(1-h,glPanU));
-      glPanV=Math.max(h,Math.min(1-h,glPanV));
+      if(glZoom>1){const h=.5/glZoom;glPanU=Math.max(h,Math.min(1-h,glPanU));glPanV=Math.max(h,Math.min(1-h,glPanV));}else{glPanU=0.5;glPanV=0.5;}
       lx=e.clientX;ly=e.clientY; renderGrid();
     }
   });
@@ -1219,15 +1258,13 @@ function initCanvas2DGrid(){
       const dy=e.touches[0].clientY-e.touches[1].clientY;
       const dist=Math.sqrt(dx*dx+dy*dy);
       const f=dist/lastDist;
-      const nz=Math.max(1,Math.min(80,glZoom*f));
+      const nz=Math.max(0.25,Math.min(80,glZoom*f));
       setGridZoom(nz); lastDist=dist;
     }else{
       const tx=e.touches[0].clientX,ty=e.touches[0].clientY;
       glPanU-=(tx-lastTX)/rect.width/glZoom;
       glPanV+=(ty-lastTY)/rect.height/glZoom;
-      const h=.5/glZoom;
-      glPanU=Math.max(h,Math.min(1-h,glPanU));
-      glPanV=Math.max(h,Math.min(1-h,glPanV));
+      if(glZoom>1){const h=.5/glZoom;glPanU=Math.max(h,Math.min(1-h,glPanU));glPanV=Math.max(h,Math.min(1-h,glPanV));}else{glPanU=0.5;glPanV=0.5;}
       lastTX=tx;lastTY=ty; renderGrid();
     }
   },{passive:false});
@@ -1676,21 +1713,38 @@ function drawGridInspect(lctx,cW,cH){
   const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
   const cellW=cW/G*glZoom,cellH=cH/G*glZoom;
   const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
+  const globalRot=getGlobalRotGrid();
+  // Canvas centre (rotation pivot)
+  const rcx=cW/2,rcy=cH/2;
   _inspectGridPts.forEach(({r,M},idx)=>{
     if(r<1||r>G||M<1||M>G)return;
-    const px=((r-.5)/G-x0)*cW*glZoom;
-    const py=cH-((M-.5)/G-y0)*cH*glZoom;
+    // Per-point extra rotation angle (a/b × 2π)
+    const ptRot=_getInspectPtRotAngle(idx);
+    const totalRot=globalRot+ptRot;
+    // Unrotated pixel position
+    const pxRaw=((r-.5)/G-x0)*cW*glZoom;
+    const pyRaw=cH-((M-.5)/G-y0)*cH*glZoom;
+    // Apply total rotation around canvas centre
+    const dx=pxRaw-rcx,dy=pyRaw-rcy;
+    const cosR=Math.cos(totalRot),sinR=Math.sin(totalRot);
+    const px=rcx+dx*cosR-dy*sinR;
+    const py=rcy+dx*sinR+dy*cosR;
     const col=COLS[idx%COLS.length];
     let ok=true,ff=-1,fp=0;
     for(let j=0;j<=gridN&&ok;j++){const g=gcd(r,M+j);if(g>1){ok=false;ff=j;fp=spf(g);}}
-    // Crosshair (only for first point)
+    // Crosshair from rotated centre
     if(idx===0){
       lctx.save();lctx.strokeStyle='rgba(61,200,184,.35)';lctx.lineWidth=1;lctx.setLineDash([4,4]);
       lctx.beginPath();lctx.moveTo(0,py);lctx.lineTo(cW,py);lctx.moveTo(px,0);lctx.lineTo(px,cH);lctx.stroke();
       lctx.restore();
     }
-    // Cell fill
-    lctx.fillStyle=col+'22';lctx.fillRect(px-cellW/2,py-cellH/2,cellW,cellH);
+    // Spoke from canvas centre to point
+    lctx.strokeStyle=col+'88';lctx.lineWidth=1.2;
+    lctx.beginPath();lctx.moveTo(rcx,rcy);lctx.lineTo(px,py);lctx.stroke();
+    // Cell fill (rotated rect)
+    lctx.save();lctx.translate(px,py);lctx.rotate(totalRot);
+    lctx.fillStyle=col+'22';lctx.fillRect(-cellW/2,-cellH/2,cellW,cellH);
+    lctx.restore();
     // Cell circle
     const circR=Math.max(Math.min(cellW,cellH)*.46,5);
     lctx.strokeStyle=col;lctx.lineWidth=2;
@@ -1699,10 +1753,17 @@ function drawGridInspect(lctx,cW,cH){
     lctx.fillStyle=col+'dd';lctx.font=`bold ${Math.max(7,circR*.8)}px "JetBrains Mono",monospace`;
     lctx.textAlign='center';lctx.textBaseline='middle';lctx.fillText(idx+1,px,py);
     lctx.textBaseline='alphabetic';
+    // Rotation annotation if non-zero
+    if(ptRot!==0){
+      const rot=_inspectPtRot[idx]||{a:0,b:1};
+      const rotLbl=`+${rot.a}/${rot.b}·2π`;
+      lctx.fillStyle=col+'bb';lctx.font=`7px "JetBrains Mono",monospace`;
+      lctx.textAlign='center';lctx.fillText(rotLbl,px,py+circR+10);
+    }
     // Label
     const lbl=`r=${r} M=${M}  ${ok?'pass':('j='+ff)}`;
     const lx=Math.max(circR+2,Math.min(cW-60,px));
-    const ly=py-circR-10 < 10 ? py+circR+12 : py-circR-10;
+    const ly=py-circR-10 < 10 ? py+circR+22 : py-circR-10;
     lctx.fillStyle='rgba(4,4,13,.8)';
     const lw=lctx.measureText(lbl).width+10;
     lctx.fillRect(lx-lw/2,ly-9,lw,14);
@@ -1744,73 +1805,95 @@ function renderGrid(){
 
   gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 
-  // Cell label overlay (Canvas2D on top of WebGL when zoomed)
-  const showCellLabels=document.getElementById('grid-cell-labels')&&document.getElementById('grid-cell-labels').checked;
-  if(showCellLabels&&glZoom>=8){
-    const lblCV=document.getElementById('cv-gl-lbl');
-    if(lblCV){
-      const wrap=document.getElementById('cv-gl-wrap');
-      const cW=wrap.clientWidth,cH=wrap.clientHeight;
-      const dpr=Math.min(devicePixelRatio||1,2);
-      lblCV.width=cW*dpr;lblCV.height=cH*dpr;
-      const lctx=lblCV.getContext('2d');
-      lctx.setTransform(dpr,0,0,dpr,0,0);
-      lctx.clearRect(0,0,cW,cH);
-      const cellW=cW/G*glZoom;
-      const cellH=cH/G*glZoom;
-      if(cellW>18&&cellH>14){
-        const x0=glPanU-.5/glZoom,y0=glPanV-.5/glZoom;
-        const rMin=Math.max(1,Math.floor(x0*G)+1);
-        const rMax=Math.min(G,Math.ceil((glPanU+.5/glZoom)*G));
-        const MMin=Math.max(1,Math.floor(y0*G)+1);
-        const MMax=Math.min(G,Math.ceil((glPanV+.5/glZoom)*G));
-        const lsz=parseInt(document.getElementById('global-label-sz').value)||9;
-        const lmode=document.getElementById('global-label-mode').value;
-        lctx.font=`${Math.min(lsz,cellH*.32)}px 'JetBrains Mono',monospace`;
-        lctx.textAlign='center';lctx.textBaseline='middle';
-        for(let r=rMin;r<=rMax;r++){
-          for(let M=MMin;M<=MMax;M++){
-            let ok=true,ff=-1;
-            for(let j=0;j<=gridN&&ok;j++){if(gcd(r,M+j)>1){ok=false;ff=j;}}
-            const px=((r-1)/G-x0)*cW*glZoom;
-            const py=(1-((M-1)/G-y0)*glZoom)*cH - cellH;
-            lctx.fillStyle=ok?'rgba(0,0,0,.75)':'rgba(255,255,255,.5)';
-            let lbl;
-            if(lmode==='rm')lbl=`${r}/${M}`;
-            else if(lmode==='r')lbl=`${r}`;
-            else if(lmode==='gcd')lbl=ok?'1':`${gcd(r,M)}`;
-            else lbl='';
-            if(lbl)lctx.fillText(lbl,px+cellW/2,py+cellH*.38);
-            if(cellH>22&&lmode!=='none'){
-              lctx.font=`${Math.min(lsz-2,cellH*.26)}px 'JetBrains Mono',monospace`;
-              lctx.fillStyle=ok?'rgba(0,0,0,.55)':'rgba(200,168,74,.5)';
-              lctx.fillText(ok?'ok':`j=${ff}`,px+cellW/2,py+cellH*.68);
-              lctx.font=`${Math.min(lsz,cellH*.32)}px 'JetBrains Mono',monospace`;
-            }
-          }
-        }
-      }
-    }
-  } else {
-    const lblCV=document.getElementById('cv-gl-lbl');
-    if(lblCV){const lctx=lblCV.getContext('2d');lctx.clearRect(0,0,lblCV.width,lblCV.height);}
-  }
-
-  // Inspect + barrier + prime spiral overlay — always evaluate on label canvas
-  const _needOverlay=(_inspectGridPts.length>0)
-    ||(document.getElementById('grid-barriers')&&document.getElementById('grid-barriers').checked)
-    ||(document.getElementById('grid-prime-spiral')&&document.getElementById('grid-prime-spiral').checked);
-  if(_needOverlay){
+  // ── UNIFIED label-canvas block ──────────────────────────────────────────────
+  // Single clear + draw pass.  Canvas sized with Math.round consistently.
+  // Cell labels: text stays UPRIGHT — we compute each cell's actual screen-space
+  // centre by applying the INVERSE rotation (+gridRot) to the cell's t-space
+  // centre, then converting to CSS pixels.  No context.rotate() for labels.
+  // Overlays (barriers, spiral, inspect) each manage their own rotation.
+  {
     const lblCV=document.getElementById('cv-gl-lbl');
     if(lblCV){
       const wrap=document.getElementById('cv-gl-wrap');
       const cW=Math.max(1,wrap.clientWidth),cH=Math.max(1,wrap.clientHeight);
       const dpr=Math.min(devicePixelRatio||1,2);
-      if(lblCV.width!==Math.round(cW*dpr)||lblCV.height!==Math.round(cH*dpr)){
-        lblCV.width=Math.round(cW*dpr);lblCV.height=Math.round(cH*dpr);
-      }
+      const nW=Math.round(cW*dpr),nH=Math.round(cH*dpr);
+      if(lblCV.width!==nW||lblCV.height!==nH){lblCV.width=nW;lblCV.height=nH;}
       const lctx=lblCV.getContext('2d');
       lctx.setTransform(dpr,0,0,dpr,0,0);
+      lctx.clearRect(0,0,cW,cH); // single clear for the whole frame
+
+      // ── Layer 1: cell labels (upright text, rotation-aware positions) ──
+      const showCellLabels2=document.getElementById('grid-cell-labels')?.checked;
+      if(showCellLabels2&&glZoom>=8){
+        const cellW=cW/G*glZoom,cellH=cH/G*glZoom;
+        if(cellW>18&&cellH>14){
+          const lsz=parseInt(document.getElementById('global-label-sz').value)||9;
+          const lmode=document.getElementById('global-label-mode').value;
+          lctx.font=`${Math.min(lsz,cellH*.32)}px 'JetBrains Mono',monospace`;
+          lctx.textAlign='center';lctx.textBaseline='middle';
+
+          // gridRot is the angle the WebGL shader applied via cos(-gridRot)/sin(-gridRot).
+          // To find where cell (r,M) APPEARS on screen, rotate its t-space centre by
+          // +gridRot (the inverse) and convert to CSS pixels.
+          const gridRot=getGlobalRotGrid();
+          const cosR=Math.cos(gridRot),sinR=Math.sin(gridRot);
+
+          // Determine which (r,M) cells could be visible by rotating the 4 screen
+          // corners through the shader pipeline and taking the bounding box.
+          const x0=glPanU-.5/glZoom,x1=glPanU+.5/glZoom;
+          const y0=glPanV-.5/glZoom,y1=glPanV+.5/glZoom;
+          const cosN=Math.cos(-gridRot),sinN=Math.sin(-gridRot); // shader's rotation
+          const corners=[[x0,y0],[x1,y0],[x0,y1],[x1,y1]].map(([tx,ty])=>{
+            const cx=tx-.5,cy=ty-.5;
+            return [cx*cosN-cy*sinN+.5, cx*sinN+cy*cosN+.5];
+          });
+          const trxs=corners.map(p=>p[0]),trys=corners.map(p=>p[1]);
+          const rMinV=Math.max(1,Math.floor(Math.min(...trxs)*G));
+          const rMaxV=Math.min(G,Math.ceil(Math.max(...trxs)*G)+1);
+          const MMinV=Math.max(1,Math.floor(Math.min(...trys)*G));
+          const MMaxV=Math.min(G,Math.ceil(Math.max(...trys)*G)+1);
+
+          for(let r=rMinV;r<=rMaxV;r++){
+            for(let M=MMinV;M<=MMaxV;M++){
+              // Cell centre in t_rotated space (what the shader looks up)
+              const trx=(r-.5)/G,trY=(M-.5)/G;
+              // Rotate back +gridRot to get actual t (what maps to screen UV)
+              const ctrx=trx-.5,ctrY=trY-.5;
+              const tx=ctrx*cosR-ctrY*sinR+.5;
+              const ty=ctrx*sinR+ctrY*cosR+.5;
+              // Convert t → CSS screen position
+              const scx=(tx-glPanU)*glZoom*cW+.5*cW;
+              const scy=(ty-glPanV)*glZoom*cH+.5*cH;
+              // Cull cells outside the visible canvas
+              if(scx<-cellW||scx>cW+cellW||scy<-cellH||scy>cH+cellH)continue;
+
+              let ok=true,ff=-1;
+              for(let j=0;j<=gridN&&ok;j++){if(gcd(r,M+j)>1){ok=false;ff=j;}}
+              lctx.fillStyle=ok?'rgba(0,0,0,.75)':'rgba(255,255,255,.5)';
+              let lbl;
+              if(lmode==='rm')lbl=`${r}/${M}`;
+              else if(lmode==='r')lbl=`${r}`;
+              else if(lmode==='gcd')lbl=ok?'1':`${gcd(r,M)}`;
+              else lbl='';
+              if(lbl)lctx.fillText(lbl,scx,scy-.15*cellH);
+              if(cellH>22&&lmode!=='none'){
+                lctx.font=`${Math.min(lsz-2,cellH*.26)}px 'JetBrains Mono',monospace`;
+                lctx.fillStyle=ok?'rgba(0,0,0,.55)':'rgba(200,168,74,.5)';
+                lctx.fillText(ok?'ok':`j=${ff}`,scx,scy+.22*cellH);
+                lctx.font=`${Math.min(lsz,cellH*.32)}px 'JetBrains Mono',monospace`;
+              }
+            }
+          }
+        }
+      }
+
+      // ── Layer 2: inspect, barriers, prime-spiral overlays ──
+      // Dim non-selected points when inspect mode is active
+      if(inspectMode&&_inspectGridPts.length>0){
+        lctx.fillStyle='rgba(4,4,13,0.38)';
+        lctx.fillRect(0,0,cW,cH);
+      }
       drawGridInspect(lctx,cW,cH);
       drawGridBarriers(lctx,cW,cH);
       drawGridPrimeSpiral(lctx,cW,cH);
@@ -1839,14 +1922,14 @@ function renderGrid(){
 
 // ── ZOOM HELPERS (log-scale sliders) ──
 // Grid: slider 0-100 → zoom 1-80 on log scale
-function _sliderToGridZoom(v){return Math.pow(80,v/100);}
-function _gridZoomToSlider(z){return Math.round(Math.log(Math.max(1,z))/Math.log(80)*100);}
+function _sliderToGridZoom(v){return Math.pow(80,v/100)*0.25;}
+function _gridZoomToSlider(z){return Math.round(Math.log(Math.max(0.25,z)/0.25)/Math.log(80)*100);}
 // Ring: slider 0-100 → zoom 0.5-20 on log scale
 function _sliderToRingZoom(v){return .5*Math.pow(40,v/100);}
 function _ringZoomToSlider(z){return Math.round(Math.log(Math.max(.5,z)/.5)/Math.log(40)*100);}
 
 function setGridZoom(z){
-  glZoom=Math.max(1,Math.min(80,z));
+  glZoom=Math.max(0.25,Math.min(80,z));
   const sl=document.getElementById('grid-zoom-sl');
   const lbl=document.getElementById('grid-zoom-v');
   if(sl)sl.value=_gridZoomToSlider(glZoom);
@@ -1868,15 +1951,13 @@ function resetGridView(){glZoom=1;glPanU=0.5;glPanV=0.5;setGridZoom(1);}
 glCV.addEventListener('wheel',e=>{
   e.preventDefault();
   const f=e.deltaY>0?.83:1.2;
-  const nz=Math.max(1,Math.min(80,glZoom*f));
+  const nz=Math.max(0.25,Math.min(80,glZoom*f));
   const rect=glCV.getBoundingClientRect();
   const mx=(e.clientX-rect.left)/rect.width;
   const my=1-(e.clientY-rect.top)/rect.height;
   const ux=glPanU+(mx-.5)/glZoom, uy=glPanV+(my-.5)/glZoom;
   glPanU=ux-(mx-.5)/nz; glPanV=uy-(my-.5)/nz;
-  const h=.5/nz;
-  glPanU=Math.max(h,Math.min(1-h,glPanU));
-  glPanV=Math.max(h,Math.min(1-h,glPanV));
+  if(nz>1){const h=.5/nz;glPanU=Math.max(h,Math.min(1-h,glPanU));glPanV=Math.max(h,Math.min(1-h,glPanV));}else{glPanU=0.5;glPanV=0.5;}
   setGridZoom(nz); // syncs slider
 },{passive:false});
 
@@ -1886,9 +1967,7 @@ window.addEventListener('mousemove',e=>{
     const r=glCV.getBoundingClientRect();
     glPanU-=(e.clientX-glLX)/r.width/glZoom;
     glPanV+=(e.clientY-glLY)/r.height/glZoom;
-    const h=.5/glZoom;
-    glPanU=Math.max(h,Math.min(1-h,glPanU));
-    glPanV=Math.max(h,Math.min(1-h,glPanV));
+    if(glZoom>1){const h=.5/glZoom;glPanU=Math.max(h,Math.min(1-h,glPanU));glPanV=Math.max(h,Math.min(1-h,glPanV));}else{glPanU=0.5;glPanV=0.5;}
     glLX=e.clientX;glLY=e.clientY;
     renderGrid();
   }
@@ -1902,12 +1981,45 @@ window.addEventListener('mouseup',e=>{
     if(inspectMode&&!wasDrag){
       const rect=glCV.getBoundingClientRect();
       if(e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom){
-        const mx=(e.clientX-rect.left)/rect.width;
-        const my=1-(e.clientY-rect.top)/rect.height;
-        const u=glPanU+(mx-.5)/glZoom,v=glPanV+(my-.5)/glZoom;
-        const G=getGridG();
-        const r=Math.round(u*G),M=Math.round(v*G);
-        if(r>=1&&r<=G&&M>=1&&M<=G)_addGridInspectPt(r,M);
+        const viewMode=document.getElementById('grid-view-mode')?.value||'euclidean';
+        if(viewMode==='euclidean'){
+          const mx=(e.clientX-rect.left)/rect.width;
+          const my=1-(e.clientY-rect.top)/rect.height;
+          const u=glPanU+(mx-.5)/glZoom,v=glPanV+(my-.5)/glZoom;
+          const G=getGridG();
+          const r=Math.round(u*G),M=Math.round(v*G);
+          if(r>=1&&r<=G&&M>=1&&M<=G)_addGridInspectPt(r,M);
+        }else{
+          // Alt views: map click → (r,M) via inverse of the coordinate formulas
+          const lblCV=document.getElementById('cv-gl-lbl');
+          const dpr=Math.min(devicePixelRatio||1,2);
+          const cW=Math.max(1,lblCV.width)/dpr,cH=Math.max(1,lblCV.height)/dpr;
+          const PAD_L=38,PAD_R=14,PAD_T=14,PAD_B=30;
+          const PW=cW-PAD_L-PAD_R,PH=cH-PAD_T-PAD_B;
+          const PX=PAD_L,PY=PAD_T;
+          const cx=(e.clientX-rect.left)/rect.width*cW;
+          const cy=(e.clientY-rect.top)/rect.height*cH;
+          const G=getGridG();const n=getGridN();
+          let bestR=-1,bestM=-1,bestDist=1e9;
+          // Hit-test: find the closest rendered point within 10px
+          const HIT=12;
+          for(let M=2;M<=G;M++){
+            let py2,sqG,sqMin,yRange,logG,yTop,yBot,ySpan,u2;
+            if(viewMode==='fermat'){sqG=Math.sqrt(G);sqMin=Math.sqrt(2);yRange=sqG-sqMin;py2=PY+PH*(1-(Math.sqrt(M)-sqMin)/yRange);}
+            else if(viewMode==='farey'){yTop=0.5;yBot=1/G;ySpan=yTop-yBot;u2=(1/M-yBot)/ySpan;py2=PY+PH*(1-u2);}
+            else if(viewMode==='logm'){logG=Math.log(G);py2=PY+PH*(1-Math.log(M)/logG);}
+            else if(viewMode==='linear'){py2=PY+PH*(1-M/G);}
+            else continue;
+            if(Math.abs(cy-py2)>HIT*2)continue;
+            for(let r=1;r<M;r++){
+              const px2=PX+(r/M)*PW;
+              if(Math.abs(cx-px2)>HIT)continue;
+              const d=Math.hypot(cx-px2,cy-py2);
+              if(d<bestDist){bestDist=d;bestR=r;bestM=M;}
+            }
+          }
+          if(bestR>0&&bestDist<HIT*1.5)_addGridInspectPt(bestR,bestM);
+        }
       }
     }
     renderGrid();
@@ -1932,7 +2044,7 @@ glCV.addEventListener('touchmove',e=>{
     const dy=e.touches[0].clientY-e.touches[1].clientY;
     const dist=Math.sqrt(dx*dx+dy*dy);
     if(_glTouchDist>0){
-      const nz=Math.max(1,Math.min(80,glZoom*dist/_glTouchDist));
+      const nz=Math.max(0.25,Math.min(80,glZoom*dist/_glTouchDist));
       const h=.5/nz;
       glPanU=Math.max(h,Math.min(1-h,glPanU));
       glPanV=Math.max(h,Math.min(1-h,glPanV));
@@ -1943,9 +2055,7 @@ glCV.addEventListener('touchmove',e=>{
     const tx=e.touches[0].clientX,ty=e.touches[0].clientY;
     glPanU-=(tx-_glTX)/rect.width/glZoom;
     glPanV+=(ty-_glTY)/rect.height/glZoom;
-    const h=.5/glZoom;
-    glPanU=Math.max(h,Math.min(1-h,glPanU));
-    glPanV=Math.max(h,Math.min(1-h,glPanV));
+    if(glZoom>1){const h=.5/glZoom;glPanU=Math.max(h,Math.min(1-h,glPanU));glPanV=Math.max(h,Math.min(1-h,glPanV));}else{glPanU=0.5;glPanV=0.5;}
     _glTX=tx;_glTY=ty; renderGrid();
   }
 },{passive:false});
@@ -2151,6 +2261,10 @@ function renderRing(){
   const{rho2}=drawRingImpl(ctx,cW,cH,rZoom,rPanX,rPanY);
   drawRingBarriers(ctx,cW,cH);
   drawRingPrimeSpiral(ctx,cW,cH);
+  if(inspectMode&&_inspectRingPts.length>0){
+    ctx.fillStyle='rgba(4,4,13,0.38)';
+    ctx.fillRect(0,0,cW,cH);
+  }
   if(_inspectRingPts.length>0)drawRingInspect(ctx,cW,cH);
   const mMax=parseInt(document.getElementById('ring-max').value)||60;
   const ringN=getRingN();
@@ -2383,11 +2497,11 @@ function drawChartImpl(ctx,W,H,n,opts){
     ctx.textAlign='left';ctx.fillText('6/π²',pad.l+pw+5,ry+3);
   }
 
-  // Asymptotic e^{-γ}/ln(n+1)
+  // Asymptotic ζ(2)·e^{-γ}/ln(n+1)  [correct asymptotic for C(n)]
   if(showAsymp){
     ctx.beginPath();let aStarted=false;
     for(let i=1;i<=MAX;i++){
-      const v=Math.exp(-EULER_GAMMA)/Math.log(i+1);
+      const v=ZETA2*Math.exp(-EULER_GAMMA)/Math.log(i+1);
       const y=toY(v);
       if(y<pad.t-12||y>pad.t+ph+12){aStarted=false;continue;}
       const x=toX(i);
@@ -2426,7 +2540,7 @@ function drawChartImpl(ctx,W,H,n,opts){
   ctx.strokeStyle=lg;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
 
   // Notable points
-  [[0,getCn(0),'C(0)=1'],[1,getCn(1),'C(1)=z(2)*FT']].forEach(([ni,val,lbl])=>{
+  [[0,getCn(0),'C(0)=1'],[1,getCn(1),'C(1)≈0.5307']].forEach(([ni,val,lbl])=>{
     if(ni>MAX)return;
     const x=toX(ni),y=toY(val);
     ctx.beginPath();ctx.arc(x,y,4,0,2*Math.PI);ctx.fillStyle='rgba(200,168,74,.5)';ctx.fill();
@@ -2537,13 +2651,13 @@ function setupChartHover(){
       getCn(ni);
       const Cn=_cn[ni]||0;
       const Dn=Cn/ZETA2;
-      const aVal=(ni>0?Math.exp(-EULER_GAMMA)/Math.log(ni+1):1);
+      const aVal=(ni>0?ZETA2*Math.exp(-EULER_GAMMA)/Math.log(ni+1):1);
       const bar=document.getElementById('chart-hover-bar');
       if(bar)bar.innerHTML=
         `n=<span class="chb-val gold">${ni}</span> &nbsp;`+
         `C(n)=<span class="chb-val gold">${Cn.toFixed(7)}</span> &nbsp;`+
         `D(n)=<span class="chb-val teal">${Dn.toFixed(7)}</span> &nbsp;`+
-        `e⁻ᵞ/ln(n+1)=<span class="chb-val violet">${aVal.toFixed(6)}</span> &nbsp;`+
+        `ζ(2)·e⁻ᵞ/ln(n+1)=<span class="chb-val violet">${aVal.toFixed(6)}</span> &nbsp;`+
         `Sat=<span class="chb-val">${numSat(ni)}</span> &nbsp;Block=${ni+1}`;
     }
     if(!_chartHoverRAF){
@@ -2563,17 +2677,17 @@ function setupChartHover(){
 // ══════════════════════════════════════════════════════════
 //  GLOBAL ANIMATION (top-bar play button — drives everything)
 // ══════════════════════════════════════════════════════════
-let _gAnimTO=null,_gAnimCur=0,_gAnimEnd=100,_gAnimDir2=1;
+let _gAnimTO=null,_gAnimCur=0,_gAnimEnd=1000,_gAnimDir2=1;
 
 function toggleGlobalAnim(){
   if(_gAnimTO){stopGlobalAnim();return;}
   stopAnim(); // stop canvas-only anim if running
   const btn=document.getElementById('nb-play');
-  // Direction: always 0→target so user sees the story build
   _gAnimDir2=1;
   _gAnimCur=0;
-  _gAnimEnd=Math.max(N,50); // animate up to current N (min 50)
-  if(N<5)_gAnimEnd=100;
+  // Always animate to the slider's full range (default 1000)
+  const slEl=document.getElementById('nb-sl');
+  _gAnimEnd=slEl?parseInt(slEl.max)||1000:1000;
   btn.textContent='■ Stop';btn.classList.add('playing');
   _stepGlobalAnim();
 }
@@ -2597,7 +2711,7 @@ function _updateUIAnimFrame(){
   const n=N;
   const Cn=getCn(n),Dn=Cn/ZETA2;
   const sat=numSat(n);const next=nextSatN(n);
-  document.getElementById('nb-sl').value=Math.min(n,500);
+  const _sl=document.getElementById('nb-sl');if(_sl)_sl.value=Math.min(n,parseInt(_sl.max)||1000);
   document.getElementById('nb-num').value=n;
   document.getElementById('nb-cn').textContent=Cn.toFixed(6);
   document.getElementById('nb-dn').textContent=Dn.toFixed(6);
@@ -2676,7 +2790,7 @@ function exportChartPNG(){
 // ── 2. CHART CSV ──
 function exportChartCSV(){
   const xMax=parseInt(document.getElementById('chart-xmax')?document.getElementById('chart-xmax').value:100)||100;
-  const rows=[['n','Block','C(n)','D(n)','C(n)/C(n-1)','Sat.primes','Event','Asymptotic e^-gamma/ln(n+1)']];
+  const rows=[['n','Block','C(n)','D(n)','C(n)/C(n-1)','Sat.primes','Event','Asymptotic zeta2*e^-gamma/ln(n+1)']];
   for(let i=0;i<=xMax;i++){
     getCn(i);
     const Cn=_cn[i],Dn=Cn/ZETA2;
@@ -2684,7 +2798,7 @@ function exportChartCSV(){
     const isPrimeSat=i>0&&PS.has(i+1);
     const ev=isPrimeSat?`p=${i+1} sat.`:(i===0?'start':'');
     const ratio=i===0?'':(Cn/_cn[i-1]).toFixed(10);
-    const asymp=i>0?(Math.exp(-EULER_GAMMA)/Math.log(i+1)).toFixed(10):'';
+    const asymp=i>0?(ZETA2*Math.exp(-EULER_GAMMA)/Math.log(i+1)).toFixed(10):'';
     rows.push([i,i+1,Cn.toFixed(12),Dn.toFixed(12),ratio,sat,ev,asymp]);
   }
   _dlCSV(rows,`cn_chart_n${N}_xmax${xMax}.csv`);
@@ -2828,6 +2942,9 @@ function buildDataTable(){
     const isPrimeSat=(i>0&&PS.has(i+1));
     const ev=isPrimeSat?`p=${i+1} sat.`:(i===0?'start':'');
     const ratio=i===0?'—':(_cn[i]/_cn[i-1]).toFixed(5);
+    const delta_c=i===0?'—':(_cn[i]-_cn[i-1]).toFixed(6);
+    const delta_c_val=i===0?null:(_cn[i]-_cn[i-1]);
+    const isSatEvent=(i>0&&PS.has(i+1));
     const hi=(i===n);
     rows.push(`<tr class="${hi?'td-hi':''}" onclick="showDataRowDetail(${i})" tabindex="0" role="button" aria-label="n=${i} — click for step-by-step derivation" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showDataRowDetail(${i});}">
       <td style="color:${hi?'var(--gold)':'var(--cream3)'};">${i}</td>
@@ -2835,6 +2952,9 @@ function buildDataTable(){
       <td class="td-cn">${Cn.toFixed(6)}</td>
       <td>${Dn.toFixed(6)}</td>
       <td style="color:var(--cream2)">${ratio}</td>
+      <td style="color:${isSatEvent?'var(--coral)':'var(--cream3)'};" title="${isSatEvent?'Saturation drop: prime p='+(i+1)+' enters':''}">
+        ${isSatEvent&&delta_c_val!==null?'▼ '+delta_c:delta_c}
+      </td>
       <td style="color:var(--cream3)">${sat}</td>
       <td class="td-ev">${ev}</td>
     </tr>`);
@@ -3046,7 +3166,7 @@ function _renderDD(rowN){
           <div class="kv"><span class="kv-k">Saturated primes</span><span class="kv-v coral">${satPrimes.slice(0,12).join(', ')}${satPrimes.length>12?'…':''}</span></div>
           <div class="kv"><span class="kv-k">Next saturation at</span><span class="kv-v teal">n = ${nextSatN(n)} (p = ${nextSatN(n)+1})</span></div>
           <div class="kv"><span class="kv-k">Active primes (first few)</span><span class="kv-v">${actPrimes.slice(0,8).join(', ')}${actPrimes.length>8?'…':''}</span></div>
-          <div class="dd-note">As n → ∞, C(n) → 0 at rate e<sup>−γ</sup> / log(n+1) by Mertens' theorem.</div>
+          <div class="dd-note">As n → ∞, D(n)=C(n)/ζ(2) ∼ e<sup>−γ</sup> / ln(n+1) (Mertens), hence C(n) ∼ ζ(2)·e<sup>−γ</sup> / ln(n+1).</div>
         </div>
       </div>
 
@@ -3069,10 +3189,26 @@ function _renderDD(rowN){
 
 // Keyboard nav inside modal
 document.addEventListener('keydown',e=>{
-  if(!document.getElementById('dd-overlay').classList.contains('open'))return;
-  if(e.key==='ArrowLeft')_ddNav(-1);
-  else if(e.key==='ArrowRight')_ddNav(1);
-  else if(e.key==='Escape')closeDD();
+  // Arrow navigation inside data-row detail modal
+  if(document.getElementById('dd-overlay').classList.contains('open')){
+    if(e.key==='ArrowLeft')_ddNav(-1);
+    else if(e.key==='ArrowRight')_ddNav(1);
+    else if(e.key==='Escape')closeDD();
+    return;
+  }
+  // Skip if focus is in an input/select/textarea
+  const tag=(document.activeElement||{}).tagName||'';
+  if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+  // Arrow keys: step or jump n
+  if(e.key==='ArrowRight'||e.key==='ArrowUp'){
+    e.preventDefault();
+    if(e.shiftKey) jumpToNextSat();
+    else stepN(1);
+  } else if(e.key==='ArrowLeft'||e.key==='ArrowDown'){
+    e.preventDefault();
+    if(e.shiftKey) stepN(-1); // shift+left = step back 1
+    else stepN(-1);
+  }
 });
 
 
@@ -3084,11 +3220,18 @@ function buildPrimeTable(){
     ld+=lf;
     const pD=Math.exp(ld),pC=ZETA2*pD;
     const sat=p<=n+1;
+    // Bar: width proportional to fac (0..1), color teal=active coral=saturated
+    const barW=Math.round(fac*60);
+    const barCol=sat?'var(--coral)':'var(--teal)';
+    const facBar=`<div style="display:flex;align-items:center;gap:5px;">
+      <span>${fac.toFixed(7)}</span>
+      <div style="width:${barW}px;height:5px;background:${barCol};opacity:.7;flex-shrink:0;border-radius:1px;" title="f_p(n)=${fac.toFixed(5)}"></div>
+    </div>`;
     return `<tr onclick="showPrimeDetail(${p},${ld})" tabindex="0" role="button" aria-label="Prime ${p} — click for step-by-step detail" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showPrimeDetail(${p},${ld});}" title="Click for step-by-step detail">
       <td class="${sat?'td-cn':''}" style="color:${sat?'var(--coral)':'var(--teal)'}">${p}</td>
       <td style="font-size:8px;color:${sat?'var(--coral)':'var(--teal)'};letter-spacing:.08em">${sat?'SAT':'ACT'}</td>
       <td>${m}</td><td>${p2}</td>
-      <td>${fac.toFixed(7)}</td>
+      <td style="padding-right:6px">${facBar}</td>
       <td style="color:var(--cream3)">${lf.toFixed(7)}</td>
       <td>${pD.toFixed(7)}</td>
       <td class="td-cn">${pC.toFixed(6)}</td>
@@ -3139,7 +3282,7 @@ function stepAnim(){
 // ══════════════════════════════════════════════════════════
 //  UI UPDATE
 // ══════════════════════════════════════════════════════════
-const KNOWN={0:'C(0)=1 · trivial coprime density',1:'zeta(2) x Feller-Tornier · C_FT=prod(1-2/p^2)=0.3226'};
+const KNOWN={0:'C(0)=1 · trivial coprime density · D(0)=6/π²',1:'C(1)=ζ(2)·D(1)≈0.5307 · D(1)=∏(1−2/p²)≈0.3226 · C_FT=(1+D(1))/2≈0.6613'};
 
 function _updateHeroFormula(n, Cn){
   const nEl=document.getElementById('hl-n');
@@ -3156,11 +3299,13 @@ function updateUI(){
   const sat=numSat(n);const next=nextSatN(n);
 
   // Sticky bar
-  document.getElementById('nb-sl').value=Math.min(n,500);
+  const _sl=document.getElementById('nb-sl');if(_sl)_sl.value=Math.min(n,parseInt(_sl.max)||1000);
   document.getElementById('nb-num').value=n;
   document.getElementById('nb-cn').textContent=Cn.toFixed(6);
   document.getElementById('nb-dn').textContent=Dn.toFixed(6);
   document.getElementById('nb-sat').textContent=sat;
+  const _nextEl=document.getElementById('nb-next-sat');
+  if(_nextEl)_nextEl.textContent=next==='∞'?'∞':next;
 
   // Hero live formula
   _updateHeroFormula(n, Cn);
@@ -3189,10 +3334,436 @@ function updateUI(){
 
 function setN(n){
   N=Math.max(0,Math.floor(+n)||0);
+  // Persist n in URL without reloading
+  try{
+    const url=new URL(window.location.href);
+    url.searchParams.set('n',N);
+    history.replaceState(null,'',url);
+  }catch(e){}
   updateUI();
 }
 
 function stepN(d){setN(Math.max(0,N+d));}
+
+// ══════════════════════════════════════════════════════════
+//  MODULAR OPERATOR  A_p^(n) = (1/p) B_p^(n)
+// ══════════════════════════════════════════════════════════
+let _lfmP=2, _lfmTab='B';
+
+// Build the p×p binary matrix B and return it as a flat Uint8Array (row-major)
+function _buildBmatrix(p,n){
+  const B=new Uint8Array(p*p);
+  const forbidden=new Set();
+  for(let j=0;j<=n;j++) forbidden.add((((-j)%p)+p)%p);
+  for(let r=0;r<p;r++){
+    for(let M=0;M<p;M++){
+      B[r*p+M]=(r===0&&forbidden.has(M))?0:1;
+    }
+  }
+  return B;
+}
+
+// Power-iteration eigenvalues of the symmetric p×p float matrix (A = B/p)
+// Returns sorted eigenvalues descending (real, since A is real symmetric)
+// Uses Jacobi iterations for small p; for p>30 uses a simpler approach
+function _eigenvalues(p,B){
+  // Build float matrix A = B/p
+  const A=new Float64Array(p*p);
+  for(let i=0;i<p*p;i++) A[i]=B[i]/p;
+  // Jacobi eigenvalue algorithm (iterative, good for p<=61)
+  // Work with a copy
+  const M2=new Float64Array(A); // matrix (will be modified)
+  const V=new Float64Array(p*p); // eigenvectors
+  for(let i=0;i<p;i++) V[i*p+i]=1; // identity
+  const MAX_ITER=200*p;
+  for(let iter=0;iter<MAX_ITER;iter++){
+    // Find largest off-diagonal
+    let maxVal=0,pr=-1,pc=-1;
+    for(let i=0;i<p;i++) for(let j=i+1;j<p;j++){
+      const v=Math.abs(M2[i*p+j]);
+      if(v>maxVal){maxVal=v;pr=i;pc=j;}
+    }
+    if(maxVal<1e-12) break;
+    // Compute rotation
+    const Mpp=M2[pr*p+pr],Mcc=M2[pc*p+pc],Mpc=M2[pr*p+pc];
+    const theta=(Mcc-Mpp)/(2*Mpc);
+    const t=theta>=0?1/(theta+Math.sqrt(1+theta*theta)):1/(theta-Math.sqrt(1+theta*theta));
+    const c=1/Math.sqrt(1+t*t),s=t*c;
+    // Update matrix
+    for(let i=0;i<p;i++){
+      if(i===pr||i===pc) continue;
+      const Mip=M2[i*p+pr],Mic=M2[i*p+pc];
+      M2[i*p+pr]=M2[pr*p+i]=c*Mip-s*Mic;
+      M2[i*p+pc]=M2[pc*p+i]=s*Mip+c*Mic;
+    }
+    M2[pr*p+pr]=c*c*Mpp-2*s*c*Mpc+s*s*Mcc;
+    M2[pc*p+pc]=s*s*Mpp+2*s*c*Mpc+c*c*Mcc;
+    M2[pr*p+pc]=M2[pc*p+pr]=0;
+    // Update eigenvectors
+    for(let i=0;i<p;i++){
+      const Vip=V[i*p+pr],Vic=V[i*p+pc];
+      V[i*p+pr]=c*Vip-s*Vic;
+      V[i*p+pc]=s*Vip+c*Vic;
+    }
+  }
+  const eigs=[];
+  for(let i=0;i<p;i++) eigs.push(M2[i*p+i]);
+  eigs.sort((a,b)=>b-a);
+  return eigs;
+}
+
+// Modular entropy H = -Σ λᵢ log|λᵢ| for nonzero eigenvalues
+function _entropy(eigs){
+  let H=0;
+  for(const lam of eigs){
+    const al=Math.abs(lam);
+    if(al>1e-10) H-=al*Math.log(al);
+  }
+  return H;
+}
+
+function _conceptText(p,n,gold,total,sat,eigs,H){
+  const fp=(gold/total).toFixed(6);
+  const lam0=eigs[0].toFixed(5);
+  const lam1=eigs.length>1?eigs[1].toFixed(5):'—';
+  const gap=(eigs[0]-(eigs[1]||0)).toFixed(5);
+  return `<b style="color:var(--gold)">B<sub>p</sub><sup>(n)</sup></b> is a ${p}×${p} binary matrix: cell (r,M) = 1 if the block M,M+1,…,M+n survives the local sieve mod p, else 0. `+
+    `<b style="color:var(--teal)">A<sub>p</sub><sup>(n)</sup> = B/p</b> normalizes this to a probability operator — its row/column sums are bounded, and `+
+    `<span style="color:var(--gold)">∑A = ${fp} = f<sub>p</sub>(n)</span>, exactly the local Euler factor. `+
+    (sat
+      ?`<span style="color:var(--coral)">Saturated (p≤n+1):</span> the entire r=0 row is blocked — one full row of B is zero. `
+      :`Active (p>n+1): only ${Math.min(n+1,p)} of ${p} columns in row r=0 are blocked. `)
+    +`Largest eigenvalue λ₀ = <b style="color:var(--teal)">${lam0}</b> (spectral radius). `
+    +`Spectral gap λ₀−λ₁ = <b style="color:var(--violet)">${gap}</b>. `
+    +`Modular entropy H = <b style="color:var(--lime)">${H.toFixed(5)}</b>.`;
+}
+
+function lfmTab(tab){
+  _lfmTab=tab;
+  ['B','A','eig','ent'].forEach(t=>{
+    const el=document.getElementById('lfm-tab-'+t);
+    if(el) el.classList.toggle('on',t===tab);
+  });
+  drawLocalFactorMatrix(_lfmP);
+}
+
+function drawLocalFactorMatrix(p){
+  _lfmP=p;
+  const n=N;
+  const panel=document.getElementById('lfm-panel');
+  const cv=document.getElementById('lfm-cv');
+  const stat=document.getElementById('lfm-stat');
+  const pLabel=document.getElementById('lfm-p');
+  const nLabel=document.getElementById('lfm-n');
+  const concept=document.getElementById('lfm-concept');
+  if(!panel||!cv)return;
+  panel.style.display='block';
+  pLabel.textContent=p;
+  if(nLabel) nLabel.textContent=n;
+
+  const B=_buildBmatrix(p,n);
+  const sat=p<=n+1;
+  const total=p*p;
+  let gold=0; for(let i=0;i<total;i++) if(B[i]) gold++;
+  const fp=gold/total;
+  const theory=1-Math.min(n+1,p)/total;
+
+  // Eigenvalues (only for p<=59 to keep it fast)
+  const eigs=(p<=59)?_eigenvalues(p,B):[];
+  const H=(eigs.length>0)?_entropy(eigs):NaN;
+
+  // Update concept strip
+  if(concept&&eigs.length>0) concept.innerHTML=_conceptText(p,n,gold,total,sat,eigs,H);
+  else if(concept) concept.textContent=`p=${p} is large; eigenvalue computation skipped (p>59).`;
+
+  const tab=_lfmTab;
+
+  if(tab==='B'||tab==='A'){
+    _drawMatrixCanvas(cv,p,B,tab,sat,fp,total,gold);
+  } else if(tab==='eig'){
+    _drawEigenCanvas(cv,p,eigs,sat,n);
+  } else if(tab==='ent'){
+    _drawEntropyCanvas(cv,p,n,sat);
+  }
+
+  // Stat bar
+  const trA=(eigs.length>0)?(eigs.reduce((s,l)=>s+l,0)).toFixed(6):'—';
+  const rankA=(eigs.length>0)?eigs.filter(l=>Math.abs(l)>1e-8).length:'—';
+  stat.innerHTML=`
+    <span style="color:var(--gold)">f<sub>p</sub>(n) = ${fp.toFixed(8)}</span> &nbsp;·&nbsp;
+    gold ${gold}/${total} &nbsp;·&nbsp;
+    theory 1−${Math.min(n+1,p)}/${total} = <span style="color:var(--teal)">${theory.toFixed(8)}</span>
+    ${eigs.length>0?`&nbsp;·&nbsp; λ₀=<span style="color:var(--teal)">${eigs[0].toFixed(6)}</span>
+    &nbsp;·&nbsp; rank=<span style="color:var(--violet)">${rankA}</span>
+    &nbsp;·&nbsp; H=<span style="color:var(--lime)">${H.toFixed(5)}</span>`:''}
+    ${sat?' &nbsp;·&nbsp; <span style="color:var(--coral)">SATURATED</span>':''}
+  `;
+
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function _drawMatrixCanvas(cv,p,B,tab,sat,fp,total,gold){
+  const CELL=Math.max(4,Math.min(36,Math.floor(520/p)));
+  const W=p*CELL,H=p*CELL;
+  cv.width=W; cv.height=H;
+  cv.style.width=Math.min(W,520)+'px';
+  cv.style.height=Math.round(Math.min(W,520)/W*H)+'px';
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  for(let r=0;r<p;r++){
+    for(let M=0;M<p;M++){
+      const alive=B[r*p+M];
+      // B tab: binary gold/coral
+      // A tab: gold brightness ∝ 1/p (dimmer for larger p), blocked = coral
+      if(tab==='B'){
+        ctx.fillStyle=alive?'rgba(200,168,74,.85)':'rgba(224,80,96,.85)';
+      } else {
+        // A = B/p: show value as brightness — alive cell has value 1/p
+        if(alive){
+          const brightness=Math.max(0.18,Math.min(0.88,1/p*p*0.8)); // scale for visibility
+          ctx.fillStyle=`rgba(61,200,184,${brightness.toFixed(2)})`;
+        } else {
+          ctx.fillStyle='rgba(224,80,96,.55)';
+        }
+      }
+      ctx.fillRect(M*CELL,r*CELL,CELL-1,CELL-1);
+
+      // Value labels for small matrices
+      if(CELL>=14&&p<=17){
+        ctx.font=`${Math.min(CELL-4,9)}px JetBrains Mono,monospace`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        if(tab==='A'){
+          ctx.fillStyle=alive?'rgba(255,255,255,.7)':'rgba(255,255,255,.35)';
+          ctx.fillText(alive?`1/${p}`:'0',M*CELL+CELL/2,r*CELL+CELL/2);
+        } else {
+          ctx.fillStyle=alive?'rgba(4,4,13,.7)':'rgba(255,255,255,.5)';
+          ctx.fillText(alive?'1':'0',M*CELL+CELL/2,r*CELL+CELL/2);
+        }
+      }
+    }
+  }
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,.07)';
+  ctx.lineWidth=0.5;
+  for(let i=0;i<=p;i++){
+    ctx.beginPath();ctx.moveTo(i*CELL,0);ctx.lineTo(i*CELL,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,i*CELL);ctx.lineTo(W,i*CELL);ctx.stroke();
+  }
+
+  // Highlight r=0 row border
+  ctx.strokeStyle='rgba(224,80,96,.6)';
+  ctx.lineWidth=1.5;
+  ctx.strokeRect(0,0,W,CELL);
+
+  // Tab label in corner
+  if(CELL>=8){
+    ctx.font='bold 9px JetBrains Mono,monospace';
+    ctx.fillStyle='rgba(200,168,74,.6)';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText(tab==='B'?'B':'A = B/p',4,4);
+  }
+}
+
+function _drawEigenCanvas(cv,p,eigs,sat,n){
+  const W=Math.min(520,Math.max(280,p*16));
+  const H=220;
+  cv.width=W; cv.height=H;
+  cv.style.width=W+'px'; cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#04040d'; ctx.fillRect(0,0,W,H);
+
+  if(eigs.length===0){
+    ctx.fillStyle='rgba(200,168,74,.5)';
+    ctx.font='11px JetBrains Mono,monospace';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('p > 59 — eigenvalue computation skipped',W/2,H/2);
+    return;
+  }
+
+  const PAD={l:42,r:16,t:20,b:36};
+  const PW=W-PAD.l-PAD.r, PH=H-PAD.t-PAD.b;
+
+  // Range
+  const maxL=eigs[0], minL=eigs[eigs.length-1];
+  const span=Math.max(maxL-minL,0.001);
+  const toX=v=>PAD.l+((v-minL)/span)*PW;
+  const midY=PAD.t+PH*0.5;
+
+  // Zero line
+  ctx.strokeStyle='rgba(255,255,255,.12)';
+  ctx.lineWidth=1;
+  const zx=toX(0);
+  if(zx>=PAD.l&&zx<=PAD.l+PW){
+    ctx.beginPath();ctx.moveTo(zx,PAD.t);ctx.lineTo(zx,PAD.t+PH);ctx.stroke();
+  }
+
+  // Axis
+  ctx.strokeStyle='rgba(255,255,255,.2)';
+  ctx.beginPath();ctx.moveTo(PAD.l,PAD.t+PH);ctx.lineTo(PAD.l+PW,PAD.t+PH);ctx.stroke();
+
+  // Tick labels
+  ctx.font='8px JetBrains Mono,monospace';
+  ctx.fillStyle='rgba(180,170,160,.6)';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  [-0.5,0,0.5,1].forEach(v=>{
+    if(v>=minL-0.05&&v<=maxL+0.05){
+      const x=toX(v);
+      ctx.fillText(v.toFixed(1),x,PAD.t+PH+4);
+      ctx.strokeStyle='rgba(255,255,255,.07)';
+      ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+PH);ctx.stroke();
+    }
+  });
+
+  // Draw eigenvalues as vertical stems
+  const BAR_H=PH*0.55;
+  eigs.forEach((lam,i)=>{
+    const x=toX(lam);
+    const hue=lam>0.05?180:lam<-0.05?0:50;
+    const alpha=Math.max(0.3,1-i/(eigs.length));
+    ctx.strokeStyle=`hsla(${hue},75%,60%,${alpha.toFixed(2)})`;
+    ctx.lineWidth=Math.max(1,Math.min(3,PW/eigs.length*0.6));
+    ctx.beginPath();ctx.moveTo(x,midY-BAR_H/2);ctx.lineTo(x,midY+BAR_H/2);ctx.stroke();
+  });
+
+  // Largest eigenvalue label
+  ctx.fillStyle='rgba(61,200,184,.9)';
+  ctx.font='bold 9px JetBrains Mono,monospace';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`λ₀=${eigs[0].toFixed(4)}`,PAD.l+2,PAD.t+2);
+
+  // Entropy label
+  const H2=_entropy(eigs);
+  ctx.fillStyle='rgba(126,200,122,.8)';
+  ctx.textAlign='right';
+  ctx.fillText(`H=${H2.toFixed(4)}`,PAD.l+PW,PAD.t+2);
+
+  // Title
+  ctx.fillStyle='rgba(200,168,74,.55)';
+  ctx.font='8px JetBrains Mono,monospace';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText(`Eigenvalue spectrum of A_p^(n)  p=${p} n=${n}${sat?' [SAT]':''}`,W/2,H-2);
+}
+
+function _drawEntropyCanvas(cv,p,nCur,sat){
+  // Compute H(n) for n=0..min(nCur+20, p+5) to show the entropy trajectory
+  const nMax=Math.min(nCur+15, p+4, 80);
+  const ns=[],Hs=[];
+  for(let ni=0;ni<=nMax;ni++){
+    const B=_buildBmatrix(p,ni);
+    if(p<=23){ // eigenvalues only for small p in this loop
+      const eigs=_eigenvalues(p,B);
+      Hs.push(_entropy(eigs));
+    } else {
+      // Approximate H by density-based estimate for larger p
+      let gold=0; for(let i=0;i<p*p;i++) if(B[i]) gold++;
+      const fp=gold/(p*p);
+      Hs.push(fp>0&&fp<1?-(fp*Math.log(fp)+(1-fp)*Math.log(1-fp)):0);
+    }
+    ns.push(ni);
+  }
+
+  const W=Math.min(520,Math.max(300,nMax*12+80));
+  const H=220;
+  cv.width=W; cv.height=H;
+  cv.style.width=W+'px'; cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#04040d'; ctx.fillRect(0,0,W,H);
+
+  const PAD={l:46,r:16,t:20,b:36};
+  const PW=W-PAD.l-PAD.r, PH=H-PAD.t-PAD.b;
+  const maxH=Math.max(...Hs,0.001);
+  const toX=ni=>PAD.l+(ni/nMax)*PW;
+  const toY=h=>PAD.t+PH*(1-h/maxH);
+
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,.07)';
+  ctx.lineWidth=0.5;
+  [0.25,0.5,0.75,1].forEach(f=>{
+    const y=PAD.t+PH*(1-f);
+    ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+PW,y);ctx.stroke();
+    ctx.fillStyle='rgba(180,170,160,.4)';
+    ctx.font='8px JetBrains Mono,monospace';
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    ctx.fillText((maxH*f).toFixed(2),PAD.l-3,y);
+  });
+
+  // Saturation event verticals
+  PRIMES.forEach(q=>{
+    const satN=q-1;
+    if(satN>=0&&satN<=nMax){
+      const x=toX(satN);
+      ctx.strokeStyle='rgba(224,80,96,.3)';
+      ctx.lineWidth=1;
+      ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+PH);ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  });
+
+  // H(n) curve
+  ctx.strokeStyle='rgba(126,200,122,.85)';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ns.forEach((ni,i)=>{
+    const x=toX(ni),y=toY(Hs[i]);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Dots
+  ns.forEach((ni,i)=>{
+    const x=toX(ni),y=toY(Hs[i]);
+    const isCurN=(ni===nCur);
+    ctx.beginPath();
+    ctx.arc(x,y,isCurN?4:2.5,0,Math.PI*2);
+    ctx.fillStyle=isCurN?'var(--gold)':'rgba(126,200,122,.7)';
+    ctx.fill();
+  });
+
+  // Axes
+  ctx.strokeStyle='rgba(255,255,255,.2)';
+  ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PAD.l,PAD.t);ctx.lineTo(PAD.l,PAD.t+PH);
+  ctx.lineTo(PAD.l+PW,PAD.t+PH);ctx.stroke();
+
+  // X labels
+  ctx.fillStyle='rgba(180,170,160,.6)';
+  ctx.font='8px JetBrains Mono,monospace';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  for(let ni=0;ni<=nMax;ni+=Math.max(1,Math.floor(nMax/8))){
+    ctx.fillText(ni,toX(ni),PAD.t+PH+4);
+  }
+
+  // Highlight current n
+  const cx=toX(nCur),cy=toY(Hs[nCur]||0);
+  ctx.strokeStyle='rgba(200,168,74,.7)';
+  ctx.lineWidth=1;
+  ctx.setLineDash([2,2]);
+  ctx.beginPath();ctx.moveTo(cx,PAD.t);ctx.lineTo(cx,cy);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Labels
+  ctx.fillStyle='rgba(200,168,74,.8)';
+  ctx.font='bold 9px JetBrains Mono,monospace';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText(`Modular entropy H_p(n) · p=${p}`,W/2,H-2);
+  ctx.fillStyle='rgba(126,200,122,.7)';
+  ctx.font='8px JetBrains Mono,monospace';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`H(${nCur})=${(Hs[nCur]||0).toFixed(4)}`,PAD.l+2,PAD.t+2);
+}
+
+function closeLFM(){
+  const panel=document.getElementById('lfm-panel');
+  if(panel)panel.style.display='none';
+}
+
+function jumpToNextSat(){
+  const nxt=nextSatN(N);
+  if(nxt!=='∞'&&typeof nxt==='number')setN(nxt);
+}
 
 // ══════════════════════════════════════════════════════════
 //  PROOF STEPS
@@ -3212,7 +3783,7 @@ const STEPS=[
     $$D(n)=\\prod_p\\left(1-\\frac{\\min(n+1,p)}{p^2}\\right).$$
     The product converges absolutely for every $n\\ge 0$, and $D(0)=1/\\zeta(2)=6/\\pi^2$ recovers the standard coprime-pair density.</p>`},
   {t:'Verify Small Cases',b:`<p><strong>$n=0$:</strong> $\\min(1,p)=1$ always, so $D(0)=\\prod_p(1-1/p^2)=1/\\zeta(2)=6/\\pi^2\\approx0.6079$.<br>
-    <strong>$n=1$:</strong> $\\min(2,p)=2$ for all $p\\ge2$, giving the classical Feller–Tornier constant $D(1)\\approx0.3226$.</p>`},
+    <strong>$n=1$:</strong> $\\min(2,p)=2$ for all $p\\ge2$, giving $D(1)=\\prod_p\\bigl(1-2/p^2\\bigr)\\approx0.3226$. This is the <em>Feller–Tornier product</em>; the classical Feller–Tornier constant (Feller &amp; Tornier, 1932) is $C_{\\rm FT}=\\tfrac{1+D(1)}{2}\\approx0.6613$. The rescaled value $C(1)=\\zeta(2)\\cdot D(1)\\approx0.5307$ is the central constant in the lift survival analysis.</p>`},
   {t:'The C(n) Rescaling',b:`<p>Set $C(n)=\\zeta(2)\\cdot D(n)$. Then $C(0)=1$ (trivial normalisation) and
     $$C(n)=\\zeta(2)\\prod_p\\left(1-\\frac{\\min(n+1,p)}{p^2}\\right).$$
     Values: $C(1)\\approx0.5307$, $C(2)\\approx0.4128$, $C(3)\\approx0.3737$.</p>`},
@@ -3373,9 +3944,15 @@ function drawGridBarriers(lctx,cW,cH){
   // These are lines r/G = (M/G ± 1/G)/2 ≈ M/(2G), essentially r/M=1/2 offset by ±1/(2M)
   // They appear as the same k=1/2 line shifted by a pixel — draw them dashed
   lctx.save();
-  // Rotate overlay to match WebGL rotated grid
+  // Rotate overlay to match the WebGL grid rotation.
+  // The WebGL shader always rotates around t-space point (0.5,0.5).
+  // When panned/zoomed this maps to CSS position (rcx, rcy), NOT (cW/2, cH/2).
   const gridRot=getGlobalRotGrid();
-  if(gridRot!==0){lctx.translate(cW/2,cH/2);lctx.rotate(gridRot);lctx.translate(-cW/2,-cH/2);}
+  if(gridRot!==0){
+    const rcx=((0.5-glPanU)*glZoom+0.5)*cW;
+    const rcy=((0.5-glPanV)*glZoom+0.5)*cH;
+    lctx.translate(rcx,rcy);lctx.rotate(gridRot);lctx.translate(-rcx,-rcy);
+  }
   barriers.forEach(({k,c,lbl})=>{
     // Line: u = k*v in normalized space (r/G = k * M/G)
     const vA=Math.max(0,y0), vB=Math.min(1,y0+1/glZoom);
@@ -3625,12 +4202,13 @@ function drawRingPrimeSpiral(ctx,cW,cH){
 
   // Label the lift barrier paths
   if(R>60&&n>=1){
+    const kn=Math.max(1,n);
     ctx.fillStyle='rgba(200,168,74,.7)';ctx.font='7.5px "JetBrains Mono",monospace';
     ctx.textAlign='left';ctx.textBaseline='middle';
     const theta0=-Math.PI/2 - globalRot;
-    ctx.fillText(`r=(M+${n})/2 barrier`,cx+8,cy-R*.45);
+    ctx.fillText(`r=(M+${kn})/2 barrier`,cx+8,cy-R*.45);
     ctx.fillStyle='rgba(155,127,232,.7)';
-    ctx.fillText(`r=(M-${n})/2 path`,cx+8,cy-R*.38);
+    ctx.fillText(`r=(M-${kn})/2 path`,cx+8,cy-R*.38);
   }
 
   ctx.restore();
@@ -3650,6 +4228,14 @@ function drawGridPrimeSpiral(lctx,cW,cH){
   const n=getGridN();
 
   lctx.save();
+  // Apply the same grid rotation as the WebGL canvas, rotating around the CSS
+  // position of t-space centre (0.5,0.5) — correct for any pan/zoom value.
+  const _spiralRot=getGlobalRotGrid();
+  if(_spiralRot!==0){
+    const rcx=((0.5-glPanU)*glZoom+0.5)*cW;
+    const rcy=((0.5-glPanV)*glZoom+0.5)*cH;
+    lctx.translate(rcx,rcy);lctx.rotate(_spiralRot);lctx.translate(-rcx,-rcy);
+  }
 
   // Draw the spiral: prime p at position (p, M) for all valid M in [2,G]
   // In grid: x=r/G, y=M/G. Spiral is the column r=p traced across M rows.
@@ -3732,15 +4318,22 @@ function renderGridAltView(){
   const G=getGridG();
   const n=getGridN();
   const cm=getGlobalCM();
+  let pos=null; // set by ulam branch, read by inspect block
 
   // ── Padding and plot area ──────────────────────────────────────────
   // We want a true square plot area centred in the canvas.
   // The canvas itself is square (aspect-ratio:1 in CSS) but we still
   // leave a left/right margin for axis labels.
+  // Zoom: expand plot area by glZoom, shift by glPanU/glPanV (0.5=centre).
   const PAD_L=38, PAD_R=14, PAD_T=14, PAD_B=30;
-  const PW=cW-PAD_L-PAD_R;  // plot width  (fills the canvas)
-  const PH=cH-PAD_T-PAD_B;  // plot height (fills the canvas)
-  const PX=PAD_L, PY=PAD_T; // top-left of plot area
+  const basePW=cW-PAD_L-PAD_R;
+  const basePH=cH-PAD_T-PAD_B;
+  // Apply pan in normalised (0…1) → pixel units; zoom scales plot area
+  const PW=basePW*glZoom;
+  const PH=basePH*glZoom;
+  // Pan offset: glPanU=0.5 → centred, deviations shift the window
+  const PX=PAD_L - (glPanU-0.5)*basePW*glZoom;
+  const PY=PAD_T - (glPanV-0.5)*basePH*glZoom;
 
   // ── Background ────────────────────────────────────────────────────
   ctx.fillStyle='#04040d';
@@ -3931,11 +4524,242 @@ function renderGridAltView(){
     ctx.fillStyle='rgba(61,200,184,.4)';ctx.font=`8px "JetBrains Mono",monospace`;
     ctx.textAlign='right';
     ctx.fillText(`Farey strip · G=${G} · n=${n}`,cW-4,cH-4);
+
+  // ══════════════════════════════════════════════════════════════════
+  //  LOG-M STRIP  — x = r/M ∈(0,1),  y = log(M)/log(G) ∈(0,1)
+  //  Equal vertical spacing in log scale — reveals multiplicative
+  //  structure and prime-power clustering.
+  // ══════════════════════════════════════════════════════════════════
+  }else if(viewMode==='logm'){
+    const logG=Math.log(G);
+    const dotR=Math.max(1,Math.min(3.5,PW/(G*1.2)));
+    // Horizontal guide lines at primes and prime powers
+    const refMs=[2,3,4,5,7,8,9,11,13,16,17,19,23,25,29,31,37,41,43,47];
+    refMs.forEach(M=>{
+      if(M>G)return;
+      const py=PY+PH*(1-Math.log(M)/logG);
+      ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.15)':'rgba(80,80,120,.1)';
+      ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(PX,py);ctx.lineTo(PX+PW,py);ctx.stroke();
+      ctx.fillStyle=PS.has(M)?'rgba(61,200,184,.6)':'rgba(100,100,150,.4)';
+      ctx.font=`7px "JetBrains Mono",monospace`;ctx.textAlign='right';
+      ctx.fillText(`M=${M}`,PX-2,py+2.5);
+    });
+    // Vertical Farey lines
+    [2,3,5,7].forEach(p=>{for(let k=1;k<p;k++){
+      const px2=PX+(k/p)*PW;
+      ctx.strokeStyle='rgba(200,168,74,.06)';ctx.lineWidth=.4;ctx.setLineDash([3,5]);
+      ctx.beginPath();ctx.moveTo(px2,PY);ctx.lineTo(px2,PY+PH);ctx.stroke();
+    }});ctx.setLineDash([]);
+    // Plot
+    for(let M=2;M<=G;M++){
+      const py=PY+PH*(1-Math.log(M)/logG);
+      if(py<PY-dotR||py>PY+PH+dotR)continue;
+      for(let r=1;r<M;r++){
+        const px2=PX+(r/M)*PW;
+        if(px2<PX-dotR||px2>PX+PW+dotR)continue;
+        let ok=true;for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1)ok=false;
+        const copM=gcd(r,M)===1;
+        ctx.beginPath();ctx.arc(px2,py,dotR,0,Math.PI*2);
+        ctx.fillStyle=cellColor(ok,copM,r,M);ctx.fill();
+      }
+    }
+    // Axes
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.font=`8.5px "JetBrains Mono",monospace`;
+    ctx.textAlign='center';ctx.fillText('r / M',PX+PW/2,PY+PH+PAD_B-4);
+    [0,.25,.5,.75,1].forEach(t=>{
+      const px2=PX+t*PW;
+      ctx.strokeStyle='rgba(150,140,120,.2)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(px2,PY+PH);ctx.lineTo(px2,PY+PH+4);ctx.stroke();
+      ctx.fillStyle='rgba(150,140,120,.45)';ctx.textAlign='center';
+      ctx.fillText(t===0?'0':t===1?'1':`${t}`,px2,PY+PH+12);
+    });
+    ctx.save();ctx.translate(10,PY+PH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.textAlign='center';
+    ctx.fillText('log M  (multiplicative scale)',0,0);ctx.restore();
+    ctx.fillStyle='rgba(155,127,232,.4)';ctx.font=`8px "JetBrains Mono",monospace`;
+    ctx.textAlign='right';ctx.fillText(`Log-M · G=${G} · n=${n}`,cW-4,cH-4);
+
+  // ══════════════════════════════════════════════════════════════════
+  //  LINEAR DENSITY STRIP — x = r/M,  y = M/G  (linear in M)
+  //  Simplest scatter: shows coprime density bands by row.
+  //  Dense rows (smooth M) vs sparse rows (prime M near 1/p intervals).
+  // ══════════════════════════════════════════════════════════════════
+  }else if(viewMode==='linear'){
+    const dotR=Math.max(1,Math.min(3.5,PW/(G*1.2)));
+    // Row lines at key M values
+    [2,3,5,7,11,13,17,19,23].forEach(M=>{
+      if(M>G)return;
+      const py=PY+PH*(1-M/G);
+      ctx.strokeStyle='rgba(61,200,184,.13)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(PX,py);ctx.lineTo(PX+PW,py);ctx.stroke();
+      ctx.fillStyle='rgba(61,200,184,.55)';ctx.font=`7px "JetBrains Mono",monospace`;
+      ctx.textAlign='right';ctx.fillText(`p=${M}`,PX-2,py+2.5);
+    });
+    [2,3,5,7].forEach(p=>{for(let k=1;k<p;k++){
+      const px2=PX+(k/p)*PW;
+      ctx.strokeStyle='rgba(200,168,74,.06)';ctx.lineWidth=.4;ctx.setLineDash([3,5]);
+      ctx.beginPath();ctx.moveTo(px2,PY);ctx.lineTo(px2,PY+PH);ctx.stroke();
+    }});ctx.setLineDash([]);
+    for(let M=2;M<=G;M++){
+      const py=PY+PH*(1-M/G);
+      if(py<PY-dotR||py>PY+PH+dotR)continue;
+      for(let r=1;r<M;r++){
+        const px2=PX+(r/M)*PW;
+        if(px2<PX-dotR||px2>PX+PW+dotR)continue;
+        let ok=true;for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1)ok=false;
+        const copM=gcd(r,M)===1;
+        ctx.beginPath();ctx.arc(px2,py,dotR,0,Math.PI*2);
+        ctx.fillStyle=cellColor(ok,copM,r,M);ctx.fill();
+      }
+    }
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.font=`8.5px "JetBrains Mono",monospace`;
+    ctx.textAlign='center';ctx.fillText('r / M',PX+PW/2,PY+PH+PAD_B-4);
+    [0,.25,.5,.75,1].forEach(t=>{
+      const px2=PX+t*PW;
+      ctx.strokeStyle='rgba(150,140,120,.2)';ctx.lineWidth=.5;
+      ctx.beginPath();ctx.moveTo(px2,PY+PH);ctx.lineTo(px2,PY+PH+4);ctx.stroke();
+      ctx.fillStyle='rgba(150,140,120,.45)';ctx.textAlign='center';
+      ctx.fillText(t===0?'0':t===1?'1':`${t}`,px2,PY+PH+12);
+    });
+    ctx.save();ctx.translate(10,PY+PH/2);ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='rgba(150,140,120,.5)';ctx.textAlign='center';
+    ctx.fillText('M / G  (linear)',0,0);ctx.restore();
+    ctx.fillStyle='rgba(126,200,122,.4)';ctx.font=`8px "JetBrains Mono",monospace`;
+    ctx.textAlign='right';ctx.fillText(`Linear density · G=${G} · n=${n}`,cW-4,cH-4);
+
+  // ══════════════════════════════════════════════════════════════════
+  //  ULAM SPIRAL — place integers 1…G² on Ulam spiral grid.
+  //  Each cell k: colour if k mod M = r (for any M≤G) and gcd(r,M+j)=1
+  //  for j=0…n. Reveals diagonal prime alignments.
+  //  We use M=floor(√k) and r=k mod M as the canonical (r,M) pair.
+  // ══════════════════════════════════════════════════════════════════
+  }else if(viewMode==='ulam'){
+    // Build Ulam spiral position map: cell index → (col,row) in [-half,half]²
+    const side=Math.ceil(Math.sqrt(G*4))|1; // odd side length
+    const half=(side-1)/2;
+    // Classic Ulam: 1 at center, spiral outward
+    pos=new Map(); // k → {cx,cy} in grid coords (0…side-1)
+    let x=half,y=half,k=1,step=1,dir=0;
+    const dx=[1,0,-1,0],dy=[0,-1,0,1]; // R,U,L,D
+    pos.set(k++,{cx:x,cy:y});
+    outer:for(let layer=1;layer<=half;layer++){
+      for(let leg=0;leg<2;leg++){
+        for(let i=0;i<step;i++){
+          x+=dx[dir];y+=dy[dir];
+          pos.set(k++,{cx:x,cy:y});
+          if(k>side*side)break outer;
+        }
+        dir=(dir+1)%4;
+      }
+      step++;
+    }
+    const cellSz=Math.min(PW,PH)/side;
+    const ox=PX+(PW-cellSz*side)/2;
+    const oy=PY+(PH-cellSz*side)/2;
+    for(let ki=1;ki<k&&ki<=G*G;ki++){
+      const {cx,cy}=pos.get(ki)||{cx:0,cy:0};
+      const px2=ox+cx*cellSz;const py2=oy+cy*cellSz;
+      // Canonical (r,M) for this spiral cell
+      const M=Math.max(2,Math.round(Math.sqrt(ki)));
+      if(M>G)continue;
+      const r=((ki-1)%M)+1;
+      if(r<1||r>=M)continue;
+      let ok=true;for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1)ok=false;
+      const copM=gcd(r,M)===1;
+      const sz=Math.max(1,cellSz-.5);
+      ctx.fillStyle=cellColor(ok,copM,r,M);
+      ctx.fillRect(px2,py2,sz,sz);
+    }
+    // Cross at center
+    const cxc=ox+half*cellSz+cellSz/2,cyc=oy+half*cellSz+cellSz/2;
+    ctx.strokeStyle='rgba(200,168,74,.3)';ctx.lineWidth=.5;
+    ctx.beginPath();ctx.moveTo(cxc-6,cyc);ctx.lineTo(cxc+6,cyc);
+    ctx.moveTo(cxc,cyc-6);ctx.lineTo(cxc,cyc+6);ctx.stroke();
+    ctx.fillStyle='rgba(224,80,96,.4)';ctx.font=`8px "JetBrains Mono",monospace`;
+    ctx.textAlign='right';ctx.fillText(`Ulam spiral · G=${G} · n=${n}`,cW-4,cH-4);
+  }
+
+  // ── Shared: zoom+pan for alt views ───────────────────────────────
+  // Alt views support zoom via glZoom / glPanU / glPanV.
+  // We draw everything into the label canvas above then apply a
+  // canvas transform so zoom feels native. We re-render with transform.
+  // (Transform is applied at draw time by helper _altViewTransform.)
+
+  // ── Shared: dim non-inspected points overlay ──────────────────────
+  if(inspectMode&&_inspectGridPts.length>0){
+    ctx.fillStyle='rgba(4,4,13,0.38)';
+    ctx.fillRect(0,0,cW,cH);
+  }
+
+  // ── Shared: draw inspected points in alt-view coordinate space ────
+  if(_inspectGridPts.length>0){
+    const COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
+    _inspectGridPts.forEach(({r,M},idx)=>{
+      if(M<2||M>G)return;
+      // Per-point rotation (a/b × 2π) applied as angular offset around point in alt space
+      const ptRot=_getInspectPtRotAngle(idx);
+      let px2,py2;
+      if(viewMode==='fermat'){
+        const sqG=Math.sqrt(G),sqMin=Math.sqrt(2),yRange=sqG-sqMin;
+        // Apply ptRot as fractional r shift: r → r + ptRot/(2π) * M
+        const rEff=r+(ptRot/(2*Math.PI))*M;
+        px2=PX+(rEff/M)*PW;py2=PY+PH*(1-(Math.sqrt(M)-sqMin)/yRange);
+      }else if(viewMode==='farey'){
+        const yTop=0.5,yBot=1/G,ySpan=yTop-yBot;
+        const u=(1/M-yBot)/ySpan;
+        const rEff=r+(ptRot/(2*Math.PI))*M;
+        px2=PX+(rEff/M)*PW;py2=PY+PH*(1-u);
+      }else if(viewMode==='logm'){
+        const logG=Math.log(G);
+        const rEff=r+(ptRot/(2*Math.PI))*M;
+        px2=PX+(rEff/M)*PW;py2=PY+PH*(1-Math.log(M)/logG);
+      }else if(viewMode==='linear'){
+        const rEff=r+(ptRot/(2*Math.PI))*M;
+        px2=PX+(rEff/M)*PW;py2=PY+PH*(1-M/G);
+      }else if(viewMode==='ulam'){
+        const ki=(M-1)*M+r;
+        const {cx,cy}=pos&&pos.get(ki)||{cx:-999,cy:-999};
+        if(cx<0)return;
+        const side2=Math.ceil(Math.sqrt(G*4))|1,half2=(side2-1)/2;
+        const cellSz2=Math.min(PW,PH)/side2;
+        const ox2=PX+(PW-cellSz2*side2)/2,oy2=PY+(PH-cellSz2*side2)/2;
+        px2=ox2+cx*cellSz2+cellSz2/2;py2=oy2+cy*cellSz2+cellSz2/2;
+      }else return;
+      if(px2===undefined)return;
+      const col=COLS[idx%COLS.length];
+      let ok=true,ff=-1;
+      for(let j=0;j<=n&&ok;j++)if(gcd(r,M+j)>1){ok=false;ff=j;}
+      const circR=7;
+      // Spoke from plot centre to point
+      const plotCx=PX+PW/2,plotCy=PY+PH/2;
+      ctx.strokeStyle=col+'55';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(plotCx,plotCy);ctx.lineTo(px2,py2);ctx.stroke();
+      ctx.beginPath();ctx.arc(px2,py2,circR,0,Math.PI*2);
+      ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle=col+'33';ctx.fill();
+      ctx.fillStyle=col+'ee';ctx.font=`bold 7px "JetBrains Mono",monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(idx+1,px2,py2);
+      ctx.textBaseline='alphabetic';
+      // Rotation annotation
+      if(ptRot!==0){
+        const rot=_inspectPtRot[idx]||{a:0,b:1};
+        ctx.fillStyle=col+'bb';ctx.font=`7px "JetBrains Mono",monospace`;
+        ctx.textAlign='center';ctx.fillText(`+${rot.a}/${rot.b}·2π`,px2,py2+circR+10);
+      }
+      const lbl=`r=${r} M=${M} ${ok?'✓':('j='+ff)}`;
+      const lx2=Math.max(circR+2,Math.min(cW-65,px2));
+      const ly2=py2-circR-10<10?py2+circR+22:py2-circR-10;
+      const lw=ctx.measureText(lbl).width+10;
+      ctx.fillStyle='rgba(4,4,13,.82)';ctx.fillRect(lx2-lw/2,ly2-9,lw,14);
+      ctx.fillStyle=col;ctx.font=`8px "JetBrains Mono",monospace`;
+      ctx.textAlign='center';ctx.fillText(lbl,lx2,ly2+1);
+    });
   }
 
   // Badge
+  const viewLabels={fermat:'H²/√M',farey:'Farey strip',logm:'Log-M',linear:'Linear',ulam:'Ulam spiral'};
   document.getElementById('badge-zoom-ext').textContent=
-    `view: ${viewMode==='fermat'?'H²/√M':'Farey strip'} · G=${G} · n=${n}`;
+    `view: ${viewLabels[viewMode]||viewMode} · G=${G} · n=${n} · zoom ${glZoom.toFixed(1)}×`;
 }
 
 let _eulerAnimTO=null,_eulerStep=0;
@@ -4115,7 +4939,11 @@ function init(){
   buildSteps();
   setupChartHover();
   initHeroThree();
-  setN(0);
+  // Read ?n= from URL if present
+  try{
+    const _urlN=parseInt(new URL(window.location.href).searchParams.get('n'));
+    if(!isNaN(_urlN)&&_urlN>=0) { setN(_urlN); } else { setN(0); }
+  }catch(e){ setN(0); }
   drawConvergenceChart();
 }
 
@@ -5133,6 +5961,8 @@ function showPrimeDetail(p, runningLogD){
   box.innerHTML=html;
   document.getElementById('pd-overlay').classList.add('open');
   if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([box]);
+  // Also draw the local factor matrix inline (only for small p to keep it readable)
+  if(p<=61) drawLocalFactorMatrix(p);
 }
 
 function closePD(){
