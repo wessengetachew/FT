@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>C(n) — Generalized Feller–Tornier · Wessen Getachew</title>
+<title>C(n) — Block-Coprime Density · Wessen Getachew</title>
 
 <script>
 window.MathJax = {
@@ -41,8 +41,28 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
   overflow-x:auto;scrollbar-width:none;
 }
 #nbar::-webkit-scrollbar{display:none;}
-.nb-brand{font-family:var(--disp);font-size:.7rem;color:var(--gold);letter-spacing:.14em;margin-right:20px;flex-shrink:0;}
-.nb-sep{width:1px;height:22px;background:var(--edge);margin:0 10px;flex-shrink:0;}
+/* ── MOBILE: two rows ── */
+@media(max-width:700px){
+  #nbar{
+    height:auto;flex-wrap:wrap;padding:6px 10px;gap:0;overflow-x:visible;
+  }
+  #nb-row1,#nb-row2{display:flex;align-items:center;width:100%;gap:0;}
+  #nb-row1{margin-bottom:4px;}
+  #nb-row2{flex-wrap:nowrap;overflow-x:visible;}
+  .nb-stat{display:none;} /* hide verbose stats on mobile — shown in row2 */
+  #nb-stat-compact{display:flex !important;}
+}
+@media(min-width:701px){
+  #nb-row1,#nb-row2{display:contents;}
+  #nb-stat-compact{display:none !important;}
+}
+#nb-stat-compact{
+  display:none;font-size:8.5px;color:var(--cream3);white-space:nowrap;
+  flex-shrink:0;gap:6px;align-items:center;margin-left:8px;
+}
+#nb-stat-compact b{font-weight:500;}
+.nb-brand{font-family:var(--disp);font-size:.7rem;color:var(--gold);letter-spacing:.14em;margin-right:10px;flex-shrink:0;}
+.nb-sep{width:1px;height:22px;background:var(--edge);margin:0 8px;flex-shrink:0;}
 .nb-label{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--cream3);flex-shrink:0;margin-right:6px;}
 .nb-step{
   width:28px;height:28px;display:flex;align-items:center;justify-content:center;
@@ -51,15 +71,16 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 }
 .nb-step:hover{background:rgba(61,200,184,.1);}
 #nb-sl{
-  width:140px;-webkit-appearance:none;height:2px;
+  width:110px;-webkit-appearance:none;height:2px;
   background:rgba(255,255,255,.15);outline:none;cursor:pointer;
   border-radius:1px;flex-shrink:0;margin:0 6px;
 }
+@media(max-width:700px){#nb-sl{flex:1;min-width:60px;width:auto;}}
 #nb-sl::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);cursor:pointer;}
 #nb-num{
-  width:64px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);
+  width:54px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);
   color:var(--gold);font-family:var(--mono);font-size:13px;font-weight:500;
-  padding:3px 6px;outline:none;text-align:center;flex-shrink:0;
+  padding:3px 4px;outline:none;text-align:center;flex-shrink:0;
 }
 #nb-num:focus{border-color:rgba(200,168,74,.5);}
 .nb-stat{font-size:9px;color:var(--cream3);white-space:nowrap;flex-shrink:0;padding:0 4px;}
@@ -78,7 +99,9 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
   position:relative;overflow:hidden;
 }
 #hero-3d{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.2;}
-#hero>*:not(#hero-3d){position:relative;z-index:1;}
+#hero-text-wrap{position:relative;z-index:1;transition:opacity .35s;}
+#hero-text-wrap.hidden{opacity:0;pointer-events:none;}
+#hero>*:not(#hero-3d):not(#hero-overlay):not(#hero-ctrl){position:relative;z-index:1;}
 
 /* ── PARCHMENT THEME ── */
 body.parchment{
@@ -371,7 +394,17 @@ select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cr
 .lfm-tab:hover{color:var(--cream2);border-color:rgba(200,168,74,.3);}
 .lfm-tab.on{color:var(--gold);border-color:rgba(200,168,74,.55);background:rgba(200,168,74,.08);}
 
-/* ── FOCUS INDICATORS ── */
+/* ── HL CONSTANTS TABLE ── */
+#hl-const-table th:first-child{text-align:left;}
+#hl-const-table td:first-child{text-align:left;font-family:var(--mono);color:var(--gold);font-weight:500;}
+#hl-const-table td:nth-child(2){color:var(--gold);font-weight:500;font-size:11px;}
+#hl-const-table td:nth-child(3){font-size:8.5px;color:var(--cream3);font-family:var(--mono);}
+#hl-const-table td:last-child{font-family:var(--serif);font-size:11.5px;color:rgba(184,178,166,.85);}
+.hl-sym-teal td:first-child{color:var(--teal)!important;}
+.hl-sym-coral td:first-child{color:var(--coral)!important;}
+.hl-sym-violet td:first-child{color:var(--violet)!important;}
+.hl-sym-lime td:first-child{color:var(--lime)!important;}
+
 table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-offset:-1px;background:rgba(200,168,74,.04)!important;}
 .cv-btn:focus-visible,.nb-step:focus-visible,.dd-nav-btn:focus-visible,.pd-btn:focus-visible,.dd-btn:focus-visible,.px-back:focus-visible,.px-dl:focus-visible{outline:1px solid rgba(61,200,184,.55);outline-offset:2px;}
 .pd-close:focus-visible,.dd-close:focus-visible,.px-close:focus-visible,.em-close:focus-visible{outline:1px solid rgba(200,168,74,.45);outline-offset:2px;}
@@ -559,57 +592,79 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
 <!-- ══════════ STICKY N BAR ══════════ -->
 <div id="nbar">
-  <span class="nb-brand">C(n)</span>
-  <div class="nb-sep"></div>
-  <span class="nb-label">n</span>
-  <button class="nb-step" onclick="stepN(-10)" title="-10">−10</button>
-  <button class="nb-step" onclick="stepN(-1)">−</button>
-  <input id="nb-sl" type="range" min="0" max="1000" value="0" oninput="setN(+this.value)">
-  <input id="nb-num" type="number" min="0" value="0" oninput="setN(+this.value||0)">
-  <button class="nb-step" onclick="stepN(1)">+</button>
-  <button class="nb-step" onclick="stepN(10)" title="+10">+10</button>
-  <div class="nb-sep"></div>
-  <span class="nb-stat gold">C(n) = <b id="nb-cn">—</b></span>
-  <span class="nb-stat teal">D(n) = <b id="nb-dn">—</b></span>
-  <span class="nb-stat coral">Sat. p = <b id="nb-sat">—</b></span>
-  <span class="nb-stat">ρ = <b id="nb-rho" style="color:var(--cream)">—</b></span>
-  <span class="nb-stat" title="Next prime saturation event — jump to it" style="cursor:pointer;" onclick="jumpToNextSat()">next sat @ n = <b id="nb-next-sat" style="color:var(--violet)">—</b></span>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0;padding-left:10px;">
-    <span class="nb-label" style="font-size:7px;">SPD</span>
-    <input id="nb-anim-spd" type="range" min="60" max="950" value="300" title="Animation speed (right=faster)">
+  <!-- ROW 1: brand + n controls + live stats -->
+  <div id="nb-row1">
+    <span class="nb-brand">C(n)</span>
     <div class="nb-sep"></div>
-    <button id="nb-play" onclick="toggleGlobalAnim()">▶ Play</button>
-    <button id="theme-btn" onclick="toggleTheme()" title="Toggle parchment / dark theme">Parchment</button>
-    <button id="fs-btn" onclick="toggleFullscreen()" title="Toggle fullscreen">Full</button>
+    <span class="nb-label">n</span>
+    <button class="nb-step" onclick="stepN(-10)" title="-10">−10</button>
+    <button class="nb-step" onclick="stepN(-1)" title="-1">−</button>
+    <input id="nb-sl" type="range" min="0" max="1000" value="0" oninput="setN(+this.value)">
+    <input id="nb-num" type="number" min="0" value="0" oninput="setN(+this.value||0)">
+    <button class="nb-step" onclick="stepN(1)" title="+1">+</button>
+    <button class="nb-step" onclick="stepN(10)" title="+10">+10</button>
     <div class="nb-sep"></div>
-    <div id="exp-dd-wrap">
-      <button id="exp-dd-btn" onclick="toggleExpDD()">↓ Export ▾</button>
-      <div id="exp-dd">
-        <button class="exp-opt" onclick="openEM();closeExpDD()">
-          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">PNG</span>
-          <span><b>Comprehensive PNG</b><span class="exp-opt-sub">Multi-panel · custom layout · all views</span></span>
-        </button>
-        <button class="exp-opt" onclick="openChartPNGPreview()">
-          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">PNG</span>
-          <span><b>Chart PNG</b><span class="exp-opt-sub">C(n) vs n chart · high-res 1920×800</span></span>
-        </button>
-        <button class="exp-opt" onclick="exportChartCSV();closeExpDD()">
-          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">CSV</span>
-          <span><b>Chart CSV</b><span class="exp-opt-sub">n, C(n), D(n), ratio · 0 to x-max</span></span>
-        </button>
-        <button class="exp-opt" onclick="exportPrimeCSV();closeExpDD()">
-          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">CSV</span>
-          <span><b>Prime Table CSV</b><span class="exp-opt-sub">Local factors · first 60 primes at n</span></span>
-        </button>
-        <button class="exp-opt" onclick="exportDOMPage();closeExpDD()">
-          <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">HTM</span>
-          <span><b>HTML Report</b><span class="exp-opt-sub">Standalone page · chart + all tables</span></span>
-        </button>
+    <!-- Verbose stats (desktop) -->
+    <span class="nb-stat gold">C = <b id="nb-cn">—</b></span>
+    <span class="nb-stat teal">D = <b id="nb-dn">—</b></span>
+    <span class="nb-stat coral">p<sub>sat</sub> = <b id="nb-sat">—</b></span>
+    <span class="nb-stat">ρ = <b id="nb-rho" style="color:var(--cream)">—</b></span>
+    <span class="nb-stat" title="Next saturation — click to jump" style="cursor:pointer;" onclick="jumpToNextSat()">→sat <b id="nb-next-sat" style="color:var(--violet)">—</b></span>
+    <!-- Compact stats (mobile row 1 only) -->
+    <span id="nb-stat-compact">
+      C=<b style="color:var(--gold)" id="nb-cn-m">—</b>
+      &nbsp;p<sub>sat</sub>=<b style="color:var(--coral)" id="nb-sat-m">—</b>
+      &nbsp;<span style="color:var(--violet);cursor:pointer;" onclick="jumpToNextSat()" title="Jump to next sat">↗<b id="nb-next-sat-m">—</b></span>
+    </span>
+  </div>
+  <!-- ROW 2: actions (always visible, no scroll on mobile) -->
+  <div id="nb-row2">
+    <div style="margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0;">
+      <!-- Speed slider -->
+      <span class="nb-label" style="font-size:7px;" title="Animation speed">⏩</span>
+      <input id="nb-anim-spd" type="range" min="60" max="950" value="300" title="Animation speed">
+      <div class="nb-sep"></div>
+      <!-- Play / Reset -->
+      <button id="nb-play" onclick="toggleGlobalAnim()" title="Play/pause animation">▶ Play</button>
+      <button onclick="setN(0)" title="Reset n to 0"
+        style="background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;cursor:pointer;height:32px;transition:all .15s;flex-shrink:0;"
+        onmouseover="this.style.color='var(--cream)'" onmouseout="this.style.color='var(--cream3)'">⟳</button>
+      <div class="nb-sep"></div>
+      <!-- Theme / Fullscreen as symbols -->
+      <button id="theme-btn" onclick="toggleTheme()" title="Toggle parchment/dark theme">☽</button>
+      <button id="fs-btn" onclick="toggleFullscreen()" title="Toggle fullscreen">⛶</button>
+      <div class="nb-sep"></div>
+      <!-- Export -->
+      <div id="exp-dd-wrap">
+        <button id="exp-dd-btn" onclick="toggleExpDD()">↓ Export ▾</button>
+        <div id="exp-dd">
+          <button class="exp-opt" onclick="openEM();closeExpDD()">
+            <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">PNG</span>
+            <span><b>Comprehensive PNG</b><span class="exp-opt-sub">Multi-panel · custom layout · all views</span></span>
+          </button>
+          <button class="exp-opt" onclick="openChartPNGPreview()">
+            <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">PNG</span>
+            <span><b>Chart PNG</b><span class="exp-opt-sub">C(n) vs n chart · high-res 1920×800</span></span>
+          </button>
+          <button class="exp-opt" onclick="exportChartCSV();closeExpDD()">
+            <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">CSV</span>
+            <span><b>Chart CSV</b><span class="exp-opt-sub">n, C(n), D(n), ratio · 0 to x-max</span></span>
+          </button>
+          <button class="exp-opt" onclick="exportPrimeCSV();closeExpDD()">
+            <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">CSV</span>
+            <span><b>Prime Table CSV</b><span class="exp-opt-sub">Local factors · first 60 primes at n</span></span>
+          </button>
+          <button class="exp-opt" onclick="exportDOMPage();closeExpDD()">
+            <span class="exp-opt-icon" style="font-family:var(--mono);font-size:7.5px;letter-spacing:.05em;">HTM</span>
+            <span><b>HTML Report</b><span class="exp-opt-sub">Standalone page · chart + all tables</span></span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -621,20 +676,33 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 <!-- HERO -->
 <div id="hero" class="sec-anchor">
   <canvas id="hero-3d"></canvas>
-  <div class="hero-tag">Analytic Number Theory · Wessen Getachew</div>
-  <h1 class="hero-title">C(n) — The Generalized Feller–Tornier Constant</h1>
-  <div class="hero-formula" id="hero-formula">
-    $$C(n)\;=\;\zeta(2)\cdot\prod_{p\;\text{prime}}\!\left(1-\frac{\min(n+1,\,p)}{p^2}\right)$$
-    <div class="hero-live" id="hero-live">
-      <span>C(<span class="hn" id="hl-n">n</span>)</span>
-      <span class="heq">=</span>
-      <span>&#950;(2) &middot; &prod;<sub>p</sub>(1 &minus; min(<span class="hn1" id="hl-n1">n+1</span>, p) / p&sup2;)</span>
-      <span class="heq">=</span>
-      <span class="hresult" id="hl-val">—</span>
-    </div>
+  <!-- Canvas overlay — drawn on top of torus, behind text -->
+  <canvas id="hero-overlay" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity .4s;"></canvas>
+  <!-- Hero controls -->
+  <div id="hero-ctrl" style="position:absolute;top:10px;right:12px;z-index:10;display:flex;gap:6px;align-items:center;">
+    <button id="hero-text-btn" onclick="toggleHeroText()"
+      style="background:rgba(4,4,13,.8);border:1px solid rgba(200,168,74,.3);color:var(--gold);font-family:var(--mono);font-size:8px;padding:4px 10px;cursor:pointer;backdrop-filter:blur(4px);white-space:nowrap;">
+      Hide text
+    </button>
   </div>
-  <div class="hero-sub">
-    Natural density of pairs (r, M) with gcd(r, M+j) = 1 for all j = 0,…,n, rescaled by ζ(2)
+  <div id="hero-text-wrap">
+    <div class="hero-tag">Analytic Number Theory · Wessen Getachew</div>
+    <h1 class="hero-title">C(n) — Block-Coprime Density</h1>
+    <div class="hero-formula" id="hero-formula">
+      $$C(n)\;=\;\zeta(2)\cdot\prod_{p\;\text{prime}}\!\left(1-\frac{\min(n+1,\,p)}{p^2}\right)$$
+      <div class="hero-live" id="hero-live">
+        <span>C(<span class="hn" id="hl-n">n</span>)</span>
+        <span class="heq">=</span>
+        <span>&#950;(2) &middot; &prod;<sub>p</sub>(1 &minus; min(<span class="hn1" id="hl-n1">n+1</span>, p) / p&sup2;)</span>
+        <span class="heq">=</span>
+        <span class="hresult" id="hl-val">—</span>
+      </div>
+    </div>
+    <div class="hero-sub">
+      Natural density of pairs (r, M) with gcd(r, M+j) = 1 for all j = 0,…,n, rescaled by ζ(2) so that C(0) = 1.
+      At n = 1: C(1) = ζ(2)·D<sub>FT</sub> ≈ 0.5307, where D<sub>FT</sub> = ∏<sub>p</sub>(1−2/p²) is the Feller–Tornier Euler product.
+      The classical Feller–Tornier constant C<sub>FT</sub> = ½(1 + D<sub>FT</sub>) ≈ 0.6613 is a distinct object.
+    </div>
   </div>
 </div>
 
@@ -676,8 +744,33 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <strong>Saturation:</strong> prime p is <span style="color:var(--teal)">active</span> (p&nbsp;&gt;&nbsp;n+1) contributing 1−(n+1)/p², or
     <span style="color:var(--coral)">saturated</span> (p&nbsp;≤&nbsp;n+1) contributing 1−1/p.
     As n→∞, D(n)=C(n)/ζ(2) ∼ e<sup>−γ</sup>/ln(n+1) (Mertens), hence C(n) ∼ ζ(2)·e<sup>−γ</sup>/ln(n+1).
+    <strong>Feller–Tornier note:</strong> at n=1, D(1)=∏<sub>p</sub>(1−2/p²)≈0.3226 is the FT Euler product D<sub>FT</sub>;
+    the classical constant C<sub>FT</sub>=½(1+D<sub>FT</sub>)≈0.6613 is distinct — our C(1)=ζ(2)·D<sub>FT</sub>≈0.5307.
   </div>
   <div class="pills" id="sat-pills"></div>
+  <!-- Export -->
+  <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+    <span style="font-size:8px;color:var(--cream3);letter-spacing:.1em;text-transform:uppercase;">Export</span>
+    <select id="calc-export-fmt"
+      style="background:var(--bg2);border:1px solid var(--edge2);color:var(--cream2);font-family:var(--mono);font-size:8px;padding:4px 8px;cursor:pointer;outline:none;">
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+      <option value="text">Plain text</option>
+    </select>
+    <button onclick="exportCalc()"
+      style="background:none;border:1px solid rgba(200,168,74,.4);color:var(--gold);font-family:var(--mono);font-size:8px;padding:4px 14px;cursor:pointer;letter-spacing:.08em;">
+      Copy to clipboard
+    </button>
+    <button onclick="exportCalcDownload()"
+      style="background:none;border:1px solid rgba(61,200,184,.35);color:var(--teal);font-family:var(--mono);font-size:8px;padding:4px 14px;cursor:pointer;letter-spacing:.08em;">
+      Download file
+    </button>
+    <button onclick="exportCalc4K()"
+      style="background:none;border:1px solid rgba(126,200,122,.4);color:var(--lime);font-family:var(--mono);font-size:8px;padding:4px 14px;cursor:pointer;letter-spacing:.08em;">
+      ⬇ 4K PNG
+    </button>
+    <span id="calc-export-msg" style="font-size:8px;color:var(--lime);opacity:0;transition:opacity .4s;"></span>
+  </div>
 </div>
 
 <!-- SECTION 2: PRIME TABLE -->
@@ -687,12 +780,12 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <table class="dt">
       <thead><tr>
         <th>p</th><th>Status</th><th>min(n+1,p)</th><th>p²</th>
-        <th>Local factor</th><th>log factor</th><th>Partial D(n)</th><th>Partial C(n)</th>
+        <th>Local factor</th><th>log factor</th><th>Partial D(n)</th><th>Partial C(n)</th><th title="HL local factor = raw / (1-1/p)^(n+1) — contribution to singular series">HL factor</th>
       </tr></thead>
       <tbody id="prime-tbody"></tbody>
     </table>
   </div>
-  <div style="margin-top:8px;font-size:8px;color:var(--cream3);">First 60 primes. Partial C(n) = ζ(2) × running product. Converges from below. <span style="color:var(--violet)">Click any row to see its local factor matrix (p×p binary grid) and step-by-step detail.</span></div>
+  <div style="margin-top:8px;font-size:8px;color:var(--cream3);">First 60 primes. Partial C(n) = ζ(2) × running product. Converges from below. <span style="color:var(--violet)">Click any row to see its local factor matrix (p×p binary grid) and step-by-step detail.</span> <span style="color:var(--lime)">HL factor = raw/independence baseline — at n=1 for p≥3 this equals p(p−2)/(p−1)² (C₂ local factor).</span></div>
   <!-- ══ MODULAR OPERATOR PANEL ══ -->
   <div id="lfm-panel" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--edge);">
     <!-- Header -->
@@ -733,6 +826,8 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <span>— <span style="color:var(--gold)">C(n)</span></span>
     <span id="chart-dn-leg" style="display:none;">-- <span style="color:var(--teal)">D(n)</span></span>
     <span id="chart-asymp-leg" style="display:none;">··· <span style="color:var(--violet)">ζ(2)·e<sup>−γ</sup>/ln(n+1)</span></span>
+    <span id="chart-c2-leg" style="display:none;">- - <span style="color:var(--lime)">C₂≈0.6602</span></span>
+    <span id="chart-2c2-leg" style="display:none;">- - <span style="color:var(--violet)">2C₂≈1.3203</span></span>
     <span>--- 6/π² ≈ 0.6079</span>
     <span>| Saturation events</span>
     <span>● n = <span id="chart-leg-n" style="color:var(--gold)">current</span></span>
@@ -742,6 +837,8 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <label title="C(n) asymptotic: ζ(2)·e^{-γ}/ln(n+1)"><input type="checkbox" id="chart-asymp" onchange="onChartOptChange()"> Asymptotic</label>
     <label title="Logarithmic Y axis"><input type="checkbox" id="chart-log" onchange="onChartOptChange()"> Log Y</label>
     <label title="Jump Δ brackets at saturation events"><input type="checkbox" id="chart-jumps" checked onchange="onChartOptChange()" style="accent-color:var(--coral)"> Jumps</label>
+    <label title="Twin prime constant C₂≈0.6602" style="color:var(--lime);"><input type="checkbox" id="chart-c2" onchange="onChartOptChange()" style="accent-color:var(--lime)"> C₂</label>
+    <label title="Goldbach background 2C₂≈1.3203" style="color:var(--violet);"><input type="checkbox" id="chart-2c2" onchange="onChartOptChange()" style="accent-color:var(--violet)"> 2C₂</label>
     <div class="cc-sep"></div>
     <label style="gap:6px;">X max
       <input class="cv-sl" type="range" id="chart-xmax" min="20" max="600" value="100" style="width:80px;" oninput="document.getElementById('chart-xmax-v').textContent=this.value;drawChart();">
@@ -789,7 +886,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <table class="dt">
       <thead><tr>
         <th>n</th><th>Block</th><th>C(n)</th><th>D(n)</th>
-        <th>C(n)/C(n−1)</th><th title="Signed difference C(n)−C(n−1); spikes mark saturation events">ΔC</th><th>Sat. primes</th><th>Event</th>
+        <th>C(n)/C(n−1)</th><th title="Signed difference C(n)−C(n−1); spikes mark saturation events">ΔC</th><th>Sat. primes</th><th title="D(n)/D(0) = C(n) — the HL ratio numerator">D(n)/D(0)</th><th>Event</th>
       </tr></thead>
       <tbody id="dt-body"></tbody>
     </table>
@@ -880,9 +977,9 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <button class="cv-btn" id="grid-2x-btn" onclick="toggleCanvas2x('grid')" title="Double canvas height">⤢ 2×</button>
     <div class="cv-sep"></div>
     <span class="cv-lbl" style="color:var(--violet)">a/b rot:</span>
-    <input type="number" id="grid-rot-a" min="0" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="a in a/b × 360°">
+    <input type="number" id="grid-rot-a" min="0" value="0" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="a in a/b × 360°">
     <span class="cv-lbl">/</span>
-    <input type="number" id="grid-rot-b" min="1" value="4" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="b in a/b × 360°">
+    <input type="number" id="grid-rot-b" min="1" value="1" step="1" style="width:36px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:10px;padding:2px 4px;outline:none;text-align:center;" oninput="renderGrid();" title="b in a/b × 360°">
   </div>
   <div class="cv-outer" id="cv-gl-wrap">
     <canvas id="cv-gl"></canvas>
@@ -989,6 +1086,106 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <div id="steps-container"></div>
 </div>
 
+<!-- SECTION 7: HARDY–LITTLEWOOD CONNECTION -->
+<div class="card sec-anchor" id="s-hl">
+  <div class="card-title">Hardy–Littlewood Connection</div>
+
+  <!-- Named constants table -->
+  <div style="font-size:8px;color:var(--cream3);margin-bottom:10px;line-height:1.8;">
+    The Euler product structure of C(n) is the combinatorial bedrock of the Hardy–Littlewood prime k-tuple
+    conjectures. The following constants all live in the same family.
+  </div>
+  <div class="tscroll" style="max-height:none;border:none;">
+    <table class="dt" id="hl-const-table">
+      <thead><tr>
+        <th style="text-align:left;">Symbol</th>
+        <th>Value</th>
+        <th>Formula</th>
+        <th>Meaning</th>
+      </tr></thead>
+      <tbody id="hl-const-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Relationship formula -->
+  <div class="ibox" style="margin-top:14px;">
+    <strong>Key relationship:</strong> For the admissible tuple ℋ = {0,…,n} the Hardy–Littlewood singular series is
+    $$\mathfrak{S}(\mathcal{H}) = \prod_p \frac{1-\nu_p(\mathcal{H})/p}{(1-1/p)^{n+1}}$$
+    where ν<sub>p</sub>(ℋ) = min(n+1, p). This means
+    $$\mathfrak{S}(\mathcal{H}) = D(n) \cdot \prod_p \frac{1}{(1-1/p)^{n+1}} = C(n) \cdot \frac{1}{\zeta(2)} \cdot \prod_p \frac{1}{(1-1/p)^{n+1}}$$
+    so <span style="color:var(--gold)">C(n)</span> is the raw density numerator and the independence baseline ∏<sub>p</sub>(1−1/p)<sup>n+1</sup> = <span id="hl-indep-val" style="color:var(--teal)">…</span> is the denominator.
+  </div>
+
+  <!-- Per-prime HL factor table (first 12 primes, live) -->
+  <div style="margin-top:14px;">
+    <div style="font-family:var(--disp);font-size:.64rem;letter-spacing:.08em;color:var(--gold);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--edge);">
+      Per-Prime HL Factors at current n
+      <span style="font-family:var(--mono);font-size:8px;color:var(--cream3);margin-left:8px;">hlFactor(p,n) = (1−min(n+1,p)/p²)/(1−1/p)^(n+1)</span>
+    </div>
+    <div class="tscroll" style="max-height:220px;">
+      <table class="dt" id="hl-prime-table">
+        <thead><tr>
+          <th>p</th><th>Status</th><th>Raw f_p(n)</th><th>(1−1/p)^(n+1)</th><th>HL factor</th><th>C₂ local (n=1)</th>
+        </tr></thead>
+        <tbody id="hl-prime-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Goldbach calculator -->
+  <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--edge);">
+    <div style="font-family:var(--disp);font-size:.64rem;letter-spacing:.08em;color:var(--gold);margin-bottom:10px;">
+      Goldbach Calculator
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+      <span class="cv-lbl">Even N =</span>
+      <input type="number" id="gb-n-input" min="4" max="200000" step="2" value="100"
+        style="width:80px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--gold);font-family:var(--mono);font-size:13px;padding:3px 6px;outline:none;text-align:center;"
+        oninput="updateGoldbachPanel()">
+      <button class="cv-btn" onclick="document.getElementById('gb-n-input').value=Math.max(4,Math.round((parseInt(document.getElementById('gb-n-input').value)||100)-2));updateGoldbachPanel()">−2</button>
+      <button class="cv-btn" onclick="document.getElementById('gb-n-input').value=(parseInt(document.getElementById('gb-n-input').value)||100)+2;updateGoldbachPanel()">+2</button>
+      <button class="cv-btn" onclick="setGBtoCurrentN()">Set to 2(n+1)</button>
+      <button class="cv-btn" onclick="goldbachFindNext(1)">Next prime pair →</button>
+    </div>
+    <div id="gb-warning" style="display:none;font-size:8.5px;color:var(--coral);margin-bottom:8px;">N must be even and ≥ 4</div>
+    <div class="result-row" id="gb-result-row">
+      <div class="rbox">
+        <div class="rl">S(N) singular series</div>
+        <div class="rv" id="gb-singular" style="font-size:1.4rem;">—</div>
+        <div class="rs">2C₂ · ∏<sub>p|N,p>2</sub>(p−1)/(p−2)</div>
+      </div>
+      <div class="rbox">
+        <div class="rl">HL prediction G(N)</div>
+        <div class="rv" id="gb-pred" style="font-size:1.4rem;color:var(--teal);">—</div>
+        <div class="rs">S(N)·N / (ln N)²</div>
+      </div>
+      <div class="rbox">
+        <div class="rl">Actual pairs</div>
+        <div class="rv" id="gb-actual" style="font-size:1.5rem;color:var(--cream);">—</div>
+        <div class="rs">p+q=N, p≤q, both prime</div>
+      </div>
+      <div class="rbox">
+        <div class="rl">HL ratio actual/pred</div>
+        <div class="rv" id="gb-ratio" style="font-size:1.5rem;color:var(--violet);">—</div>
+        <div class="rs">→ 1 on average (unproved)</div>
+      </div>
+    </div>
+    <!-- Special prime factors of N -->
+    <div id="gb-factors" style="margin-top:8px;font-size:8.5px;color:var(--cream3);line-height:2;"></div>
+    <!-- Goldbach pairs canvas -->
+    <div style="margin-top:14px;">
+      <div style="font-size:8px;color:var(--cream3);margin-bottom:6px;">
+        <span style="color:var(--gold)">■</span> both prime &nbsp;
+        <span style="color:var(--teal)">■</span> p prime only &nbsp;
+        <span style="color:var(--coral)">■</span> q=N−p prime only &nbsp;
+        <span style="color:rgba(255,255,255,.1)">■</span> neither &nbsp;
+        Anti-diagonal p + q = N visualized
+      </div>
+      <canvas id="gb-canvas" style="display:block;width:100%;height:60px;border:1px solid var(--edge);background:#04040d;"></canvas>
+    </div>
+  </div>
+</div>
+
 </div><!-- #content -->
 
 <!-- TOOLTIP -->
@@ -1023,6 +1220,75 @@ function getCn(n){
   return(_cn[n]=ZETA2*Math.exp(ld));
 }
 for(let i=0;i<=600;i++)getCn(i);
+
+// ══════════════════════════════════════════════════════════
+//  HARDY–LITTLEWOOD / GOLDBACH PRIMITIVES
+// ══════════════════════════════════════════════════════════
+
+// Twin prime constant C₂ = ∏_{p≥3} p(p−2)/(p−1)²
+let _C2=null;
+function computeC2(){
+  if(_C2!==null)return _C2;
+  let lg=0;
+  for(const p of PRIMES){ if(p===2)continue; lg+=Math.log(p*(p-2)/((p-1)*(p-1))); }
+  return(_C2=Math.exp(lg));
+}
+computeC2();
+
+// HL local factor at prime p for block n+1:
+//   hlLocalFactor(p,n) = raw_factor(p,n) / (1−1/p)^(n+1)
+//   = [1 − min(n+1,p)/p²] / (1−1/p)^(n+1)
+// At n=1 for p≥3: (1−2/p²) / (1−1/p)² = p(p−2)/(p−1)² = C₂ local factor
+function hlLocalFactor(p,n){
+  const m=Math.min(n+1,p);
+  const raw=1-m/(p*p);
+  const indep=Math.pow(1-1/p,n+1);
+  return indep>0?raw/indep:1;
+}
+
+// Running HL singular series product ∏_{p} hlLocalFactor(p,n)
+// = D(n) / ∏_p(1−1/p)^(n+1) — note this diverges but partial products are informative
+// For display we cap at the first 60 primes
+function hlSingularPartial(n,numPrimes){
+  let v=1;
+  const ps=PRIMES.slice(0,numPrimes||60);
+  for(const p of ps) v*=hlLocalFactor(p,n);
+  return v;
+}
+
+// Goldbach singular series for even N:
+//   S(N) = 2·C₂ · ∏_{p|N, p odd} (p−1)/(p−2)
+// Hardy–Littlewood prediction: G(N) ≈ S(N)·N / (ln N)²
+function goldbachSingularSeries(N){
+  if(N%2!==0||N<4)return 0;
+  const C2=computeC2();
+  let extra=1, x=Math.abs(N);
+  while(x%2===0)x=Math.floor(x/2);
+  for(const p of PRIMES){
+    if(p===2)continue;
+    if(p*p>x)break;
+    if(x%p===0){extra*=(p-1)/(p-2);while(x%p===0)x=Math.floor(x/p);}
+  }
+  if(x>2)extra*=(x-1)/(x-2);
+  return 2*C2*extra;
+}
+
+function goldbachHLPrediction(N){
+  if(N<4||N%2!==0)return 0;
+  return goldbachSingularSeries(N)*N/(Math.log(N)*Math.log(N));
+}
+
+// Count actual Goldbach pairs p+q=N (p≤q, both prime)
+// Only feasible for moderate N (≤ ~200000 with our sieve)
+function countGoldbachPairs(N){
+  if(N<4||N%2!==0)return 0;
+  let c=0;
+  for(const p of PRIMES){
+    if(2*p>N)break;
+    if(PS.has(N-p))c++;
+  }
+  return c;
+}
 
 function numSat(n){let c=0;for(const p of PRIMES){if(p<=n+1)c++;else break;}return c;}
 function nextSatN(n){for(const p of PRIMES)if(p-1>n)return p-1;return '∞';}
@@ -2497,6 +2763,31 @@ function drawChartImpl(ctx,W,H,n,opts){
     ctx.textAlign='left';ctx.fillText('6/π²',pad.l+pw+5,ry+3);
   }
 
+  // C₂ ≈ 0.6602 reference line (twin prime constant)
+  const showC2=document.getElementById('chart-c2')&&document.getElementById('chart-c2').checked;
+  const show2C2=document.getElementById('chart-2c2')&&document.getElementById('chart-2c2').checked;
+  const C2val=computeC2();
+  if(showC2){
+    const ryC2=toY(C2val);
+    if(ryC2>=pad.t-12&&ryC2<=pad.t+ph+12){
+      ctx.strokeStyle='rgba(126,200,122,.65)';ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
+      ctx.beginPath();ctx.moveTo(pad.l,ryC2);ctx.lineTo(pad.l+pw,ryC2);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(126,200,122,.85)';ctx.font=`8.5px 'JetBrains Mono',monospace`;
+      ctx.textAlign='left';ctx.fillText(`C₂≈${C2val.toFixed(4)}`,pad.l+pw+5,ryC2+3);
+    }
+  }
+  if(show2C2){
+    const ry2C2=toY(2*C2val);
+    if(ry2C2>=pad.t-12&&ry2C2<=pad.t+ph+12){
+      ctx.strokeStyle='rgba(155,127,232,.60)';ctx.lineWidth=1.2;ctx.setLineDash([5,4]);
+      ctx.beginPath();ctx.moveTo(pad.l,ry2C2);ctx.lineTo(pad.l+pw,ry2C2);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(155,127,232,.85)';ctx.font=`8.5px 'JetBrains Mono',monospace`;
+      ctx.textAlign='left';ctx.fillText(`2C₂≈${(2*C2val).toFixed(4)}`,pad.l+pw+5,ry2C2+3);
+    }
+  }
+
   // Asymptotic ζ(2)·e^{-γ}/ln(n+1)  [correct asymptotic for C(n)]
   if(showAsymp){
     ctx.beginPath();let aStarted=false;
@@ -2593,8 +2884,12 @@ let _chartHoverN=-1,_chartHoverRAF=null;
 function onChartOptChange(){
   const dnLeg=document.getElementById('chart-dn-leg');
   const asLeg=document.getElementById('chart-asymp-leg');
+  const c2Leg=document.getElementById('chart-c2-leg');
+  const c2_2Leg=document.getElementById('chart-2c2-leg');
   if(dnLeg)dnLeg.style.display=document.getElementById('chart-dn').checked?'':'none';
   if(asLeg)asLeg.style.display=document.getElementById('chart-asymp').checked?'':'none';
+  if(c2Leg)c2Leg.style.display=document.getElementById('chart-c2')&&document.getElementById('chart-c2').checked?'':'none';
+  if(c2_2Leg)c2_2Leg.style.display=document.getElementById('chart-2c2')&&document.getElementById('chart-2c2').checked?'':'none';
   drawChart();
 }
 
@@ -2935,6 +3230,7 @@ ${date} · n = ${n} · C(${n}) = ${Cn.toFixed(12)}</footer>
 function buildDataTable(){
   const n=N;
   for(let i=0;i<=n;i++)getCn(i);
+  const D0=1/ZETA2; // D(0) = 6/π²
   const rows=[];
   for(let i=0;i<=n;i++){
     const Cn=_cn[i],Dn=Cn/ZETA2;
@@ -2946,6 +3242,7 @@ function buildDataTable(){
     const delta_c_val=i===0?null:(_cn[i]-_cn[i-1]);
     const isSatEvent=(i>0&&PS.has(i+1));
     const hi=(i===n);
+    const hlRatioVal=(Dn/D0).toFixed(6); // = C(n) since D(0)=1/ζ(2)
     rows.push(`<tr class="${hi?'td-hi':''}" onclick="showDataRowDetail(${i})" tabindex="0" role="button" aria-label="n=${i} — click for step-by-step derivation" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showDataRowDetail(${i});}">
       <td style="color:${hi?'var(--gold)':'var(--cream3)'};">${i}</td>
       <td style="color:var(--cream3)">${i+1}</td>
@@ -2956,6 +3253,7 @@ function buildDataTable(){
         ${isSatEvent&&delta_c_val!==null?'▼ '+delta_c:delta_c}
       </td>
       <td style="color:var(--cream3)">${sat}</td>
+      <td style="color:var(--violet);font-size:9px;" title="D(n)/D(0) = HL numerator ratio = C(n)">${hlRatioVal}</td>
       <td class="td-ev">${ev}</td>
     </tr>`);
   }
@@ -3072,8 +3370,8 @@ function _renderDD(rowN){
           <div class="dd-formula">gcd(r, M) = gcd(r, M+1) = … = gcd(r, M+${n}) = 1</div>
           <div class="kv"><span class="kv-k">Block length (n+1)</span><span class="kv-v teal">${n+1}</span></div>
           <div class="kv"><span class="kv-k">Offsets j checked</span><span class="kv-v">0, 1, …, ${n}</span></div>
-          ${n===0?'<div class="pd-note">n=0 is the trivial case: only gcd(r,M)=1 is required. This recovers the standard coprime density 1/ζ(2).</div>':''}
-          ${n===1?'<div class="pd-note">n=1 is the classical Feller–Tornier problem: pairs where both r and r+1 are coprime to M.</div>':''}
+          ${n===0?'<div class="pd-note">n=0 is the trivial case: only gcd(r,M)=1 is required. This recovers the standard coprime density D(0) = 1/ζ(2) = 6/π², so C(0) = 1 exactly.</div>':''}
+          ${n===1?'<div class="pd-note">n=1: the local factor at each prime p is 1−2/p², so D(1) = ∏<sub>p</sub>(1−2/p²) ≈ 0.3226. This Euler product is the <strong>Feller–Tornier product D<sub>FT</sub></strong>. Note: the classical Feller–Tornier constant is C<sub>FT</sub> = ½(1+D<sub>FT</sub>) ≈ 0.6613 — a different quantity measuring integers with even squarefull part. Our C(1) = ζ(2)·D<sub>FT</sub> ≈ 0.5307 is distinct from both.</div>':''}
         </div>
       </div>
 
@@ -3131,6 +3429,13 @@ function _renderDD(rowN){
           <div class="kv"><span class="kv-k">ζ(2) = π²/6</span><span class="kv-v">${ZETA2.toFixed(10)}</span></div>
           <div class="kv"><span class="kv-k">D(${n})</span><span class="kv-v teal">${Dn.toFixed(10)}</span></div>
           <div class="kv"><span class="kv-k">C(${n}) = ζ(2) × D(${n})</span><span class="kv-v gold">${Cn.toFixed(10)}</span></div>
+          ${n===1?`<div class="pd-note" style="margin-top:8px;">
+            <strong>Relationship to Feller–Tornier (1932):</strong><br>
+            D(1) = ∏<sub>p</sub>(1−2/p²) ≈ 0.3226 is the Feller–Tornier Euler product D<sub>FT</sub>.<br>
+            The classical constant C<sub>FT</sub> = ½(1 + D<sub>FT</sub>) ≈ <strong>0.6613</strong> counts integers whose squarefull part is a perfect square.<br>
+            Our C(1) = ζ(2)·D<sub>FT</sub> ≈ <strong>0.5307</strong> is a different normalisation — the block-coprime density rescaled so C(0)=1.<br>
+            Neither is "half" of the other; they share only the Euler product D<sub>FT</sub> as a common ingredient.
+          </div>`:''}
         </div>
       </div>
 
@@ -3220,6 +3525,7 @@ function buildPrimeTable(){
     ld+=lf;
     const pD=Math.exp(ld),pC=ZETA2*pD;
     const sat=p<=n+1;
+    const hlFac=hlLocalFactor(p,n);
     // Bar: width proportional to fac (0..1), color teal=active coral=saturated
     const barW=Math.round(fac*60);
     const barCol=sat?'var(--coral)':'var(--teal)';
@@ -3227,6 +3533,7 @@ function buildPrimeTable(){
       <span>${fac.toFixed(7)}</span>
       <div style="width:${barW}px;height:5px;background:${barCol};opacity:.7;flex-shrink:0;border-radius:1px;" title="f_p(n)=${fac.toFixed(5)}"></div>
     </div>`;
+    const hlCol=hlFac>1?'var(--lime)':hlFac<1?'var(--coral)':'var(--cream3)';
     return `<tr onclick="showPrimeDetail(${p},${ld})" tabindex="0" role="button" aria-label="Prime ${p} — click for step-by-step detail" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showPrimeDetail(${p},${ld});}" title="Click for step-by-step detail">
       <td class="${sat?'td-cn':''}" style="color:${sat?'var(--coral)':'var(--teal)'}">${p}</td>
       <td style="font-size:8px;color:${sat?'var(--coral)':'var(--teal)'};letter-spacing:.08em">${sat?'SAT':'ACT'}</td>
@@ -3235,6 +3542,7 @@ function buildPrimeTable(){
       <td style="color:var(--cream3)">${lf.toFixed(7)}</td>
       <td>${pD.toFixed(7)}</td>
       <td class="td-cn">${pC.toFixed(6)}</td>
+      <td style="color:${hlCol};font-size:9px;" title="(1−min(n+1,p)/p²)/(1−1/p)^(n+1)">${hlFac.toFixed(6)}</td>
     </tr>`;
   }).join('');
   document.getElementById('prime-tbody').innerHTML=rows;
@@ -3282,7 +3590,7 @@ function stepAnim(){
 // ══════════════════════════════════════════════════════════
 //  UI UPDATE
 // ══════════════════════════════════════════════════════════
-const KNOWN={0:'C(0)=1 · trivial coprime density · D(0)=6/π²',1:'C(1)=ζ(2)·D(1)≈0.5307 · D(1)=∏(1−2/p²)≈0.3226 · C_FT=(1+D(1))/2≈0.6613'};
+const KNOWN={0:'C(0)=1 · trivial coprime density · D(0)=6/π²',1:'C(1)=ζ(2)·D(1)≈0.5307 · D(1)=∏(1−2/p²)≈0.3226 · C_FT=(1+D(1))/2≈0.6613 · HL: D(1)/D(0)≈0.5307=C(1)'};
 
 function _updateHeroFormula(n, Cn){
   const nEl=document.getElementById('hl-n');
@@ -3306,6 +3614,10 @@ function updateUI(){
   document.getElementById('nb-sat').textContent=sat;
   const _nextEl=document.getElementById('nb-next-sat');
   if(_nextEl)_nextEl.textContent=next==='∞'?'∞':next;
+  // Mobile compact stats
+  const _cnm=document.getElementById('nb-cn-m');if(_cnm)_cnm.textContent=Cn.toFixed(4);
+  const _satm=document.getElementById('nb-sat-m');if(_satm)_satm.textContent=sat;
+  const _nxtm=document.getElementById('nb-next-sat-m');if(_nxtm)_nxtm.textContent=next==='∞'?'∞':next;
 
   // Hero live formula
   _updateHeroFormula(n, Cn);
@@ -3327,9 +3639,179 @@ function updateUI(){
   drawChart();
   buildDataTable();
   drawConvergenceChart();
+  updateHLPanel();
   _lastRenderKey=''; // force density recompute
   renderGrid();
   renderRing();
+}
+
+// ══════════════════════════════════════════════════════════
+//  HARDY–LITTLEWOOD PANEL
+// ══════════════════════════════════════════════════════════
+function updateHLPanel(){
+  const el=document.getElementById('s-hl');
+  if(!el||el.style.display==='none')return;
+  const n=N;
+  const Cn=getCn(n),Dn=Cn/ZETA2;
+  const C2=computeC2();
+  const D0=1/ZETA2;
+
+  // Independence baseline ∏_p(1-1/p)^(n+1) — only informational via partial product
+  // (product diverges, but ratio D(n)/[full indep baseline] = S(H))
+  // For display: show partial product over first 60 primes
+  const indepEl=document.getElementById('hl-indep-val');
+  if(indepEl){
+    let lg=0;
+    for(const p of PRIMES.slice(0,60))lg+=(n+1)*Math.log(1-1/p);
+    indepEl.textContent='≈'+Math.exp(lg).toExponential(4)+' (first 60 primes)';
+  }
+
+  // Named constants table
+  const tbody=document.getElementById('hl-const-tbody');
+  if(tbody){
+    const Cn1=getCn(1);const Dn1=Cn1/ZETA2;
+    const rows=[
+      {sym:'C(0)',val:'1',formula:'ζ(2)·D(0)=1',desc:'Trivial normalisation; D(0)=6/π²',cls:''},
+      {sym:'D(0)=6/π²',val:(1/ZETA2).toFixed(7),formula:'∏_p(1−1/p²)',desc:'Standard coprime pair density',cls:''},
+      {sym:`C(${n})`,val:Cn.toFixed(7),formula:'ζ(2)·D(n)',desc:`Block-coprime density, block ${n+1}`,cls:''},
+      {sym:`D(${n})`,val:Dn.toFixed(7),formula:'∏_p(1−min(n+1,p)/p²)',desc:'Raw density; D(n)/D(0) = C(n)',cls:'hl-sym-teal'},
+      {sym:'C(1)≈0.5307',val:Cn1.toFixed(7),formula:'ζ(2)·∏_p(1−2/p²)',desc:'Feller–Tornier normalized; lift survival constant',cls:''},
+      {sym:'D(1)≈0.3226',val:Dn1.toFixed(7),formula:'∏_p(1−2/p²)',desc:'Feller–Tornier Euler product D_FT',cls:'hl-sym-teal'},
+      {sym:'C₂≈0.6602',val:C2.toFixed(7),formula:'∏_{p≥3} p(p−2)/(p−1)²',desc:'Twin prime constant — HL local factor at n=1, p≥3',cls:'hl-sym-lime'},
+      {sym:'2C₂≈1.3203',val:(2*C2).toFixed(7),formula:'2·C₂',desc:'Goldbach background constant for generic even N',cls:'hl-sym-violet'},
+      {sym:'C_FT≈0.6613',val:((1+Dn1)/2).toFixed(7),formula:'½(1+D_FT)',desc:'Classical Feller–Tornier constant (distinct from C(1))',cls:'hl-sym-coral'},
+    ];
+    tbody.innerHTML=rows.map(r=>`<tr class="${r.cls}">
+      <td>${r.sym}</td>
+      <td style="font-family:var(--mono);font-size:11px;">${r.val}</td>
+      <td>${r.formula}</td>
+      <td>${r.desc}</td>
+    </tr>`).join('');
+  }
+
+  // Per-prime HL factor table
+  const ptbody=document.getElementById('hl-prime-tbody');
+  if(ptbody){
+    const primes12=PRIMES.slice(0,20);
+    ptbody.innerHTML=primes12.map(p=>{
+      const m=Math.min(n+1,p);
+      const raw=1-m/(p*p);
+      const indep=Math.pow(1-1/p,n+1);
+      const hlf=indep>0?raw/indep:1;
+      const c2local=p===2?2:(p*(p-2)/((p-1)*(p-1)));
+      const sat=p<=n+1;
+      const hlfCol=hlf>1?'var(--lime)':hlf<0.9999?'var(--coral)':'var(--cream3)';
+      return `<tr>
+        <td style="color:${sat?'var(--coral)':'var(--teal)'}">${p}</td>
+        <td style="color:${sat?'var(--coral)':'var(--teal)'};font-size:8px">${sat?'SAT':'ACT'}</td>
+        <td style="color:var(--cream2)">${raw.toFixed(7)}</td>
+        <td style="color:var(--cream3)">${indep.toFixed(7)}</td>
+        <td style="color:${hlfCol};font-weight:500">${hlf.toFixed(6)}</td>
+        <td style="color:var(--lime);font-size:9px" title="p(p-2)/(p-1)² — C₂ local factor at n=1">${p===2?'2.000000':c2local.toFixed(6)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Goldbach panel
+  updateGoldbachPanel();
+}
+
+function updateGoldbachPanel(){
+  const inp=document.getElementById('gb-n-input');
+  if(!inp)return;
+  let GN=parseInt(inp.value)||100;
+  if(GN<4){GN=4;inp.value=4;}
+  if(GN%2!==0){GN++;inp.value=GN;}
+
+  const warn=document.getElementById('gb-warning');
+  if(warn)warn.style.display='none';
+
+  const S=goldbachSingularSeries(GN);
+  const pred=goldbachHLPrediction(GN);
+  const actual=GN<=200000?countGoldbachPairs(GN):'—';
+  const ratio=(typeof actual==='number'&&pred>0)?(actual/pred).toFixed(4):'—';
+
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('gb-singular',S.toFixed(6));
+  set('gb-pred',pred.toFixed(2));
+  set('gb-actual',actual);
+  set('gb-ratio',ratio);
+
+  // Factor breakdown
+  const facEl=document.getElementById('gb-factors');
+  if(facEl){
+    const parts=['N = '+GN+' = 2'];
+    let x=GN>>1;
+    const oddFacs=[];
+    for(const p of PRIMES){
+      if(p===2)continue;if(p*p>x)break;
+      if(x%p===0){oddFacs.push(p);while(x%p===0)x=Math.floor(x/p);}
+    }
+    if(x>2)oddFacs.push(x);
+    if(oddFacs.length===0){
+      facEl.innerHTML=`<span style="color:var(--teal)">N = ${GN} = 2 × ${GN/2} — no odd prime factors → no correction, S(N) = 2C₂</span>`;
+    } else {
+      const corrParts=oddFacs.map(p=>`(${p}−1)/(${p}−2)=${((p-1)/(p-2)).toFixed(4)}`);
+      facEl.innerHTML=`<span style="color:var(--cream3)">Odd prime factors: </span><span style="color:var(--coral)">${oddFacs.join(', ')}</span>
+        &nbsp;→ correction = ${corrParts.join(' × ')} = <span style="color:var(--gold)">${(S/(2*computeC2())).toFixed(5)}</span>
+        &nbsp;→ S(N) = 2C₂ × ${(S/(2*computeC2())).toFixed(5)} = <span style="color:var(--gold)">${S.toFixed(6)}</span>`;
+    }
+  }
+
+  drawGoldbachCanvas(GN);
+}
+
+function drawGoldbachCanvas(GN){
+  const cv=document.getElementById('gb-canvas');
+  if(!cv)return;
+  const W=cv.parentElement.clientWidth||600;
+  const H=60;
+  const dpr=Math.min(devicePixelRatio||1,2);
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+  cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#04040d';ctx.fillRect(0,0,W,H);
+  if(GN<4||GN%2!==0)return;
+
+  // Draw p from 2 to N/2 as cells along x axis
+  const maxP=Math.floor(GN/2);
+  const cellW=W/maxP;
+  for(let p=2;p<=maxP;p++){
+    const q=GN-p;
+    const bothPrime=PS.has(p)&&PS.has(q);
+    const pOnly=PS.has(p)&&!PS.has(q);
+    const qOnly=!PS.has(p)&&PS.has(q);
+    let col='rgba(255,255,255,.06)';
+    if(bothPrime)col='rgba(200,168,74,.95)';
+    else if(pOnly)col='rgba(61,200,184,.75)';
+    else if(qOnly)col='rgba(224,80,96,.6)';
+    ctx.fillStyle=col;
+    ctx.fillRect((p-1)*cellW,0,Math.max(1,cellW-0.5),H);
+  }
+  // Label
+  ctx.font='8px "JetBrains Mono",monospace';
+  ctx.fillStyle='rgba(200,168,74,.6)';ctx.textAlign='right';
+  ctx.fillText(`N=${GN} · pairs=${countGoldbachPairs(GN)} · p∈[2,${maxP}]`,W-5,H-4);
+}
+
+function setGBtoCurrentN(){
+  const inp=document.getElementById('gb-n-input');
+  if(inp){inp.value=2*(N+1);updateGoldbachPanel();}
+}
+
+function goldbachFindNext(dir){
+  const inp=document.getElementById('gb-n-input');
+  if(!inp)return;
+  let v=(parseInt(inp.value)||100)+dir*2;
+  // Find next even N where there are multiple Goldbach pairs (skip trivials)
+  for(let i=0;i<2000;i++){
+    if(v<4)v=4;
+    if(v>200000)break;
+    if(v%2===0&&countGoldbachPairs(v)>=2){inp.value=v;updateGoldbachPanel();return;}
+    v+=dir*2;
+  }
+  inp.value=v;updateGoldbachPanel();
 }
 
 function setN(n){
@@ -3341,9 +3823,150 @@ function setN(n){
     history.replaceState(null,'',url);
   }catch(e){}
   updateUI();
+  // Redraw hero overlay if active
+  if(_heroOverlayMode&&_heroOverlayMode!=='none') _drawHeroOverlay();
 }
 
 function stepN(d){setN(Math.max(0,N+d));}
+
+// ══════════════════════════════════════════════════════════
+//  CALCULATOR EXPORT
+// ══════════════════════════════════════════════════════════
+function _calcExportData(){
+  const n=N;
+  const Cn=getCn(n);
+  const Dn=Cn/ZETA2;
+  const block=n+1;
+  const sat=PRIMES.filter(p=>p<=n+1).length;
+  const nextSat=nextSatN(n);
+  const prevSat=prevSatN(n);
+  // Local factors for first 20 primes
+  const factors=PRIMES.slice(0,20).map(p=>({
+    p, status:p<=n+1?'saturated':'active',
+    m:Math.min(n+1,p), p2:p*p,
+    factor:+(1-Math.min(n+1,p)/(p*p)).toFixed(10)
+  }));
+  return {n, block, Cn:+Cn.toFixed(12), Dn:+Dn.toFixed(12),
+    zeta2:+ZETA2.toFixed(12), saturated_primes:sat,
+    next_saturation_at_n: nextSat==='∞'?null:nextSat,
+    prev_saturation_at_n: prevSat,
+    local_factors:factors,
+    formula:'C(n) = zeta(2) * prod_p (1 - min(n+1,p)/p^2)',
+    exported_at: new Date().toISOString()
+  };
+}
+
+function _calcFormatExport(data, fmt){
+  if(fmt==='json') return JSON.stringify(data, null, 2);
+  if(fmt==='csv'){
+    const rows=[
+      ['field','value'],
+      ['n', data.n],
+      ['block_length', data.block],
+      ['C(n)', data.Cn],
+      ['D(n)', data.Dn],
+      ['zeta(2)', data.zeta2],
+      ['saturated_primes', data.saturated_primes],
+      ['next_saturation_n', data.next_saturation_at_n??'∞'],
+      ['prev_saturation_n', data.prev_saturation_at_n],
+      ['formula', data.formula],
+      ['exported_at', data.exported_at],
+      [],
+      ['p','status','min(n+1,p)','p²','local_factor'],
+      ...data.local_factors.map(f=>[f.p, f.status, f.m, f.p2, f.factor])
+    ];
+    return rows.map(r=>r.join(',')).join('\n');
+  }
+  // plain text
+  return [
+    `C(n) Calculator Export`,
+    `${'─'.repeat(36)}`,
+    `n              = ${data.n}`,
+    `block length   = ${data.block}`,
+    `C(n)           = ${data.Cn}`,
+    `D(n)           = ${data.Dn}`,
+    `ζ(2)           = ${data.zeta2}`,
+    `sat. primes    = ${data.saturated_primes}`,
+    `next sat @ n   = ${data.next_saturation_at_n??'∞'}`,
+    `prev sat @ n   = ${data.prev_saturation_at_n}`,
+    `formula        = ${data.formula}`,
+    ``,
+    `Local factors (first 20 primes):`,
+    data.local_factors.map(f=>`  p=${String(f.p).padStart(3)}  [${f.status}]  f_p=${f.factor}`).join('\n'),
+    ``,
+    `Exported: ${data.exported_at}`
+  ].join('\n');
+}
+
+function _calcFlash(msg){
+  const el=document.getElementById('calc-export-msg');
+  if(!el)return;
+  el.textContent=msg; el.style.opacity='1';
+  setTimeout(()=>el.style.opacity='0', 2200);
+}
+
+function exportCalc(){
+  const fmt=document.getElementById('calc-export-fmt').value;
+  const text=_calcFormatExport(_calcExportData(), fmt);
+  navigator.clipboard.writeText(text)
+    .then(()=>_calcFlash('✓ Copied!'))
+    .catch(()=>{
+      // Fallback for non-https
+      const ta=document.createElement('textarea');
+      ta.value=text; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      _calcFlash('✓ Copied!');
+    });
+}
+
+function exportCalcDownload(){
+  const fmt=document.getElementById('calc-export-fmt').value;
+  const data=_calcExportData();
+  const text=_calcFormatExport(data, fmt);
+  const ext=fmt==='json'?'json':fmt==='csv'?'csv':'txt';
+  const mime=fmt==='json'?'application/json':fmt==='csv'?'text/csv':'text/plain';
+  const blob=new Blob([text],{type:mime});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`cn_n${data.n}.${ext}`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  _calcFlash(`✓ Downloaded cn_n${data.n}.${ext}`);
+}
+
+function exportCalc4K(){
+  const el=document.getElementById('s-calc');
+  if(!el){_calcFlash('✗ Element not found');return;}
+  if(!window.html2canvas){_calcFlash('✗ html2canvas not loaded');return;}
+  _calcFlash('Rendering 4K…');
+  // Scale=4 gives ~4× native resolution; on a 1080p screen the card
+  // is ~360px tall → output ~1440px; at 4K monitor it's true 4K width.
+  const SCALE=4;
+  html2canvas(el,{
+    scale: SCALE,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg').trim()||'#04040d',
+    logging: false,
+    width: el.offsetWidth,
+    height: el.offsetHeight,
+    windowWidth: el.offsetWidth,
+    windowHeight: el.offsetHeight,
+  }).then(canvas=>{
+    canvas.toBlob(blob=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download=`cn_calculator_n${N}_4K.png`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      _calcFlash(`✓ 4K PNG saved (${canvas.width}×${canvas.height})`);
+    },'image/png',1.0);
+  }).catch(err=>{
+    console.error('4K export error:',err);
+    _calcFlash('✗ Export failed — see console');
+  });
+}
 
 // ══════════════════════════════════════════════════════════
 //  MODULAR OPERATOR  A_p^(n) = (1/p) B_p^(n)
@@ -3789,7 +4412,25 @@ const STEPS=[
     Values: $C(1)\\approx0.5307$, $C(2)\\approx0.4128$, $C(3)\\approx0.3737$.</p>`},
   {t:'Saturation and Asymptotics',b:`<p>When $p\\le n+1$: factor $=1-1/p$ (saturated, covers all residues mod $p$). By Mertens' third theorem,
     $$D(n)\\sim\\frac{e^{-\\gamma}}{\\log(n+1)}\\to0\\quad(n\\to\\infty).$$
-    The decay is logarithmically slow.</p>`}
+    The decay is logarithmically slow.</p>`},
+  {t:'The Hardy–Littlewood Singular Series',b:`<p>The Hardy–Littlewood conjecture on prime $k$-tuples involves the <em>singular series</em>
+    $$\\mathfrak{S}(\\mathcal{H})=\\prod_p \\frac{1-\\nu_p(\\mathcal{H})/p}{(1-1/p)^k}$$
+    where $\\nu_p(\\mathcal{H})$ counts distinct residues of the tuple $\\mathcal{H}$ mod $p$.
+    For the consecutive tuple $\\mathcal{H}=\\{0,1,\\dots,n\\}$ we have $\\nu_p=\\min(n+1,p)$ — exactly the numerator in the $C(n)$ local factor. Therefore:
+    $$\\mathfrak{S}(\\{0,\\dots,n\\}) = \\prod_p \\frac{1-\\min(n+1,p)/p^2}{(1-1/p)^{n+1}} = \\frac{D(n)}{\\prod_p(1-1/p)^{n+1}}$$
+    and equivalently $D(n) = \\mathfrak{S}(\\{0,\\dots,n\\})\\cdot\\prod_p(1-1/p)^{n+1}$.
+    <strong>C(n) is the raw density numerator of the singular series for the consecutive $n{+}1$-tuple.</strong></p>`},
+  {t:'Twin Primes — n = 1',b:`<p>At $n=1$, the tuple is $\\mathcal{H}=\\{0,1\\}$, which is admissible (not all residues covered mod any $p$). The HL per-prime factor at $p\\ge3$ is
+    $$\\frac{1-2/p^2}{(1-1/p)^2}=\\frac{p(p-2)}{(p-1)^2}$$
+    and at $p=2$ the factor is $2$ (only residue $0$ is blocked, not $1$). The full singular series is $\\mathfrak{S}(\\{0,2\\})=2C_2$ where
+    $$C_2=\\prod_{p\\ge3}\\frac{p(p-2)}{(p-1)^2}\\approx 0.6601618\\dots$$
+    is the twin prime constant. Meanwhile $D(1)=\\prod_p(1-2/p^2)\\approx0.3226$ is the Feller–Tornier product and $C(1)=\\zeta(2)\\cdot D(1)\\approx0.5307$. The relationship is:
+    $$C_2 = \\prod_{p\\ge3}\\frac{p(p-2)}{(p-1)^2},\\qquad D(1)=\\frac{1}{2}\\prod_{p\\ge3}\\frac{p^2-2}{p^2}$$
+    Both are Euler products over odd primes with local factors agreeing to $O(1/p^2)$.</p>`},
+  {t:'Goldbach — Even N',b:`<p>For Goldbach's conjecture (every even $N\\ge4$ is a sum of two primes), the Hardy–Littlewood prediction for the number of representations $G(N)=\\#\\{p\\le N/2: p,N-p\\text{ both prime}\\}$ is:
+    $$G(N)\\approx\\mathfrak{S}(N)\\cdot\\frac{N}{(\\ln N)^2},\\qquad
+    \\mathfrak{S}(N)=2C_2\\prod_{\\substack{p\\mid N\\\\p>2}}\\frac{p-1}{p-2}.$$
+    The <em>background constant</em> $2C_2\\approx1.3203$ is the product for $N$ generic (not divisible by any small odd prime). The correction factor $\\prod_{p\\mid N}(p-1)/(p-2)$ is precisely the "$N$-specific" twist — it is larger when $N$ has many odd prime factors (more residue classes forced prime). This is entirely determined by the local factor structure already encoded in $C(n)$ at $n=1$: the Goldbach computation is $C(1)$-arithmetic with an $N$-dependent twist.</p>`}
 ];
 
 function buildSteps(){
@@ -3893,13 +4534,125 @@ function initHeroThree(){
 }
 
 // ══════════════════════════════════════════════════════════
+//  HERO TEXT TOGGLE + CANVAS OVERLAY
+// ══════════════════════════════════════════════════════════
+let _heroTextVisible=true;
+let _heroOverlayMode='none';
+let _heroOverlayRAF=null;
+
+function toggleHeroText(){
+  _heroTextVisible=!_heroTextVisible;
+  const wrap=document.getElementById('hero-text-wrap');
+  const btn=document.getElementById('hero-text-btn');
+  if(wrap) wrap.classList.toggle('hidden',!_heroTextVisible);
+  if(btn) btn.textContent=_heroTextVisible?'Hide text':'Show text';
+}
+
+function setHeroOverlay(mode){
+  _heroOverlayMode=mode;
+  const ov=document.getElementById('hero-overlay');
+  if(!ov) return;
+  if(mode==='none'){
+    ov.style.opacity='0';
+    if(_heroOverlayRAF){cancelAnimationFrame(_heroOverlayRAF);_heroOverlayRAF=null;}
+  } else {
+    ov.style.opacity='0.72';
+    _drawHeroOverlay();
+  }
+}
+
+function _drawHeroOverlay(){
+  if(_heroOverlayRAF){cancelAnimationFrame(_heroOverlayRAF);_heroOverlayRAF=null;}
+  const ov=document.getElementById('hero-overlay');
+  const hero=document.getElementById('hero');
+  if(!ov||!hero||_heroOverlayMode==='none') return;
+
+  // Size canvas to hero
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const W=hero.clientWidth, H=hero.clientHeight;
+  if(ov.width!==Math.round(W*dpr)||ov.height!==Math.round(H*dpr)){
+    ov.width=Math.round(W*dpr); ov.height=Math.round(H*dpr);
+  }
+  const ctx=ov.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+
+  if(_heroOverlayMode==='ring') _drawHeroRing(ctx,W,H);
+  else if(_heroOverlayMode==='grid') _drawHeroGrid(ctx,W,H);
+  else if(_heroOverlayMode==='euler') drawConvergenceChart(N,ov);
+}
+
+function _drawHeroRing(ctx,W,H){
+  const n=N;
+  const mMax=Math.min(60,Math.max(12,Math.round(W/8)));
+  const cx=W/2, cy=H/2;
+  const maxR=Math.min(W,H)*0.44;
+
+  ctx.save();
+  for(let M=2;M<=mMax;M++){
+    const ringR=maxR*(M/mMax);
+    for(let r=1;r<M;r++){
+      const angle=2*Math.PI*r/M - Math.PI/2;
+      let ok=true;
+      for(let j=0;j<=n&&ok;j++) if(gcd(r,M+j)>1) ok=false;
+      const copM=gcd(r,M)===1;
+      const dotR=Math.max(1,Math.min(3,maxR/mMax*0.35));
+      const x=cx+ringR*Math.cos(angle);
+      const y=cy+ringR*Math.sin(angle);
+      ctx.beginPath();
+      ctx.arc(x,y,dotR,0,Math.PI*2);
+      ctx.fillStyle=ok?'rgba(200,168,74,.85)':copM?'rgba(61,200,184,.4)':'rgba(255,255,255,.1)';
+      ctx.fill();
+    }
+    // Ring circle
+    ctx.beginPath();
+    ctx.arc(cx,cy,ringR,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,.06)';
+    ctx.lineWidth=0.5;
+    ctx.stroke();
+  }
+  // C(n) label
+  ctx.font=`bold ${Math.min(13,W/28)}px JetBrains Mono,monospace`;
+  ctx.fillStyle='rgba(200,168,74,.7)';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText(`C(${n}) = ${getCn(n).toFixed(5)}`,cx,H-6);
+  ctx.restore();
+}
+
+function _drawHeroGrid(ctx,W,H){
+  const n=N;
+  const G=Math.min(48,Math.max(16,Math.round(Math.min(W,H)/10)));
+  const cellW=W/G, cellH=H/G;
+  ctx.save();
+  for(let r=1;r<=G;r++){
+    for(let M=1;M<=G;M++){
+      let ok=true;
+      for(let j=0;j<=n&&ok;j++) if(gcd(r,M+j)>1) ok=false;
+      if(!ok && gcd(r,M)===1){
+        ctx.fillStyle='rgba(61,200,184,.25)';
+      } else if(ok){
+        ctx.fillStyle='rgba(200,168,74,.55)';
+      } else {
+        ctx.fillStyle='rgba(255,255,255,.04)';
+      }
+      ctx.fillRect((M-1)*cellW,(r-1)*cellH,cellW-0.5,cellH-0.5);
+    }
+  }
+  ctx.font=`bold ${Math.min(13,W/28)}px JetBrains Mono,monospace`;
+  ctx.fillStyle='rgba(200,168,74,.7)';
+  ctx.textAlign='center'; ctx.textBaseline='bottom';
+  ctx.fillText(`C(${n}) = ${getCn(n).toFixed(5)} · grid ${G}×${G}`,W/2,H-6);
+  ctx.restore();
+}
+
+// ══════════════════════════════════════════════════════════
 //  FEATURE 2 — PARCHMENT THEME TOGGLE
 // ══════════════════════════════════════════════════════════
 let _parchment=false;
 function toggleTheme(){
   _parchment=!_parchment;
   document.body.classList.toggle('parchment',_parchment);
-  document.getElementById('theme-btn').textContent=_parchment?'Dark':'Parchment';
+  document.getElementById('theme-btn').textContent=_parchment?'☀':'☽';
   renderGrid();renderRing();drawConvergenceChart();
 }
 
@@ -3907,17 +4660,17 @@ function toggleFullscreen(){
   const btn=document.getElementById('fs-btn');
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen().catch(()=>{});
-    btn.textContent='Exit Full';btn.classList.add('active');
+    btn.textContent='⊠';btn.classList.add('active');
   }else{
     document.exitFullscreen().catch(()=>{});
-    btn.textContent='Full';btn.classList.remove('active');
+    btn.textContent='⛶';btn.classList.remove('active');
   }
 }
 document.addEventListener('fullscreenchange',()=>{
   const btn=document.getElementById('fs-btn');
   if(!btn)return;
-  if(!document.fullscreenElement){btn.textContent='Full';btn.classList.remove('active');}
-  else{btn.textContent='Exit Full';btn.classList.add('active');}
+  if(!document.fullscreenElement){btn.textContent='⛶';btn.classList.remove('active');}
+  else{btn.textContent='⊠';btn.classList.add('active');}
 });
 
 // ══════════════════════════════════════════════════════════
@@ -4942,8 +5695,8 @@ function init(){
   // Read ?n= from URL if present
   try{
     const _urlN=parseInt(new URL(window.location.href).searchParams.get('n'));
-    if(!isNaN(_urlN)&&_urlN>=0) { setN(_urlN); } else { setN(0); }
-  }catch(e){ setN(0); }
+    if(!isNaN(_urlN)&&_urlN>=0) { setN(_urlN); } else { setN(1); }
+  }catch(e){ setN(1); }
   drawConvergenceChart();
 }
 
