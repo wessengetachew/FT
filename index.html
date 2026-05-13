@@ -780,12 +780,12 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <table class="dt">
       <thead><tr>
         <th>p</th><th>Status</th><th>min(n+1,p)</th><th>p²</th>
-        <th>Local factor</th><th>log factor</th><th>Partial D(n)</th><th>Partial C(n)</th><th title="HL local factor = raw / (1-1/p)^(n+1) — contribution to singular series">HL factor</th>
+        <th>Local factor</th><th>log factor</th><th>Partial D(n)</th><th>Partial C(n)</th><th title="Block correlation = (1−min(n+1,p)/p²)/(1−1/p)^(n+1): ratio of block-coprime density to what independence would predict at prime p. Always > 1. Diverges as a product — not the HL singular series.">Block corr.</th>
       </tr></thead>
       <tbody id="prime-tbody"></tbody>
     </table>
   </div>
-  <div style="margin-top:8px;font-size:8px;color:var(--cream3);">First 60 primes. Partial C(n) = ζ(2) × running product. Converges from below. <span style="color:var(--violet)">Click any row to see its local factor matrix (p×p binary grid) and step-by-step detail.</span> <span style="color:var(--lime)">HL factor = raw/independence baseline — at n=1 for p≥3 this equals p(p−2)/(p−1)² (C₂ local factor).</span></div>
+  <div style="margin-top:8px;font-size:8px;color:var(--cream3);">First 60 primes. Partial C(n) = ζ(2) × running product. <span style="color:var(--violet)">Click any row for local factor matrix and step-by-step detail.</span> <span style="color:var(--teal)">Block corr. = (1−min(n+1,p)/p²)/(1−1/p)^(n+1): how much the 2D block-coprime density exceeds the independence baseline at each prime. Always &gt; 1 and diverges as a product — not the HL singular series. The C₂ local factor p(p−2)/(p−1)² is a separate 1D quantity visible in the HL Connection panel.</span></div>
   <!-- ══ MODULAR OPERATOR PANEL ══ -->
   <div id="lfm-panel" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--edge);">
     <!-- Header -->
@@ -886,7 +886,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <table class="dt">
       <thead><tr>
         <th>n</th><th>Block</th><th>C(n)</th><th>D(n)</th>
-        <th>C(n)/C(n−1)</th><th title="Signed difference C(n)−C(n−1); spikes mark saturation events">ΔC</th><th>Sat. primes</th><th title="D(n)/D(0) = C(n) — the HL ratio numerator">D(n)/D(0)</th><th>Event</th>
+        <th>C(n)/C(n−1)</th><th title="Signed difference C(n)−C(n−1); spikes mark saturation events">ΔC</th><th>Sat. primes</th><th title="C(n)/C₂ — block-coprime density relative to twin prime constant; genuinely new column">C(n)/C₂</th><th>Event</th>
       </tr></thead>
       <tbody id="dt-body"></tbody>
     </table>
@@ -1109,11 +1109,14 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
 
   <!-- Relationship formula -->
   <div class="ibox" style="margin-top:14px;">
-    <strong>Key relationship:</strong> For the admissible tuple ℋ = {0,…,n} the Hardy–Littlewood singular series is
-    $$\mathfrak{S}(\mathcal{H}) = \prod_p \frac{1-\nu_p(\mathcal{H})/p}{(1-1/p)^{n+1}}$$
-    where ν<sub>p</sub>(ℋ) = min(n+1, p). This means
-    $$\mathfrak{S}(\mathcal{H}) = D(n) \cdot \prod_p \frac{1}{(1-1/p)^{n+1}} = C(n) \cdot \frac{1}{\zeta(2)} \cdot \prod_p \frac{1}{(1-1/p)^{n+1}}$$
-    so <span style="color:var(--gold)">C(n)</span> is the raw density numerator and the independence baseline ∏<sub>p</sub>(1−1/p)<sup>n+1</sup> = <span id="hl-indep-val" style="color:var(--teal)">…</span> is the denominator.
+    <strong>Structural parallel — same exclusion count, different space:</strong>
+    The C(n) local factor at prime $p$ is
+    $$f_p(n) = 1 - \frac{\min(n+1,p)}{p^2} \quad (\text{2D: counts pairs }(r,M)\in(\mathbb{Z}/p\mathbb{Z})^2)$$
+    The HL singular series local factor for an admissible tuple $\mathcal{H}$ with $\nu_p=|\mathcal{H}\bmod p|$ is
+    $$\frac{1-\nu_p/p}{(1-1/p)^k} \quad (\text{1D: counts residues in }\mathbb{Z}/p\mathbb{Z})$$
+    Both share the exclusion count $\nu_p = \min(n+1,p)$, but operate in different ambient dimensions. The
+    <span style="color:var(--teal)">Block corr.</span> column shows the ratio $f_p(n)/(1-1/p)^{n+1}$ — always &gt; 1, diverging — 
+    while the <span style="color:var(--lime)">C₂ local (1D)</span> column shows the genuine twin prime factor $p(p-2)/(p-1)^2$, which is distinct.
   </div>
 
   <!-- Per-prime HL factor table (first 12 primes, live) -->
@@ -1125,7 +1128,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     <div class="tscroll" style="max-height:220px;">
       <table class="dt" id="hl-prime-table">
         <thead><tr>
-          <th>p</th><th>Status</th><th>Raw f_p(n)</th><th>(1−1/p)^(n+1)</th><th>HL factor</th><th>C₂ local (n=1)</th>
+          <th>p</th><th>Status</th><th>Raw f_p(n)</th><th>(1−1/p)^(n+1)</th><th title="Block corr. = raw / independence baseline. Always > 1. Not the C₂ local factor.">Block corr.</th><th title="C₂ local = p(p-2)/(p-1)² — the 1D twin prime factor (separate from C(n))">C₂ local (1D)</th>
         </tr></thead>
         <tbody id="hl-prime-tbody"></tbody>
       </table>
@@ -1246,10 +1249,10 @@ function hlLocalFactor(p,n){
   return indep>0?raw/indep:1;
 }
 
-// Running HL singular series product ∏_{p} hlLocalFactor(p,n)
-// = D(n) / ∏_p(1−1/p)^(n+1) — note this diverges but partial products are informative
-// For display we cap at the first 60 primes
-function hlSingularPartial(n,numPrimes){
+// Block correlation partial product ∏_{p≤P} hlLocalFactor(p,n)
+// Always > 1 per factor; diverges as P→∞ (not the HL singular series).
+// Retained as a diagnostic showing per-prime correlation structure.
+function blockCorrPartial(n,numPrimes){
   let v=1;
   const ps=PRIMES.slice(0,numPrimes||60);
   for(const p of ps) v*=hlLocalFactor(p,n);
@@ -3230,7 +3233,7 @@ ${date} · n = ${n} · C(${n}) = ${Cn.toFixed(12)}</footer>
 function buildDataTable(){
   const n=N;
   for(let i=0;i<=n;i++)getCn(i);
-  const D0=1/ZETA2; // D(0) = 6/π²
+  const C2=computeC2();
   const rows=[];
   for(let i=0;i<=n;i++){
     const Cn=_cn[i],Dn=Cn/ZETA2;
@@ -3242,7 +3245,8 @@ function buildDataTable(){
     const delta_c_val=i===0?null:(_cn[i]-_cn[i-1]);
     const isSatEvent=(i>0&&PS.has(i+1));
     const hi=(i===n);
-    const hlRatioVal=(Dn/D0).toFixed(6); // = C(n) since D(0)=1/ζ(2)
+    const cnOverC2=(Cn/C2).toFixed(5);
+    const cnOverC2Col=Cn>C2?'var(--lime)':Cn<C2*0.5?'var(--coral)':'var(--cream2)';
     rows.push(`<tr class="${hi?'td-hi':''}" onclick="showDataRowDetail(${i})" tabindex="0" role="button" aria-label="n=${i} — click for step-by-step derivation" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showDataRowDetail(${i});}">
       <td style="color:${hi?'var(--gold)':'var(--cream3)'};">${i}</td>
       <td style="color:var(--cream3)">${i+1}</td>
@@ -3253,7 +3257,7 @@ function buildDataTable(){
         ${isSatEvent&&delta_c_val!==null?'▼ '+delta_c:delta_c}
       </td>
       <td style="color:var(--cream3)">${sat}</td>
-      <td style="color:var(--violet);font-size:9px;" title="D(n)/D(0) = HL numerator ratio = C(n)">${hlRatioVal}</td>
+      <td style="color:${cnOverC2Col};font-size:9px;" title="C(n)/C₂ — block-coprime density relative to twin prime constant. >1 at n=0, crosses below C₂ around n=1">${cnOverC2}</td>
       <td class="td-ev">${ev}</td>
     </tr>`);
   }
@@ -4413,24 +4417,90 @@ const STEPS=[
   {t:'Saturation and Asymptotics',b:`<p>When $p\\le n+1$: factor $=1-1/p$ (saturated, covers all residues mod $p$). By Mertens' third theorem,
     $$D(n)\\sim\\frac{e^{-\\gamma}}{\\log(n+1)}\\to0\\quad(n\\to\\infty).$$
     The decay is logarithmically slow.</p>`},
-  {t:'The Hardy–Littlewood Singular Series',b:`<p>The Hardy–Littlewood conjecture on prime $k$-tuples involves the <em>singular series</em>
+  {t:'The Hardy–Littlewood Structural Parallel',b:`<p>The Hardy–Littlewood conjecture on prime $k$-tuples involves the <em>singular series</em>
     $$\\mathfrak{S}(\\mathcal{H})=\\prod_p \\frac{1-\\nu_p(\\mathcal{H})/p}{(1-1/p)^k}$$
-    where $\\nu_p(\\mathcal{H})$ counts distinct residues of the tuple $\\mathcal{H}$ mod $p$.
-    For the consecutive tuple $\\mathcal{H}=\\{0,1,\\dots,n\\}$ we have $\\nu_p=\\min(n+1,p)$ — exactly the numerator in the $C(n)$ local factor. Therefore:
-    $$\\mathfrak{S}(\\{0,\\dots,n\\}) = \\prod_p \\frac{1-\\min(n+1,p)/p^2}{(1-1/p)^{n+1}} = \\frac{D(n)}{\\prod_p(1-1/p)^{n+1}}$$
-    and equivalently $D(n) = \\mathfrak{S}(\\{0,\\dots,n\\})\\cdot\\prod_p(1-1/p)^{n+1}$.
-    <strong>C(n) is the raw density numerator of the singular series for the consecutive $n{+}1$-tuple.</strong></p>`},
-  {t:'Twin Primes — n = 1',b:`<p>At $n=1$, the tuple is $\\mathcal{H}=\\{0,1\\}$, which is admissible (not all residues covered mod any $p$). The HL per-prime factor at $p\\ge3$ is
-    $$\\frac{1-2/p^2}{(1-1/p)^2}=\\frac{p(p-2)}{(p-1)^2}$$
-    and at $p=2$ the factor is $2$ (only residue $0$ is blocked, not $1$). The full singular series is $\\mathfrak{S}(\\{0,2\\})=2C_2$ where
-    $$C_2=\\prod_{p\\ge3}\\frac{p(p-2)}{(p-1)^2}\\approx 0.6601618\\dots$$
-    is the twin prime constant. Meanwhile $D(1)=\\prod_p(1-2/p^2)\\approx0.3226$ is the Feller–Tornier product and $C(1)=\\zeta(2)\\cdot D(1)\\approx0.5307$. The relationship is:
-    $$C_2 = \\prod_{p\\ge3}\\frac{p(p-2)}{(p-1)^2},\\qquad D(1)=\\frac{1}{2}\\prod_{p\\ge3}\\frac{p^2-2}{p^2}$$
-    Both are Euler products over odd primes with local factors agreeing to $O(1/p^2)$.</p>`},
+    where $\\nu_p(\\mathcal{H})$ counts distinct residues of $\\mathcal{H}$ mod $p$ (denominator $p$, counting in $\\mathbb{Z}/p\\mathbb{Z}$).
+    The $C(n)$ local factor at prime $p$ is
+    $$f_p(n) = 1 - \\frac{\\min(n+1,p)}{p^2}$$
+    with denominator $p^2$, because $C(n)$ counts ordered pairs $(r,M)\\in(\\mathbb{Z}/p\\mathbb{Z})^2$.
+    Both expressions share the same exclusion count $\\nu_p = \\min(n+1,p)$ — but they operate in different spaces:
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;margin:10px 0;">
+    <tr style="border-bottom:1px solid rgba(255,255,255,.1);">
+      <td style="padding:5px 8px;color:var(--cream3)">Object</td>
+      <td style="padding:5px 8px;color:var(--cream3)">Space</td>
+      <td style="padding:5px 8px;color:var(--cream3)">Local factor at $p$</td>
+      <td style="padding:5px 8px;color:var(--cream3)">Convergence</td>
+    </tr>
+    <tr style="background:rgba(200,168,74,.05);">
+      <td style="padding:5px 8px;color:var(--gold)">$C(n)$</td>
+      <td style="padding:5px 8px;">$(\\mathbb{Z}/p\\mathbb{Z})^2$</td>
+      <td style="padding:5px 8px;color:var(--gold)">$1 - \\nu_p/p^2$</td>
+      <td style="padding:5px 8px;color:var(--teal)">Absolute ($O(1/p^2)$)</td>
+    </tr>
+    <tr>
+      <td style="padding:5px 8px;color:var(--teal)">$\\mathfrak{S}(\\mathcal{H})$</td>
+      <td style="padding:5px 8px;">$\\mathbb{Z}/p\\mathbb{Z}$</td>
+      <td style="padding:5px 8px;color:var(--teal)">$(1 - \\nu_p/p)/(1-1/p)^k$</td>
+      <td style="padding:5px 8px;color:var(--coral)">Requires normalization</td>
+    </tr>
+    </table>
+    <p>Note: the consecutive tuple $\\{0,\\dots,n\\}$ for $n\\ge1$ is <em>not admissible</em> ($p=2$ covers both residues mod 2 for any pair of consecutive integers), so $\\mathfrak{S}(\\{0,\\dots,n\\})=0$ formally and cannot be used directly. The connection is structural: <strong>$D(n)$ is the 2-dimensional density analog of the singular series local factors</strong> — same exclusion counts $\\nu_p$, different ambient dimension.</p>`},
+  {t:'Twin Primes and C₂ — n = 1',b:`<p>The twin prime constant $C_2$ comes from the <em>1-dimensional</em> HL formula for primes $p$ with $p+2$ also prime. At prime $\\ell\\ge3$: out of $\\ell$ residue classes for $p\\bmod\\ell$, the pair $(p,p+2)$ is blocked when $p\\equiv0$ or $p\\equiv-2\\pmod\\ell$ — two distinct classes since $\\ell>2$. So $\\ell-2$ classes survive. Normalized by independence $(1-1/\\ell)^2$:
+    $$\\text{C}_2\\text{ local: }\\frac{(\\ell-2)/\\ell}{(1-1/\\ell)^2}=\\frac{\\ell(\\ell-2)}{(\\ell-1)^2}$$
+    giving $C_2=\\prod_{\\ell\\ge3}\\ell(\\ell-2)/(\\ell-1)^2\\approx0.6601618$.
+    Meanwhile $C(n=1)$ at $\\ell\\ge3$ gives the <em>2-dimensional</em> factor:
+    $$\\text{C(1) local: }1-\\frac{2}{\\ell^2}=\\frac{\\ell^2-2}{\\ell^2}$$
+    These are <strong>different</strong> — $\\ell^2-2\\ne\\ell(\\ell-2)=\\ell^2-2\\ell$ — but share the same "exclude 2 residues" structure in different spaces. Numerically at $\\ell=5$: C(1) local $=23/25=0.920$; C₂ local $=15/16=0.9375$. For large $\\ell$ both approach $1-2/\\ell^2$ vs $1-2/\\ell$, so the 2D factor (C(n)) decays faster. The product $D(1)=\\prod_\\ell(1-2/\\ell^2)$ converges absolutely; $\\prod_\\ell(1-2/\\ell)$ would diverge to 0 and requires the normalization by $(1-1/\\ell)^2$ to give the finite constant $C_2$.
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;margin:10px 0;">
+    <tr style="border-bottom:1px solid rgba(255,255,255,.1);">
+      <td style="padding:4px 8px;color:var(--cream3)">Constant</td>
+      <td style="padding:4px 8px;color:var(--cream3)">Local factor at $\\ell\\ge3$</td>
+      <td style="padding:4px 8px;color:var(--cream3)">Value at $\\ell=5$</td>
+      <td style="padding:4px 8px;color:var(--cream3)">Product</td>
+    </tr>
+    <tr style="background:rgba(200,168,74,.05);">
+      <td style="padding:4px 8px;color:var(--gold)">$C(1)$ local</td>
+      <td style="padding:4px 8px;">$(\\ell^2-2)/\\ell^2$</td>
+      <td style="padding:4px 8px;color:var(--gold)">23/25 = 0.920</td>
+      <td style="padding:4px 8px;color:var(--gold)">$D(1)\\approx0.3226$</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px;color:var(--lime)">$C_2$ local</td>
+      <td style="padding:4px 8px;">$\\ell(\\ell-2)/(\\ell-1)^2$</td>
+      <td style="padding:4px 8px;color:var(--lime)">15/16 = 0.9375</td>
+      <td style="padding:4px 8px;color:var(--lime)">$C_2\\approx0.6602$</td>
+    </tr>
+    </table>`},
   {t:'Goldbach — Even N',b:`<p>For Goldbach's conjecture (every even $N\\ge4$ is a sum of two primes), the Hardy–Littlewood prediction for the number of representations $G(N)=\\#\\{p\\le N/2: p,N-p\\text{ both prime}\\}$ is:
     $$G(N)\\approx\\mathfrak{S}(N)\\cdot\\frac{N}{(\\ln N)^2},\\qquad
     \\mathfrak{S}(N)=2C_2\\prod_{\\substack{p\\mid N\\\\p>2}}\\frac{p-1}{p-2}.$$
-    The <em>background constant</em> $2C_2\\approx1.3203$ is the product for $N$ generic (not divisible by any small odd prime). The correction factor $\\prod_{p\\mid N}(p-1)/(p-2)$ is precisely the "$N$-specific" twist — it is larger when $N$ has many odd prime factors (more residue classes forced prime). This is entirely determined by the local factor structure already encoded in $C(n)$ at $n=1$: the Goldbach computation is $C(1)$-arithmetic with an $N$-dependent twist.</p>`}
+    The local factor at prime $\\ell$ is a 1D count: out of $\\ell$ residues for $p\\bmod\\ell$, the pair $(p,N-p)$ is blocked when $p\\equiv0$ or $p\\equiv N\\pmod\\ell$. When $\\ell\\nmid N$ these are 2 distinct forbidden classes ($\\ell-2$ survive); when $\\ell\\mid N$ they coincide (only 1 forbidden, $\\ell-1$ survive), giving the correction factor $(p-1)/(p-2)$.
+    </p>
+    <p>The <strong>parallel with C(n=1)</strong>: both computations ask "at each prime $\\ell$, how many configurations avoid having two conditions simultaneously hit 0 mod $\\ell$?" — but in different spaces:
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;margin:10px 0;">
+    <tr style="border-bottom:1px solid rgba(255,255,255,.1);">
+      <td style="padding:4px 8px;color:var(--cream3)">Problem</td>
+      <td style="padding:4px 8px;color:var(--cream3)">Space</td>
+      <td style="padding:4px 8px;color:var(--cream3)">Forbidden configs at $\\ell$</td>
+      <td style="padding:4px 8px;color:var(--cream3)">Local density</td>
+    </tr>
+    <tr style="background:rgba(200,168,74,.05);">
+      <td style="padding:4px 8px;color:var(--gold)">$C(1)$</td>
+      <td style="padding:4px 8px;">$(r,M)\\in(\\mathbb{Z}/\\ell\\mathbb{Z})^2$</td>
+      <td style="padding:4px 8px;">2 of $\\ell^2$ pairs</td>
+      <td style="padding:4px 8px;color:var(--gold)">$(\\ell^2-2)/\\ell^2$</td>
+    </tr>
+    <tr>
+      <td style="padding:4px 8px;color:var(--teal)">Goldbach ($\\ell\\nmid N$)</td>
+      <td style="padding:4px 8px;">$p\\bmod\\ell\\in\\mathbb{Z}/\\ell\\mathbb{Z}$</td>
+      <td style="padding:4px 8px;">2 of $\\ell$ residues</td>
+      <td style="padding:4px 8px;color:var(--teal)">$(\\ell-2)/\\ell$</td>
+    </tr>
+    </table>
+    <p>Same instinct — "exclude 2 at each prime" — executed in 2D (C(n)) vs 1D (Goldbach). The background constant $2C_2\\approx1.3203$ is the full normalization of the 1D product; $C(1)\\approx0.5307$ is the 2D product without normalization. Both are consequences of the same local arithmetic.</p>`}
 ];
 
 function buildSteps(){
