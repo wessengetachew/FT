@@ -35,7 +35,7 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 /* ── STICKY N BAR ── */
 #nbar{
   position:sticky;top:0;z-index:200;
-  background:rgba(4,4,13,.97);backdrop-filter:blur(12px);
+  background:#04040d;border-bottom:1px solid var(--edge);
   border-bottom:1px solid var(--edge2);
   display:flex;align-items:center;padding:0 16px;height:50px;gap:0;
   overflow-x:auto;scrollbar-width:none;
@@ -681,7 +681,7 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
   <!-- Hero controls -->
   <div id="hero-ctrl" style="position:absolute;top:10px;right:12px;z-index:10;display:flex;gap:6px;align-items:center;">
     <button id="hero-text-btn" onclick="toggleHeroText()"
-      style="background:rgba(4,4,13,.8);border:1px solid rgba(200,168,74,.3);color:var(--gold);font-family:var(--mono);font-size:8px;padding:4px 10px;cursor:pointer;backdrop-filter:blur(4px);white-space:nowrap;">
+      style="background:rgba(4,4,13,.92);border:1px solid rgba(200,168,74,.3);color:var(--gold);font-family:var(--mono);font-size:8px;padding:4px 10px;cursor:pointer;white-space:nowrap;">
       Hide text
     </button>
   </div>
