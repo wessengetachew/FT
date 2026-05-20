@@ -83,7 +83,7 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 .hero-formula{
   display:inline-block;font-family:var(--mono);font-size:clamp(.85rem,1.8vw,1.1rem);
   color:var(--gold);background:rgba(200,168,74,.06);border:1px solid rgba(200,168,74,.2);
-  padding:14px 28px 0;margin-bottom:10px;
+  padding:14px 28px;margin-bottom:10px;
 }
 .hero-live{
   display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:0 8px;
@@ -165,6 +165,7 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 .tc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);cursor:pointer;}
 .tc-slider.gold::-webkit-slider-thumb{background:var(--gold);}
 .tc-slider.violet::-webkit-slider-thumb{background:var(--violet);}
+.tc-slider.teal::-webkit-slider-thumb{background:var(--teal);}
 .tc-val{
   min-width:44px;text-align:center;background:rgba(255,255,255,.04);
   border:1px solid var(--edge2);color:var(--gold);font-family:var(--mono);
@@ -283,6 +284,36 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 #canvas3d-wrap.dragging{cursor:grabbing;}
 #canvas3d{display:block;width:100%;height:100%;}
 #lbl-3d-stats{font-size:8px;color:var(--cream3);padding:4px 14px;background:var(--bg1);border:1px solid var(--edge);border-top:none;letter-spacing:.08em;}
+/* ── VIEW MODE BAR ── */
+#view-bar{
+  display:flex;flex-wrap:wrap;gap:0;
+  border:1px solid var(--edge);border-top:none;margin-bottom:0;
+  background:var(--bg1);
+}
+.vm-btn{
+  font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+  padding:8px 14px;cursor:pointer;background:none;border:none;border-right:1px solid var(--edge);
+  color:var(--cream3);transition:all .14s;white-space:nowrap;
+}
+.vm-btn:last-child{border-right:none;}
+.vm-btn:hover:not(.active){color:var(--cream);background:rgba(255,255,255,.02);}
+.vm-btn.active{color:var(--gold);background:rgba(200,168,74,.06);border-bottom:2px solid var(--gold);}
+#spiral-nav{
+  display:none;align-items:center;gap:6px;padding:6px 10px;
+  background:var(--bg2);border:1px solid var(--edge);border-top:none;
+}
+/* ── HIGHLIGHT PANEL ── */
+#hl-panel{
+  display:none;padding:10px 14px;
+  background:var(--bg1);border:1px solid var(--edge);border-top:none;
+  margin-bottom:20px;
+}
+#hl-panel-title{font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+#hl-grid{display:flex;flex-wrap:wrap;gap:6px 14px;}
+.hl-item{display:flex;align-items:baseline;gap:5px;font-size:9px;}
+.hl-k{color:var(--cream3);letter-spacing:.06em;}
+.hl-v{color:var(--cream);font-weight:500;font-family:var(--mono);}
+.hl-v.teal{color:var(--teal);} .hl-v.coral{color:var(--coral);} .hl-v.gold{color:var(--gold);}
 </style>
 </head>
 <body>
@@ -309,7 +340,7 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
     <div class="hero-tag">Analytic Number Theory · Wessen Getachew · 2026</div>
     <h1 class="hero-title">Gap Diagonal Identity</h1>
     <div class="hero-formula">
-      $$\text{gold density on } |M - r| = g \;=\; \frac{\varphi(g)}{g}$$
+      $$\text{coprime density on } |M - r| = g \;=\; \frac{\varphi(g)}{g}$$
     </div>
     <div class="hero-live">
       <span>diagonal &nbsp;</span>
@@ -378,6 +409,11 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
     <span id="phase-ind"></span>
     <button class="tc-btn" id="btn-play" onclick="togglePlay()">▶ Play</button>
     <div class="tc-sep"></div>
+    <!-- Ring rotation speed (controls rings view; 0 = static) -->
+    <span class="tc-label">Ring ω</span>
+    <input type="range" class="tc-slider teal" id="sl-ring-speed" min="0" max="100" value="35" step="1" oninput="onRingSpeed(+this.value)" style="max-width:80px;">
+    <span class="tc-val" id="val-ring-speed" style="color:var(--teal);">1.0×</span>
+    <div class="tc-sep"></div>
     <!-- Zoom -->
     <span class="tc-label">Zoom</span>
     <input type="range" class="tc-slider" id="sl-zoom" min="1" max="8" step="0.25" value="1" oninput="onSliderZoom(+this.value)" style="max-width:90px;">
@@ -387,13 +423,37 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
     <button class="tc-btn" id="btn-reset-view" onclick="resetView()" title="Reset zoom &amp; pan">⌖</button>
     <div class="tc-sep"></div>
     <button class="tc-btn" id="btn-export" onclick="export4K()">↓ 4K PNG</button>
-    <button class="tc-btn" id="btn-rings" onclick="toggleRings()" title="Animated modular rings overlay">⟳ Rings</button>
-    <button class="tc-btn" id="btn-complex" onclick="toggleComplex()" title="ℤ[i] 4-quadrant view">ℤ[i] View</button>
+  </div><!-- /tool-controls -->
+
+  <!-- View Mode Bar -->
+  <div id="view-bar">
+    <button class="vm-btn active" id="vm-grid"    onclick="setViewMode('grid')">Grid</button>
+    <button class="vm-btn"        id="vm-rings"   onclick="setViewMode('rings')">⟳ Rings</button>
+    <button class="vm-btn"        id="vm-zi"      onclick="setViewMode('zi')">ℤ[i]</button>
+    <button class="vm-btn"        id="vm-barrier" onclick="setViewMode('barrier')">Barrier</button>
+    <button class="vm-btn"        id="vm-spiral"  onclick="setViewMode('spiral')">Spiral</button>
+    <button class="vm-btn"        id="vm-farey"   onclick="setViewMode('farey')">Farey</button>
   </div>
+
+  <!-- Spiral navigation (shown only in spiral mode) -->
+  <div id="spiral-nav">
+    <button class="tc-btn" onclick="prevSpiral()">◀ Prev prime</button>
+    <span id="spiral-info" style="font-size:8px;color:var(--cream3);">—</span>
+    <button class="tc-btn" onclick="nextSpiral()">Next prime ▶</button>
+    <button class="tc-btn" onclick="resetView()" style="margin-left:6px;">⌖ Reset view</button>
+  </div>
+
   <div class="cv-outer" id="diag-cv-wrap">
     <canvas id="diag-cv"></canvas>
   </div>
-</div>
+
+  <!-- Highlight Detail Panel -->
+  <div id="hl-panel">
+    <div id="hl-panel-title">Selected point</div>
+    <div id="hl-grid"></div>
+  </div>
+
+</div><!-- /tool-section -->
 
 <!-- ── DENSITY BAR ── -->
 <div id="density-bar">
@@ -401,7 +461,7 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
   <div class="db-item"><span class="db-lbl">Diagonal g</span><span class="db-val teal" id="db-g">—</span></div>
   <div class="db-item"><span class="db-lbl">φ(g)</span><span class="db-val" id="db-phi">—</span></div>
   <div class="db-item"><span class="db-lbl">φ(g)/g theory</span><span class="db-val" id="db-density">—</span></div>
-  <div class="db-item"><span class="db-lbl">Gold / Total on diag</span><span class="db-val teal" id="db-ratio">—</span></div>
+  <div class="db-item"><span class="db-lbl">Coprime / Total on diag</span><span class="db-val teal" id="db-ratio">—</span></div>
   <div class="db-item"><span class="db-lbl">Observed density</span><span class="db-val" id="db-obs" style="color:var(--lime);">—</span></div>
   <div class="db-item"><span class="db-lbl">Depth n</span><span class="db-val" id="db-n" style="color:var(--violet);">0</span></div>
   <div class="db-item"><span class="db-lbl">Block diag density</span><span class="db-val" id="db-cn" style="color:var(--coral);">—</span></div>
@@ -415,15 +475,15 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
   </div>
   <div class="prose">
     <p>Consider the integer lattice of pairs $(r, M)$ with $1 \le r, M \le G$.
-      Color a cell <strong style="color:var(--gold)">gold</strong> if $\gcd(r, M) = 1$.
+      A cell is <strong>coprime</strong> if $\gcd(r, M) = 1$.
       Fix any anti-diagonal defined by $|M - r| = g$.</p>
   </div>
   <div class="formula-block">
-    $$\text{density of gold cells on } \{|M - r| = g\} \;=\; \frac{\varphi(g)}{g}$$
+    $$\text{coprime density on } \{|M - r| = g\} \;=\; \frac{\varphi(g)}{g}$$
   </div>
   <div class="prose">
     <p>This holds for <em>any</em> $g \ge 1$ and any $G \ge g$, uniformly — independent of the grid size.
-      Euler's totient function $\varphi$ is literally the gold density of a diagonal stripe in the coprime lattice.</p>
+      Euler's totient function $\varphi$ is literally the coprime density of a diagonal stripe in the integer lattice.</p>
   </div>
   <div class="result-row" style="margin-top:18px;">
     <div class="rbox"><div class="rl">g = 1</div><div class="rv">1.000</div><div class="rs">φ(1)/1 = <span>1/1</span> · all pairs coprime</div></div>
@@ -438,19 +498,19 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
   <div class="card-title">Proof Sketch</div>
   <div class="prose">
     <p>On the diagonal $|M - r| = g$, every cell has the form $(r, r + g)$ for $r \ge 1$.
-    The cell is gold iff $\gcd(r, r+g) = 1$. Since $\gcd(r, r+g) = \gcd(r, g)$, we need $\gcd(r, g) = 1$.</p>
+    The cell is coprime iff $\gcd(r, r+g) = 1$. Since $\gcd(r, r+g) = \gcd(r, g)$, we need $\gcd(r, g) = 1$.</p>
   </div>
   <div class="formula-block teal">$$\gcd(r,\, r+g) \;=\; \gcd(r,\, g)$$</div>
   <div class="prose">
     <p>The proportion of $r \in \{1, \ldots, g\}$ with $\gcd(r,g) = 1$ is exactly $\varphi(g)/g$.
-    The diagonal repeats with period $g$, so every window of $g$ consecutive cells contains exactly $\varphi(g)$ gold ones.
+    The diagonal repeats with period $g$, so every window of $g$ consecutive cells contains exactly $\varphi(g)$ coprime ones.
     The density is therefore $\varphi(g)/g$ for any $G$. $\square$</p>
   </div>
   <div style="margin-top:16px;">
     <div class="step open"><div class="step-hdr"><span class="step-num">Step 01</span><span class="step-ttl">Parametrize the diagonal</span><span class="step-arr">▶</span></div>
       <div class="step-body"><p>The anti-diagonal $|M - r| = g$ consists of pairs $(r, r+g)$ for $r = 1, 2, \ldots, G-g$ (and symmetrically $(r+g, r)$). We focus on one sheet; the other is identical by symmetry.</p></div></div>
     <div class="step"><div class="step-hdr"><span class="step-num">Step 02</span><span class="step-ttl">Reduce the coprimality condition</span><span class="step-arr">▶</span></div>
-      <div class="step-body"><p>A cell $(r, r+g)$ is gold iff $\gcd(r, r+g) = 1$. By the Euclidean algorithm, $\gcd(a, b) = \gcd(a, b-a)$, so $\gcd(r, r+g) = \gcd(r, g)$. The condition simplifies to $r \perp g$.</p></div></div>
+      <div class="step-body"><p>A cell $(r, r+g)$ is coprime iff $\gcd(r, r+g) = 1$. By the Euclidean algorithm, $\gcd(a, b) = \gcd(a, b-a)$, so $\gcd(r, r+g) = \gcd(r, g)$. The condition simplifies to $r \perp g$.</p></div></div>
     <div class="step"><div class="step-hdr"><span class="step-num">Step 03</span><span class="step-ttl">Count via periodicity</span><span class="step-arr">▶</span></div>
       <div class="step-body"><p>The function $r \mapsto \gcd(r,g)$ has period $g$. In each block of $g$ consecutive integers, exactly $\varphi(g)$ are coprime to $g$. As $r$ runs over the diagonal, this pattern repeats perfectly, giving density $\varphi(g)/g$ independent of $G$.</p></div></div>
     <div class="step"><div class="step-hdr"><span class="step-num">Step 04</span><span class="step-ttl">Exact for all G ≥ g</span><span class="step-arr">▶</span></div>
@@ -462,11 +522,11 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 <div class="card">
   <div class="card-title">Extension to Block-Coprimality — The C(n) Setting<span class="ct-badge ct-ext">Extension</span></div>
   <div class="prose">
-    <p>For a fixed depth $n \ge 0$, a cell $(r, M)$ is <strong style="color:var(--gold)">gold</strong> if $\gcd(r, M+j) = 1$ for all $j = 0, 1, \ldots, n$.
+    <p>For a fixed depth $n \ge 0$, a cell $(r, M)$ is <strong>block-coprime</strong> if $\gcd(r, M+j) = 1$ for all $j = 0, 1, \ldots, n$.
     On the diagonal $|M - r| = g$, this reduces to: $\gcd(r, g+j)=1$ for all $j=0,\ldots,n$.</p>
   </div>
   <div class="formula-block violet">
-    $$\text{gold density on } |M-r|=g \text{ at depth } n \;=\; \prod_{p \mid g(g+1)\cdots(g+n)} \!\!\left(1 - \frac{1}{p}\right)$$
+    $$\text{coprime density on } |M-r|=g \text{ at depth } n \;=\; \prod_{p \mid g(g+1)\cdots(g+n)} \!\!\left(1 - \frac{1}{p}\right)$$
   </div>
   <div class="kv-row">
     <div class="kv"><span class="kv-k">n=0</span><span class="kv-v">φ(g)/g</span></div>
@@ -494,24 +554,6 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
   </ul>
 </div>
 
-<!-- ── GAUSSIAN INTEGER EXTENSION ── -->
-<div class="card" id="complex-card" style="display:none;margin-bottom:20px;">
-  <div class="card-title">Gaussian Integer Extension — Coprime Lattice in $\mathbb{Z}[i]$<span class="ct-badge ct-new">New</span></div>
-  <div class="prose" style="margin-bottom:14px;">
-    <p>Rotating the coprime lattice by $90°$ increments around the origin embeds it into all four quadrants of $\mathbb{Z}[i]$. Each quadrant corresponds to multiplication by a unit $i^k$: the original patch occupies Quadrant IV ($z = r - iM$), and successive $90°$ clockwise rotations fill Q III, Q II, and Q I. Because the Gaussian norm $N(z) = x^2 + y^2$ is invariant, the coprimality structure maps perfectly across all four fields.</p>
-    <p>The anti-diagonals $|M - r| = g$ (straight lines in the single-quadrant view) become <strong>concentric tilted square shells</strong> around the origin. The <em>Gap Diagonal Identity</em> becomes a <em>Square Shell Identity</em>: each shell's gold density is exactly $\varphi(g)/g$, by the same periodicity argument, now realized over the entire complex lattice.</p>
-  </div>
-  <div class="cv-outer" id="complex-cv-wrap" style="aspect-ratio:1/1;width:100%;max-width:min(80vh,820px);">
-    <canvas id="complex-cv"></canvas>
-  </div>
-  <div class="kv-row" style="margin-top:12px;">
-    <div class="kv"><span class="kv-k">Q I (top-right)</span><span class="kv-v teal">z = M + ir</span></div>
-    <div class="kv"><span class="kv-k">Q II (top-left)</span><span class="kv-v violet">z = −r + iM</span></div>
-    <div class="kv"><span class="kv-k">Q III (bot-left)</span><span class="kv-v" style="color:var(--coral)">z = −M − ir</span></div>
-    <div class="kv"><span class="kv-k">Q IV (bot-right)</span><span class="kv-v">z = r − iM (base patch)</span></div>
-  </div>
-</div>
-
 <!-- ── 4K EXPORT ── -->
 <div class="card" id="export-card">
   <div class="card-title">4K Export</div>
@@ -528,7 +570,7 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 <div class="card">
   <div class="card-title">The One-Line Form</div>
   <div class="share-quote">
-    "Euler's $\varphi(g)/g$ is not just a formula — it is the gold density on the diagonal $|M-r|=g$ in the coprime lattice."
+    "Euler's $\varphi(g)/g$ is not just a formula — it is the coprime density on the anti-diagonal $|M-r|=g$ of the integer lattice."
     <cite>— Wessen Getachew, 2026 · wessengetachew.github.io</cite>
   </div>
   <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;">
@@ -577,7 +619,7 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
 </div>
 
 <!-- Z-slice controls (hidden by default) -->
-<div id="slice-controls" style="display:none;padding:8px 14px;background:var(--bg1);border:1px solid var(--edge);border-top:none;display:none;">
+<div id="slice-controls" style="display:none;padding:8px 14px;background:var(--bg1);border:1px solid var(--edge);border-top:none;">
   <span class="tc-label" style="margin-right:8px;">Z layer</span>
   <input type="range" class="tc-slider teal" id="sl-3d-z" min="1" max="4" value="1" oninput="set3DZslice(+this.value)" style="max-width:180px;">
   <span class="tc-val" id="val-3d-z" style="color:var(--teal);">1</span>
@@ -587,6 +629,10 @@ body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:1
   <canvas id="canvas3d"></canvas>
 </div>
 <div id="lbl-3d-stats">— initializing —</div>
+<div style="padding:8px 0 0;display:flex;align-items:center;gap:12px;">
+  <button class="export-btn" id="btn-3d-export" onclick="export3D()">↓ Export 4K PNG</button>
+  <span id="export-3d-prog" style="font-size:8px;color:var(--cream3);display:none;">Rendering…</span>
+</div>
 
 <!-- 3D Math Card -->
 <div class="card" style="margin-top:20px;">
@@ -727,20 +773,39 @@ function cellColor(ri,mi,G,n,activeGap,mode){
 // ══════════════════════════════════════════════════════════
 let G=8, activeGap=0, depthN=0, showLabels=true, colorMode='sector';
 let playId=null, playPhase=1, playDir=1;
-let showComplex=false;
-// Zoom + pan state
+
+// View mode: grid | rings | zi | barrier | spiral | farey
+let viewMode='grid';
+// Highlight: null or {view, ...props}
+let highlighted=null;
+// Zoom + pan
 let zoomLevel=1, panX=0, panY=0;
-let isDragging=false, dragStart={x:0,y:0}, dragStartPan={x:0,y:0};
-// Cell label mode: 'none' | 'r' | 'M' | 'r/M'
+let isDragging=false, _dragged=false, dragStart={x:0,y:0}, dragStartPan={x:0,y:0};
+// Cell label mode
 let cellLabelMode='none';
 const LABEL_MODES=['none','r','M','r/M'];
-// Rotating rings animation (modular ℤ/Mℤ* rings, per-ring angular velocity)
-let ringsActive=false, ringsAnimId=null, ringsT=0, ringsLastTime=null;
+// Rings animation
+let ringsAnimId=null, ringsT=0, ringsLastTime=null;
+let ringSpeedMult=1.0;   // 0 = static, 1 = default, controlled by slider
+let _ringHitTargets=[];
+// Spiral data
+let _spiralData=null, _spiralPrimes=[], _spiralPIdx=0;
 
 // ══════════════════════════════════════════════════════════
 //  RENDER
 // ══════════════════════════════════════════════════════════
-function render(){ renderHero(); renderGrid(); updateBar(); if(showComplex) renderComplexLattice(); }
+function render(){ renderHero(); renderMain(); updateBar(); }
+
+function renderMain(){
+  switch(viewMode){
+    case 'grid':    renderGrid();    break;
+    case 'rings':   renderRings();   break;
+    case 'zi':      renderZI();      break;
+    case 'barrier': renderBarrier(); break;
+    case 'spiral':  renderSpiral();  break;
+    case 'farey':   renderFarey();   break;
+  }
+}
 
 // ── HERO LABELS (no canvas — just keeps the live readout in sync with the g slider)
 function renderHero(){
@@ -1029,396 +1094,597 @@ function cycleLabelMode(){
   renderGrid();
 }
 
-// ── RINGS ANIMATION — modular ℤ/Mℤ* concentric rotating rings ──
-// Each ring M has φ(M) lit dots at angles 2π·r/M for gcd(r,M)=1.
-// Angular velocity ω_M = BASE_SPEED / M  (outer rings orbit slower).
-// Colour comes from the sector hue mapped to the dot's current angle.
-function drawRingsOverlay(ctx, W, cx, cy, maxR){
-  const BASE_SPEED=0.35;
-  // Number of rings: up to G, capped for performance and visual clarity
-  const numRings=Math.min(G, 28);
-  if(numRings<2) return;
-
-  const innerR=maxR*0.06;
-  const ringStep=(maxR-innerR)/Math.max(1,numRings-1);
-
-  ctx.save();
-
-  for(let M=2;M<=numRings+1;M++){
-    const radius=innerR+(M-2)*ringStep;
-    if(radius<=0) continue;
-    const omega=BASE_SPEED/M;
-    const baseAngle=ringsT*omega;
-
-    // Faint ring circle
-    ctx.strokeStyle=`rgba(200,168,74,${Math.max(0.03,0.10-M*0.003)})`;
-    ctx.lineWidth=0.6;
-    ctx.beginPath();
-    ctx.arc(cx,cy,radius,0,Math.PI*2);
-    ctx.stroke();
-
-    // Dots at coprime residues
-    const dotR=Math.max(1.8, maxR*0.016*(1-M/numRings*0.4));
-    for(let r=1;r<=M;r++){
-      if(gcd(r,M)!==1) continue;
-      const angle=(2*Math.PI*r/M)+baseAngle;
-      const x=cx+radius*Math.cos(angle);
-      const y=cy+radius*Math.sin(angle);
-
-      // Sector hue from current screen angle, saturation/value from density
-      const hue=((angle*180/Math.PI)%360+360)%360;
-      const density=phi(M)/M;
-      const [cr,cg,cb]=hsv2rgb(hue,0.82,0.95);
-
-      ctx.globalAlpha=0.72;
-      ctx.fillStyle=`rgb(${cr},${cg},${cb})`;
-      ctx.beginPath();
-      ctx.arc(x,y,dotR,0,Math.PI*2);
-      ctx.fill();
-
-      // Faint spoke from centre (only for inner rings to avoid clutter)
-      if(M<=8){
-        ctx.globalAlpha=0.06;
-        ctx.strokeStyle=`rgb(${cr},${cg},${cb})`;
-        ctx.lineWidth=0.6;
-        ctx.beginPath();
-        ctx.moveTo(cx,cy);
-        ctx.lineTo(x,y);
-        ctx.stroke();
-      }
-    }
-  }
-
-  ctx.globalAlpha=1;
-  ctx.restore();
-}
-
-function toggleRings(){
-  ringsActive=!ringsActive;
-  document.getElementById('btn-rings').classList.toggle('on',ringsActive);
-  if(ringsActive){
+// ── RING SPEED SLIDER ──
+function onRingSpeed(v){
+  ringSpeedMult=v/35; // 35 = default (slider mid-value maps to 1×)
+  const label=v===0?'off':((v/35).toFixed(1)+'×');
+  document.getElementById('val-ring-speed').textContent=label;
+  // If rings view is active but loop stalled (speed was 0), restart it
+  if(viewMode==='rings'&&!ringsAnimId&&v>0){
     ringsLastTime=null;
-    _ringsAnimFrame();
-  } else {
-    if(ringsAnimId) cancelAnimationFrame(ringsAnimId);
-    ringsAnimId=null;
-    // Redraw without rings
-    renderGrid();
-    if(showComplex) renderComplexLattice();
+    _ringsLoop();
   }
 }
 
-function _ringsAnimFrame(){
-  if(!ringsActive){ringsAnimId=null;return;}
-  const now=performance.now();
-  if(ringsLastTime!==null) ringsT+=(now-ringsLastTime)/1000;
-  ringsLastTime=now;
-  renderGrid();
-  if(showComplex) renderComplexLattice();
-  ringsAnimId=requestAnimationFrame(_ringsAnimFrame);
-}
-
-function setupCanvasEvents(){
-  const cv=document.getElementById('diag-cv');
-
-  // ── MOUSE DRAG ──
-  cv.addEventListener('mousedown',e=>{
-    if(e.button!==0) return;
-    isDragging=true;
-    dragStart={x:e.clientX,y:e.clientY};
-    dragStartPan={x:panX,y:panY};
-    cv.classList.add('dragging');
-    e.preventDefault();
-  });
-  window.addEventListener('mousemove',e=>{
-    if(!isDragging) return;
-    panX=dragStartPan.x+(e.clientX-dragStart.x);
-    panY=dragStartPan.y+(e.clientY-dragStart.y);
-    constrainPan();
-    renderGrid();
-  });
-  window.addEventListener('mouseup',()=>{
-    isDragging=false;
-    cv.classList.remove('dragging');
-  });
-
-  // ── SCROLL WHEEL ZOOM (toward mouse cursor) ──
-  cv.addEventListener('wheel',e=>{
-    e.preventDefault();
-    const rect=cv.getBoundingClientRect();
-    const mx=(e.clientX-rect.left)*(cv.width/rect.width);
-    const my=(e.clientY-rect.top)*(cv.height/rect.height);
-    const {lPad,baseCw}=getGridOrigin();
-    // Grid coord under mouse
-    const gx=(mx-lPad-panX)/(baseCw*zoomLevel);
-    const gy=(my-lPad-panY)/(baseCw*zoomLevel);
-    const delta=e.deltaY>0?-0.25:0.25;
-    zoomLevel=Math.max(1,Math.min(8,zoomLevel+delta));
-    panX=mx-lPad-gx*baseCw*zoomLevel;
-    panY=my-lPad-gy*baseCw*zoomLevel;
-    document.getElementById('sl-zoom').value=zoomLevel;
-    document.getElementById('val-zoom').textContent=zoomLevel%1===0?`${zoomLevel}\u00d7`:`${zoomLevel.toFixed(2)}\u00d7`;
-    constrainPan();
-    renderGrid();
-  },{passive:false});
-
-  // ── DOUBLE-CLICK RESET ──
-  cv.addEventListener('dblclick',()=>resetView());
-
-  // ── TOUCH: drag + pinch-zoom ──
-  let t0={x:0,y:0},tp0={x:0,y:0},pinchDist0=0,pinchZoom0=1;
-  cv.addEventListener('touchstart',e=>{
-    e.preventDefault();
-    if(e.touches.length===1){
-      isDragging=true;
-      t0={x:e.touches[0].clientX,y:e.touches[0].clientY};
-      tp0={x:panX,y:panY};
-    } else if(e.touches.length===2){
-      isDragging=false;
-      const dx=e.touches[1].clientX-e.touches[0].clientX;
-      const dy=e.touches[1].clientY-e.touches[0].clientY;
-      pinchDist0=Math.hypot(dx,dy);
-      pinchZoom0=zoomLevel;
-    }
-  },{passive:false});
-  cv.addEventListener('touchmove',e=>{
-    e.preventDefault();
-    if(e.touches.length===1&&isDragging){
-      panX=tp0.x+(e.touches[0].clientX-t0.x);
-      panY=tp0.y+(e.touches[0].clientY-t0.y);
-      constrainPan(); renderGrid();
-    } else if(e.touches.length===2){
-      const dx=e.touches[1].clientX-e.touches[0].clientX;
-      const dy=e.touches[1].clientY-e.touches[0].clientY;
-      const dist=Math.hypot(dx,dy);
-      zoomLevel=Math.max(1,Math.min(8,pinchZoom0*(dist/pinchDist0)));
-      document.getElementById('sl-zoom').value=zoomLevel;
-      document.getElementById('val-zoom').textContent=zoomLevel%1===0?`${zoomLevel}\u00d7`:`${zoomLevel.toFixed(2)}\u00d7`;
-      constrainPan(); renderGrid();
-    }
-  },{passive:false});
-  cv.addEventListener('touchend',()=>{isDragging=false;});
-}
-
-// ══════════════════════════════════════════════════════════
-//  PLAY  — Phase 1: animate G from 4→128, Phase 2: animate g
-// ══════════════════════════════════════════════════════════
-function setPhaseInd(phase){
-  const el=document.getElementById('phase-ind');
-  if(phase===0){el.style.display='none';el.className='';return;}
-  el.style.display='inline-block';
-  if(phase===1){el.className='phase-ind p1';el.textContent='Phase 1: G sweep';}
-  else{el.className='phase-ind p2';el.textContent='Phase 2: g sweep';}
-}
-
+// ── PLAY BUTTON — animates diagonal g through 0…G-1 and back ──
 function togglePlay(){
   const btn=document.getElementById('btn-play');
-  if(playId){
+  const ind=document.getElementById('phase-ind');
+  if(playId!==null){
     clearInterval(playId); playId=null;
-    btn.textContent='▶ Play'; btn.classList.remove('play-on');
-    setPhaseInd(0);
+    btn.textContent='▶ Play';
+    btn.classList.remove('play-on');
+    ind.style.display='none';
     return;
   }
-  btn.textContent='■ Stop'; btn.classList.add('play-on');
-
-  // Phase 1: grow G from 4 to 128
-  playPhase=1;
-  G=4;
-  activeGap=0;
-  document.getElementById('sl-G').value=4;
-  document.getElementById('val-G').textContent=4;
-  document.getElementById('sl-g').value=0;
-  document.getElementById('val-g').textContent='off';
-  setPhaseInd(1);
-  render();
-
-  // Fixed 80 ms tick; phase-2 visually fine at this speed
+  // Start: reset to g=0 phase-1
+  playPhase=1; playDir=1;
+  btn.textContent='■ Stop';
+  btn.classList.add('play-on');
+  ind.className='phase-ind p1';
+  ind.textContent='→';
+  ind.style.display='inline-flex';
   playId=setInterval(()=>{
-    if(playPhase===1){
-      G++;
-      if(G>128){
-        // Transition to phase 2
-        G=128;
-        playPhase=2;
-        activeGap=1;
-        playDir=1;
-        document.getElementById('sl-g').max=G-1;
-        document.getElementById('sl-g').value=1;
-        document.getElementById('val-g').textContent='g=1';
-        setPhaseInd(2);
-      }
-      document.getElementById('sl-G').value=G;
-      document.getElementById('val-G').textContent=G;
-      document.getElementById('sl-g').max=G-1;
-    } else {
-      // Phase 2: sweep g
-      activeGap+=playDir;
-      const maxG=Math.min(G-1,G-1);
-      if(activeGap>=maxG){playDir=-1;}
-      else if(activeGap<=1){playDir=1;}
-      document.getElementById('sl-g').value=activeGap;
-      document.getElementById('val-g').textContent=`g=${activeGap}`;
-    }
+    const slg=document.getElementById('sl-g');
+    const maxG=G-1;
+    activeGap+=playDir;
+    if(activeGap>maxG){ activeGap=maxG; playDir=-1; playPhase=2;
+      ind.className='phase-ind p2'; ind.textContent='←'; }
+    if(activeGap<0){ activeGap=0; playDir=1; playPhase=1;
+      ind.className='phase-ind p1'; ind.textContent='→'; }
+    slg.value=activeGap;
+    document.getElementById('val-g').textContent=activeGap>0?`g=${activeGap}`:'off';
     render();
-  }, 80);
+  },120);
 }
 
 // ══════════════════════════════════════════════════════════
-//  COMPLEX ℤ[i] LATTICE — 4-quadrant rotational render
-//  Embeds the G×G coprime patch into all four quadrants of ℤ[i]
-//  via successive 90° canvas rotations around the origin.
-//  Quadrant assignment (canvas y-down convention):
-//    Draw patch (ri→x+, mi→y+):  occupies bottom-right = Q IV (z = r − iM)
-//    rotate(π/2) clockwise → bottom-left = Q III (z = −M − ir)
-//    rotate(π/2) clockwise → top-left   = Q II  (z = −r + iM)
-//    rotate(π/2) clockwise → top-right  = Q I   (z = M  + ir)
+//  VIEW MODE SWITCHER
 // ══════════════════════════════════════════════════════════
-function renderComplexLattice(){
-  const cv=document.getElementById('complex-cv');
-  const wrap=document.getElementById('complex-cv-wrap');
-  if(!cv||!wrap) return;
+function setViewMode(mode){
+  const prev=viewMode;
+  viewMode=mode;
+  // Update button states
+  ['grid','rings','zi','barrier','spiral','farey'].forEach(m=>{
+    const b=document.getElementById('vm-'+m);
+    if(b) b.classList.toggle('active',m===mode);
+  });
+  // Spiral nav visibility
+  const sn=document.getElementById('spiral-nav');
+  if(sn) sn.style.display=mode==='spiral'?'flex':'none';
+  // Rings animation
+  if(mode==='rings'){
+    ringsLastTime=null;
+    if(!ringsAnimId) _ringsLoop();
+  } else if(prev==='rings' && ringsAnimId){
+    cancelAnimationFrame(ringsAnimId); ringsAnimId=null;
+  }
+  // Build spiral on demand
+  if(mode==='spiral'&&(!_spiralData||_spiralData.length!==G*G)) _buildSpiral();
+  highlighted=null;
+  const hp=document.getElementById('hl-panel');
+  if(hp) hp.style.display='none';
+  renderMain();
+}
+
+function _ringsLoop(){
+  if(viewMode!=='rings'){ringsAnimId=null;ringsLastTime=null;return;}
+  const now=performance.now();
+  if(ringsLastTime!==null && ringSpeedMult>0)
+    ringsT+=(now-ringsLastTime)/1000*ringSpeedMult;
+  ringsLastTime=now;
+  renderMain();
+  ringsAnimId=requestAnimationFrame(_ringsLoop);
+}
+
+
+
+// ══════════════════════════════════════════════════════════
+//  RINGS VIEW (full canvas, animated)
+// ══════════════════════════════════════════════════════════
+function renderRings(){
+  const cv=document.getElementById('diag-cv');
+  const wrap=document.getElementById('diag-cv-wrap');
   const W=wrap.clientWidth||600;
   cv.width=W; cv.height=W;
   const ctx=cv.getContext('2d');
+  ctx.fillStyle='#030310'; ctx.fillRect(0,0,W,W);
 
-  ctx.fillStyle='#03030f'; ctx.fillRect(0,0,W,W);
+  const cx=W/2+panX, cy=W/2+panY;
+  const maxR=W*0.44*zoomLevel;
+  const numRings=Math.min(G,28);
+  _ringHitTargets=[];
+  if(numRings<2){_drawOverlayText(ctx,W);return;}
 
-  // Faint axis cross
-  ctx.save();
-  ctx.strokeStyle='rgba(200,168,74,.12)'; ctx.lineWidth=1;
-  ctx.setLineDash([4,4]);
-  ctx.beginPath();
-  ctx.moveTo(W/2,0); ctx.lineTo(W/2,W);
-  ctx.moveTo(0,W/2); ctx.lineTo(W,W/2);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
+  const innerR=maxR*0.05;
+  const ringStep=(maxR-innerR)/Math.max(1,numRings-1);
 
-  // Diagonal guides at 45° (anti-diagonals become square shells across all quadrants)
-  if(activeGap>0){
-    const halfW=W/2;
-    const cw=halfW/G;
-    const gOff=activeGap*cw;
-    ctx.save();
-    ctx.strokeStyle='rgba(61,200,184,.25)'; ctx.lineWidth=Math.max(1,cw*0.12);
-    ctx.setLineDash([cw*1.5, cw*0.8]);
-    // Draw the tilted square shell at offset gOff from center
-    ctx.beginPath();
-    ctx.moveTo(W/2+gOff, W/2);
-    ctx.lineTo(W/2, W/2+gOff);
-    ctx.lineTo(W/2-gOff, W/2);
-    ctx.lineTo(W/2, W/2-gOff);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
+  for(let M=2;M<=numRings+1;M++){
+    const radius=innerR+(M-2)*ringStep;
+    const omega=0.35/M;   // base angular speed for ring M; scaled by ringSpeedMult via ringsT
+    const baseAngle=ringsT*omega;
+    const isActiveM=(M===activeGap&&activeGap>0);
+
+    ctx.strokeStyle=isActiveM?'rgba(61,200,184,.55)':`rgba(200,168,74,${Math.max(0.04,0.11-M*0.003)})`;
+    ctx.lineWidth=isActiveM?1.5:0.6;
+    ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2); ctx.stroke();
+
+    const dotR=Math.max(2,maxR*0.015*(1-M/numRings*0.3));
+
+    for(let r=1;r<=M;r++){
+      let ok=true;
+      for(let j=0;j<=depthN&&ok;j++) if(gcd(r,M+j)!==1) ok=false;
+      if(!ok) continue;
+
+      const angle=(2*Math.PI*r/M)+baseAngle;
+      const x=cx+radius*Math.cos(angle);
+      const y=cy+radius*Math.sin(angle);
+      const isHL=highlighted&&highlighted.view==='rings'&&highlighted.M===M&&highlighted.r===r;
+      const h=((angle*180/Math.PI)%360+360)%360;
+      const [cr2,cg2,cb2]=hsv2rgb(h,0.82,isHL?1.0:0.90);
+
+      ctx.globalAlpha=isHL?1.0:0.78;
+      ctx.fillStyle=`rgb(${cr2},${cg2},${cb2})`;
+      ctx.beginPath(); ctx.arc(x,y,isHL?dotR*2:dotR,0,6.2832); ctx.fill();
+      if(isHL){ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.globalAlpha=1;ctx.beginPath();ctx.arc(x,y,dotR*2.8,0,6.2832);ctx.stroke();}
+
+      if(zoomLevel>2&&dotR>7){
+        const g2=gcd(r,M);
+        ctx.fillStyle='rgba(255,255,255,.75)';
+        ctx.font=`${Math.min(10,dotR*.65)}px "JetBrains Mono",monospace`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.globalAlpha=0.9;
+        ctx.fillText(`${r/g2}/${M/g2}`,x,y);
+      }
+      _ringHitTargets.push({M,r,x,y,dotR});
+    }
   }
-
-  // Shift origin to canvas centre, render all 4 quadrants
-  ctx.save();
-  ctx.translate(W/2, W/2);
-  for(let q=0;q<4;q++){
-    _drawComplexPatch(ctx, W, q);
-    ctx.rotate(Math.PI/2);
-  }
-  ctx.restore();
-
-  _drawComplexLabels(ctx, W);
-  // Rotating modular rings — centered at complex origin, fills all 4 quadrants
-  if(ringsActive) drawRingsOverlay(ctx,W,W/2,W/2,W*0.46);
+  ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(200,168,74,.5)';
+  ctx.beginPath(); ctx.arc(cx,cy,3,0,6.2832); ctx.fill();
+  _drawOverlayText(ctx,W);
+  ctx.fillStyle='rgba(61,200,184,.7)';
+  ctx.font='8px "JetBrains Mono",monospace';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`Rings M=2..${Math.min(G,28)+1}  ·  n=${depthN}  ·  gcd(r,M+j)=1 ∀j≤n  ·  drag to pan  ·  scroll to zoom`,8,8);
 }
 
-function _drawComplexPatch(ctx, W, quadrant){
-  const halfW=W/2;
+// ══════════════════════════════════════════════════════════
+//  ℤ[i] VIEW (4-quadrant complex plane on main canvas)
+// ══════════════════════════════════════════════════════════
+function renderZI(){
+  const cv=document.getElementById('diag-cv');
+  const wrap=document.getElementById('diag-cv-wrap');
+  const W=wrap.clientWidth||600;
+  cv.width=W; cv.height=W;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#03030f'; ctx.fillRect(0,0,W,W);
+
+  const cx=W/2+panX, cy=W/2+panY;
+  const halfW=W*0.46*zoomLevel;
   const cw=halfW/G;
   const dotR=Math.max(0.5,cw*0.38);
 
-  if(G>60){
-    for(let ri=0;ri<G;ri++){
-      for(let mi=0;mi<G;mi++){
-        const [cr,cg,cb,ca]=cellColor(ri,mi,G,depthN,activeGap,colorMode);
-        if(ca<4) continue;
-        ctx.globalAlpha=ca/255;
-        ctx.fillStyle=`rgb(${cr},${cg},${cb})`;
-        ctx.fillRect(ri*cw+0.5,mi*cw+0.5,cw-0.8,cw-0.8);
-      }
-    }
-  } else {
-    for(let ri=0;ri<G;ri++){
-      for(let mi=0;mi<G;mi++){
-        const [cr,cg,cb,ca]=cellColor(ri,mi,G,depthN,activeGap,colorMode);
-        if(ca<4) continue;
-        ctx.globalAlpha=ca/255;
-        ctx.fillStyle=`rgb(${cr},${cg},${cb})`;
-        ctx.beginPath();
-        ctx.arc((ri+0.5)*cw,(mi+0.5)*cw,dotR,0,6.2832);
-        ctx.fill();
-      }
-    }
-  }
-  ctx.globalAlpha=1;
+  ctx.strokeStyle='rgba(200,168,74,.10)'; ctx.lineWidth=1;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,W);
+  ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke(); ctx.setLineDash([]);
 
-  // Per-quadrant tint so the 4-fold symmetry is visually distinct
-  const tints=['rgba(200,168,74,.07)','rgba(61,200,184,.07)','rgba(155,127,232,.07)','rgba(224,80,96,.06)'];
-  ctx.fillStyle=tints[quadrant];
-  ctx.globalAlpha=1;
-  ctx.fillRect(0,0,halfW,halfW);
-}
-
-function _drawComplexLabels(ctx, W){
-  const fs=Math.max(8,Math.floor(W*0.016));
-  const fs2=Math.max(7,Math.floor(W*0.012));
-  const cx=W/2, cy=W/2;
-
-  // Axis labels
-  ctx.font=`${fs}px "JetBrains Mono",monospace`;
-  ctx.fillStyle='rgba(200,168,74,.6)';
-  ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.fillText('+Re', cx+7, cy);
-  ctx.textAlign='right';
-  ctx.fillText('−Re', cx-7, cy);
-  ctx.textAlign='center'; ctx.textBaseline='top';
-  ctx.fillText('+Im', cx, 5);
-  ctx.textBaseline='bottom';
-  ctx.fillText('−Im', cx, W-5);
-
-  // Quadrant labels (small, faint)
-  ctx.font=`${fs2}px "JetBrains Mono",monospace`;
-  ctx.fillStyle='rgba(155,127,232,.35)';
-  const pad=fs2*0.8;
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.fillText('Q I  z=M+ir', cx+pad, cy+pad);
-  ctx.textAlign='right';
-  ctx.fillText('Q II  z=−r+iM', cx-pad, cy+pad);
-  ctx.textBaseline='bottom';
-  ctx.fillText('Q III  z=−M−ir', cx-pad, cy-pad);
-  ctx.textAlign='left';
-  ctx.fillText('Q IV  z=r−iM', cx+pad, cy-pad);
-
-  // Gap label when active
   if(activeGap>0){
-    const phiG=phi(activeGap);
-    ctx.fillStyle='rgba(61,200,184,.8)';
-    ctx.font=`bold ${fs}px "JetBrains Mono",monospace`;
-    ctx.textAlign='right'; ctx.textBaseline='top';
-    ctx.fillText(`Square shell |M−r|=${activeGap}  φ(${activeGap})/${activeGap}≈${(phiG/activeGap).toFixed(4)}`, W-8, 8);
+    const gOff=activeGap*cw;
+    ctx.strokeStyle='rgba(61,200,184,.22)'; ctx.lineWidth=Math.max(1,cw*.1);
+    ctx.setLineDash([cw*1.4,cw*.7]);
+    ctx.beginPath();
+    ctx.moveTo(cx+gOff,cy); ctx.lineTo(cx,cy+gOff);
+    ctx.lineTo(cx-gOff,cy); ctx.lineTo(cx,cy-gOff); ctx.closePath();
+    ctx.stroke(); ctx.setLineDash([]);
   }
 
-  // Watermark
-  ctx.fillStyle='rgba(106,101,96,.28)';
-  ctx.font=`${Math.max(7,Math.floor(fs*0.75))}px "JetBrains Mono",monospace`;
-  ctx.textAlign='right'; ctx.textBaseline='bottom';
-  ctx.fillText('wessengetachew.github.io', W-6, W-4);
+  const quadTints=['rgba(200,168,74,.07)','rgba(61,200,184,.07)','rgba(155,127,232,.07)','rgba(224,80,96,.06)'];
+  ctx.save(); ctx.translate(cx,cy);
+  for(let q=0;q<4;q++){
+    for(let ri=0;ri<G;ri++){
+      for(let mi=0;mi<G;mi++){
+        const [cr2,cg2,cb2,ca]=cellColor(ri,mi,G,depthN,activeGap,colorMode);
+        if(ca<4) continue;
+        const isHL=highlighted&&highlighted.view==='zi'&&highlighted.quadrant===q&&highlighted.ri===ri&&highlighted.mi===mi;
+        ctx.globalAlpha=isHL?1.0:ca/255;
+        ctx.fillStyle=`rgb(${cr2},${cg2},${cb2})`;
+        if(cw<3) ctx.fillRect(ri*cw,mi*cw,cw-0.5,cw-0.5);
+        else{ctx.beginPath();ctx.arc((ri+.5)*cw,(mi+.5)*cw,isHL?dotR*1.8:dotR,0,6.2832);ctx.fill();}
+        if(isHL){ctx.strokeStyle='white';ctx.lineWidth=1.2;ctx.globalAlpha=1;ctx.beginPath();ctx.arc((ri+.5)*cw,(mi+.5)*cw,dotR*2.2,0,6.2832);ctx.stroke();}
+      }
+    }
+    ctx.globalAlpha=1; ctx.fillStyle=quadTints[q]; ctx.fillRect(0,0,halfW,halfW);
+    ctx.rotate(Math.PI/2);
+  }
+  ctx.restore(); ctx.globalAlpha=1;
+
+  const fs=Math.max(8,Math.floor(W*.014));
+  ctx.font=`${fs}px "JetBrains Mono",monospace`; ctx.fillStyle='rgba(200,168,74,.55)';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('+Re',cx+halfW*.6,cy);
+  ctx.fillText('-Re',cx-halfW*.6,cy);
+  ctx.textBaseline='top'; ctx.fillText('+Im',cx,cy-halfW*.8);
+  ctx.textBaseline='bottom'; ctx.fillText('-Im',cx,cy+halfW*.8);
+  const fs2=Math.max(6,Math.floor(fs*.75));
+  ctx.font=`${fs2}px "JetBrains Mono",monospace`; ctx.fillStyle='rgba(155,127,232,.38)';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('Q I: z=M+ir',cx+4,cy+4);
+  ctx.textAlign='right'; ctx.fillText('Q II: z=-r+iM',cx-4,cy+4);
+  ctx.textBaseline='bottom'; ctx.fillText('Q III: z=-M-ir',cx-4,cy-4);
+  ctx.textAlign='left'; ctx.fillText('Q IV: z=r-iM',cx+4,cy-4);
+  _drawOverlayText(ctx,W);
 }
 
-function toggleComplex(){
-  showComplex=!showComplex;
-  const card=document.getElementById('complex-card');
-  const btn=document.getElementById('btn-complex');
-  card.style.display=showComplex?'block':'none';
-  btn.classList.toggle('on',showComplex);
-  // Defer so the browser completes layout and clientWidth is valid
-  if(showComplex) requestAnimationFrame(()=>requestAnimationFrame(()=>renderComplexLattice()));
+// ══════════════════════════════════════════════════════════
+//  BARRIER PATH VIEW
+// ══════════════════════════════════════════════════════════
+function renderBarrier(){
+  const cv=document.getElementById('diag-cv');
+  const wrap=document.getElementById('diag-cv-wrap');
+  const W=wrap.clientWidth||600;
+  cv.width=W; cv.height=W;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#030310'; ctx.fillRect(0,0,W,W);
+
+  const lPad=showLabels?Math.min(28,Math.max(14,Math.floor(W*.035))):4;
+  const inner=W-lPad*2;
+  const cw=(inner/G)*zoomLevel;
+  const dotR=Math.max(0.5,cw*.38);
+  const ox=lPad+panX, oy=lPad+panY;
+  const ri0=Math.max(0,Math.floor(-ox/cw)),ri1=Math.min(G,Math.ceil((W-ox)/cw)+1);
+  const mi0=Math.max(0,Math.floor(-oy/cw)),mi1=Math.min(G,Math.ceil((W-oy)/cw)+1);
+
+  for(let ri=ri0;ri<ri1;ri++){
+    for(let mi=mi0;mi<mi1;mi++){
+      const r=ri+1,M=mi+1;
+      const b1=Math.floor(M/2),b2=Math.ceil(M/2);
+      const isBarrier=(r===b1||r===b2);
+      const x=ox+(ri+.5)*cw,y=oy+(mi+.5)*cw;
+      const isHL=highlighted&&highlighted.view==='barrier'&&highlighted.ri===ri&&highlighted.mi===mi;
+
+      if(isBarrier){
+        const cop=gcd(r,M)===1;
+        ctx.globalAlpha=isHL?1.0:0.88;
+        ctx.fillStyle=cop?'rgb(61,200,184)':`rgb(224,80,96)`;
+        ctx.beginPath();ctx.arc(x,y,isHL?dotR*2:dotR*1.3,0,6.2832);ctx.fill();
+        if(isHL){ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.globalAlpha=1;ctx.beginPath();ctx.arc(x,y,dotR*2.6,0,6.2832);ctx.stroke();}
+      } else {
+        const [cr2,cg2,cb2,ca]=cellColor(ri,mi,G,depthN,0,colorMode);
+        if(ca>10){ctx.globalAlpha=ca/255*.12;ctx.fillStyle=`rgb(${cr2},${cg2},${cb2})`;ctx.beginPath();ctx.arc(x,y,dotR,0,6.2832);ctx.fill();}
+      }
+    }
+  }
+  ctx.globalAlpha=1;
+
+  // Barrier path lines
+  const drawPath=(getRI)=>{
+    ctx.beginPath(); let first=true;
+    for(let mi=mi0;mi<mi1;mi++){
+      const ri=getRI(mi+1)-1;
+      if(ri<0||ri>=G) continue;
+      const x=ox+(ri+.5)*cw,y=oy+(mi+.5)*cw;
+      if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  };
+  ctx.strokeStyle='rgba(61,200,184,.3)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  drawPath(M=>Math.floor(M/2));
+  drawPath(M=>Math.ceil(M/2));
+  ctx.setLineDash([]);
+
+  _drawLabels(ctx,W,lPad,ox,oy,cw);
+  ctx.fillStyle='rgba(61,200,184,.75)'; ctx.font='8px "JetBrains Mono",monospace';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('Barrier path: r=⌊M/2⌋ and r=⌈M/2⌉  ·  teal=coprime  ·  coral=not coprime',lPad,lPad);
+  _drawOverlayText(ctx,W);
+}
+
+// ══════════════════════════════════════════════════════════
+//  PRIME SPIRAL VIEW (Ulam spiral)
+// ══════════════════════════════════════════════════════════
+function isPrime(n){
+  if(n<2) return false;
+  if(n===2) return true;
+  if(n%2===0) return false;
+  for(let i=3;i*i<=n;i+=2) if(n%i===0) return false;
+  return true;
+}
+
+function _buildSpiral(){
+  const N=G*G;
+  const pts=[];
+  let x=Math.floor(G/2),y=Math.floor(G/2);
+  const dirs=[[1,0],[0,-1],[-1,0],[0,1]];
+  let di=0,steps=1,sc=0,step=0;
+  for(let n=1;n<=N;n++){
+    if(x>=0&&x<G&&y>=0&&y<G) pts.push({n,ri:x,mi:y});
+    x+=dirs[di][0]; y+=dirs[di][1]; step++;
+    if(step===steps){step=0;di=(di+1)%4;sc++;if(sc%2===0)steps++;}
+  }
+  _spiralData=pts;
+  _spiralPrimes=pts.filter(p=>isPrime(p.n));
+  _spiralPIdx=0;
+  if(_spiralPrimes.length>0){
+    const p=_spiralPrimes[0];
+    highlighted={view:'spiral',ri:p.ri,mi:p.mi,n:p.n};
+  }
+  _updateSpiralInfo();
+}
+
+function _updateSpiralInfo(){
+  const el=document.getElementById('spiral-info');
+  if(!el) return;
+  if(!_spiralPrimes.length){el.textContent='—';return;}
+  const p=_spiralPrimes[_spiralPIdx];
+  el.textContent=`prime ${p.n}  ·  #${_spiralPIdx+1} / ${_spiralPrimes.length}  ·  pos (${p.ri+1},${p.mi+1})`;
+}
+
+function renderSpiral(){
+  if(!_spiralData||_spiralData.length!==G*G) _buildSpiral();
+  const cv=document.getElementById('diag-cv');
+  const wrap=document.getElementById('diag-cv-wrap');
+  const W=wrap.clientWidth||600;
+  cv.width=W; cv.height=W;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#030310'; ctx.fillRect(0,0,W,W);
+
+  const lPad=showLabels?Math.min(28,Math.max(14,Math.floor(W*.035))):4;
+  const inner=W-lPad*2;
+  const cw=(inner/G)*zoomLevel;
+  const dotR=Math.max(0.5,cw*.38);
+  const ox=lPad+panX,oy=lPad+panY;
+
+  for(const {ri,mi,n} of _spiralData){
+    const x=ox+(ri+.5)*cw,y=oy+(mi+.5)*cw;
+    if(x<-dotR||x>W+dotR||y<-dotR||y>W+dotR) continue;
+    const prime=isPrime(n);
+    const isHL=highlighted&&highlighted.view==='spiral'&&highlighted.n===n;
+    if(!prime&&!isHL){
+      ctx.globalAlpha=0.11; ctx.fillStyle='rgba(80,80,100,1)';
+    } else {
+      const h=(n*137.508)%360;
+      const [cr2,cg2,cb2]=hsv2rgb(h,0.85,isHL?1.0:0.88);
+      ctx.globalAlpha=isHL?1.0:0.85; ctx.fillStyle=`rgb(${cr2},${cg2},${cb2})`;
+    }
+    ctx.beginPath(); ctx.arc(x,y,isHL?dotR*2.2:prime?dotR:dotR*.55,0,6.2832); ctx.fill();
+    if(isHL){ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.globalAlpha=1;ctx.beginPath();ctx.arc(x,y,dotR*2.8,0,6.2832);ctx.stroke();}
+    if(cw>20&&(prime||isHL)){
+      ctx.fillStyle='rgba(255,255,255,.78)'; ctx.globalAlpha=1;
+      ctx.font=`${Math.min(11,cw*.38)}px "JetBrains Mono",monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(`${n}`,x,y);
+    }
+  }
+  ctx.globalAlpha=1;
+  _drawLabels(ctx,W,lPad,ox,oy,cw);
+  _drawOverlayText(ctx,W);
+  ctx.fillStyle='rgba(200,168,74,.7)'; ctx.font='8px "JetBrains Mono",monospace';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`Ulam spiral  ·  ${_spiralPrimes.length} primes in ${G}×${G}  ·  click prime to inspect  ·  use Prev/Next`,lPad,lPad);
+}
+
+function nextSpiral(){
+  if(!_spiralPrimes.length){if(!_spiralData) _buildSpiral(); return;}
+  _spiralPIdx=(_spiralPIdx+1)%_spiralPrimes.length;
+  const p=_spiralPrimes[_spiralPIdx];
+  highlighted={view:'spiral',ri:p.ri,mi:p.mi,n:p.n};
+  _panTo(p.ri,p.mi); _updateSpiralInfo(); renderMain(); updateHighlightPanel();
+}
+function prevSpiral(){
+  if(!_spiralPrimes.length) return;
+  _spiralPIdx=(_spiralPIdx-1+_spiralPrimes.length)%_spiralPrimes.length;
+  const p=_spiralPrimes[_spiralPIdx];
+  highlighted={view:'spiral',ri:p.ri,mi:p.mi,n:p.n};
+  _panTo(p.ri,p.mi); _updateSpiralInfo(); renderMain(); updateHighlightPanel();
+}
+function _panTo(ri,mi){
+  const W=document.getElementById('diag-cv').width||600;
+  const lPad=showLabels?Math.min(28,Math.max(14,Math.floor(W*.035))):4;
+  const baseCw=(W-lPad*2)/G;
+  panX=W/2-lPad-ri*baseCw*zoomLevel-baseCw*zoomLevel/2;
+  panY=W/2-lPad-mi*baseCw*zoomLevel-baseCw*zoomLevel/2;
+  constrainPan();
+}
+
+// ══════════════════════════════════════════════════════════
+//  FAREY VIEW (Ford circles for Farey sequence F_G)
+// ══════════════════════════════════════════════════════════
+function renderFarey(){
+  const cv=document.getElementById('diag-cv');
+  const wrap=document.getElementById('diag-cv-wrap');
+  const W=wrap.clientWidth||600;
+  cv.width=W; cv.height=W;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#030310'; ctx.fillRect(0,0,W,W);
+
+  const lPad=22;
+  const drawW=W-2*lPad;
+  const scale=drawW*zoomLevel;
+  const baseY=W-lPad+panY;
+  const offsetX=lPad+panX;
+
+  ctx.strokeStyle='rgba(200,168,74,.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(offsetX,baseY); ctx.lineTo(offsetX+scale,baseY); ctx.stroke();
+  // Tick marks for 0, 1/2, 1
+  [[0,'0'],[0.5,'1/2'],[1,'1']].forEach(([f,lbl])=>{
+    const tx=offsetX+f*scale;
+    ctx.strokeStyle='rgba(200,168,74,.3)'; ctx.beginPath(); ctx.moveTo(tx,baseY); ctx.lineTo(tx,baseY-6); ctx.stroke();
+    ctx.fillStyle='rgba(200,168,74,.5)'; ctx.font='8px "JetBrains Mono",monospace';
+    ctx.textAlign='center'; ctx.textBaseline='top'; ctx.fillText(lbl,tx,baseY+3);
+  });
+
+  for(let q=1;q<=G;q++){
+    const rFrac=1/(2*q*q);
+    const pxR=rFrac*scale;
+    if(pxR<0.5) continue;
+    for(let p=0;p<=q;p++){
+      if(p>0&&p<q&&gcd(p,q)!==1) continue;
+      if(p===0&&q>1) continue;
+      const cx2=offsetX+(p/q)*scale;
+      const cy2=baseY-rFrac*scale;
+      if(cx2<-pxR||cx2>W+pxR||cy2<-pxR||cy2>W+pxR) continue;
+      const isHL=highlighted&&highlighted.view==='farey'&&highlighted.p===p&&highlighted.q===q;
+      const h=(p/q)*280+10;
+      const v=Math.max(0.45,1.0-q/G*0.55);
+      const [cr2,cg2,cb2]=hsv2rgb(h,isHL?0.95:0.80,isHL?1.0:v);
+      const fillOp=isHL?0.48:Math.max(0.07,0.32-q/G*.22);
+      ctx.fillStyle=`rgba(${cr2},${cg2},${cb2},${fillOp})`;
+      ctx.beginPath(); ctx.arc(cx2,cy2,pxR,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle=isHL?'white':`rgba(${cr2},${cg2},${cb2},${isHL?1:.65})`;
+      ctx.lineWidth=isHL?2:Math.min(1.4,pxR*.08);
+      ctx.beginPath(); ctx.arc(cx2,cy2,pxR,0,Math.PI*2); ctx.stroke();
+      if(isHL){ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx2,cy2,pxR+4,0,Math.PI*2);ctx.stroke();}
+      if(pxR>14){
+        ctx.fillStyle=`rgba(${cr2},${cg2},${cb2},${Math.min(1,fillOp*4)})`;
+        ctx.font=`${Math.min(13,pxR*.32)}px "JetBrains Mono",monospace`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(`${p}/${q}`,cx2,cy2);
+      }
+    }
+  }
+  _drawOverlayText(ctx,W);
+  ctx.fillStyle='rgba(155,127,232,.75)'; ctx.font='8px "JetBrains Mono",monospace';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText(`Farey F(${G}) Ford circles  ·  p/q: gcd(p,q)=1, 0≤p≤q≤${G}  ·  radius=1/(2q²)  ·  click to inspect`,lPad,lPad);
+}
+
+// ══════════════════════════════════════════════════════════
+//  CLICK TO HIGHLIGHT
+// ══════════════════════════════════════════════════════════
+function handleCanvasClick(clickX,clickY){
+  const cv=document.getElementById('diag-cv');
+  const W=cv.width||600;
+  const lPad=showLabels?Math.min(28,Math.max(14,Math.floor(W*.035))):4;
+  const baseCw=(W-lPad*2)/G;
+  const cw=baseCw*zoomLevel;
+  const ox=lPad+panX,oy=lPad+panY;
+
+  if(viewMode==='grid'||viewMode==='barrier'){
+    const ri=Math.floor((clickX-ox)/cw);
+    const mi=Math.floor((clickY-oy)/cw);
+    if(ri>=0&&ri<G&&mi>=0&&mi<G){
+      highlighted={view:viewMode,ri,mi,r:ri+1,M:mi+1};
+    }
+  } else if(viewMode==='rings'){
+    let best=null,bestD=Infinity;
+    for(const t of _ringHitTargets){
+      const d=Math.hypot(clickX-t.x,clickY-t.y);
+      if(d<t.dotR*3&&d<bestD){bestD=d;best=t;}
+    }
+    if(best) highlighted={view:'rings',M:best.M,r:best.r};
+  } else if(viewMode==='zi'){
+    const cx=W/2+panX,cy=W/2+panY;
+    const halfW=W*0.46*zoomLevel;
+    const cwZI=halfW/G;
+    const dx=clickX-cx,dy=clickY-cy;
+    const ri=Math.floor(dx/cwZI),mi=Math.floor(dy/cwZI);
+    if(ri>=0&&ri<G&&mi>=0&&mi<G)
+      highlighted={view:'zi',quadrant:0,ri,mi,r:ri+1,M:mi+1};
+  } else if(viewMode==='spiral'){
+    if(!_spiralData) return;
+    const ri=Math.floor((clickX-ox)/cw),mi=Math.floor((clickY-oy)/cw);
+    const entry=_spiralData.find(d=>d.ri===ri&&d.mi===mi);
+    if(entry){
+      highlighted={view:'spiral',ri,mi,n:entry.n};
+      const pi=_spiralPrimes.findIndex(p=>p.n===entry.n);
+      if(pi>=0){_spiralPIdx=pi;_updateSpiralInfo();}
+    }
+  } else if(viewMode==='farey'){
+    const lPad2=22,drawW=W-2*lPad2;
+    const scale=drawW*zoomLevel,baseY=W-lPad2+panY,offsetX=lPad2+panX;
+    let best=null,bestD=Infinity;
+    for(let q=1;q<=G;q++){
+      const rFrac=1/(2*q*q),pxR=rFrac*scale;
+      if(pxR<0.5) continue;
+      for(let p=0;p<=q;p++){
+        if(p>0&&p<q&&gcd(p,q)!==1) continue;
+        if(p===0&&q>1) continue;
+        const cx2=offsetX+(p/q)*scale,cy2=baseY-rFrac*scale;
+        const d=Math.hypot(clickX-cx2,clickY-cy2);
+        if(d<pxR+6&&d<bestD){bestD=d;best={p,q};}
+      }
+    }
+    if(best) highlighted={view:'farey',p:best.p,q:best.q};
+  }
+
+  if(highlighted){ renderMain(); updateHighlightPanel(); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  HIGHLIGHT DETAIL PANEL
+// ══════════════════════════════════════════════════════════
+function updateHighlightPanel(){
+  const panel=document.getElementById('hl-panel');
+  const grid=document.getElementById('hl-grid');
+  if(!highlighted||!panel){if(panel) panel.style.display='none';return;}
+  panel.style.display='block';
+  const {view}=highlighted;
+  const items=[];
+
+  if(view==='grid'||view==='barrier'||view==='zi'||view==='rings'){
+    let r,M;
+    if(view==='rings'){r=highlighted.r;M=highlighted.M;}
+    else{r=highlighted.r;M=highlighted.M;}
+    const g2=gcd(r,M);
+    const cop=g2===1;
+    let blockOk=true;
+    for(let j=0;j<=depthN&&blockOk;j++) if(gcd(r,M+j)!==1) blockOk=false;
+    const phiM=phi(M);
+    items.push(
+      {k:'r',v:`${r}`,cls:'gold'},
+      {k:'M',v:`${M}`},
+      {k:'gcd(r,M)',v:`${g2}`,cls:cop?'teal':'coral'},
+      {k:'coprime',v:cop?'✓ yes':'✗ no',cls:cop?'teal':'coral'},
+      {k:'r/M reduced',v:`${r/g2}/${M/g2}`},
+      {k:'φ(M)',v:`${phiM}`},
+      {k:'φ(M)/M',v:(phiM/M).toFixed(6)},
+      {k:`block-cop n=${depthN}`,v:blockOk?'✓':'✗',cls:blockOk?'teal':'coral'},
+    );
+    if(view==='zi') items.push({k:'z in ℤ[i]',v:`${r} − ${M}i (Q IV)`});
+    if(view==='barrier'){
+      const b1=Math.floor(M/2),b2=Math.ceil(M/2);
+      items.push({k:'barrier r',v:`⌊${M}/2⌋=${b1}, ⌈${M}/2⌉=${b2}`});
+    }
+    if(view==='rings'){
+      const angle=(2*Math.PI*r/M);
+      items.push(
+        {k:'ring M',v:`${M}`},
+        {k:'residue r',v:`${r}`},
+        {k:'angle 2πr/M',v:`${angle.toFixed(4)} rad`},
+      );
+    }
+  } else if(view==='spiral'){
+    const {n,ri,mi}=highlighted;
+    const prime=isPrime(n);
+    const pi=_spiralPrimes.findIndex(p=>p.n===n);
+    items.push(
+      {k:'N',v:`${n}`,cls:prime?'teal':''},
+      {k:'prime',v:prime?'✓ yes':'✗ no',cls:prime?'teal':'coral'},
+      {k:'position',v:`(${ri+1}, ${mi+1})`},
+      {k:'φ(N)',v:`${phi(n)}`},
+      {k:'φ(N)/N',v:(phi(n)/n).toFixed(6)},
+    );
+    if(prime&&pi>=0) items.push({k:'prime #',v:`${pi+1} of ${_spiralPrimes.length}`});
+  } else if(view==='farey'){
+    const {p,q}=highlighted;
+    const rFrac=1/(2*q*q);
+    items.push(
+      {k:'fraction',v:`${p}/${q}`,cls:'gold'},
+      {k:'value',v:(p/q).toFixed(8)},
+      {k:'gcd(p,q)',v:`${gcd(p,q)}`,cls:'teal'},
+      {k:'denominator q',v:`${q}`},
+      {k:'Ford radius',v:rFrac.toFixed(7)},
+      {k:'in Farey F(G)',v:'✓',cls:'teal'},
+    );
+  }
+
+  grid.innerHTML=items.map(({k,v,cls=''})=>
+    `<div class="hl-item"><span class="hl-k">${k}</span><span class="hl-v${cls?' '+cls:''}">${v}</span></div>`
+  ).join('');
+  document.getElementById('hl-panel-title').textContent=
+    `${view.toUpperCase()} — selected point`;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1500,8 +1766,8 @@ async function export4K(){
   ctx.font=`${dFs}px "JetBrains Mono",monospace`;
   ctx.fillStyle='rgba(184,178,166,.52)';
   const d1=g>0
-    ? `Gold density on the anti-diagonal |M\u2212r| = ${g} is \u03c6(${g})/${g} by the periodicity of gcd(r,g) mod ${g}.`
-    : `Gold density on the anti-diagonal |M\u2212r| = g equals \u03c6(g)/g for any grid size G \u2265 g (Euler, 1763).`;
+    ? `Coprime density on the anti-diagonal |M\u2212r| = ${g} is \u03c6(${g})/${g} by the periodicity of gcd(r,g) mod ${g}.`
+    : `Coprime density on the anti-diagonal |M\u2212r| = g equals \u03c6(g)/g for any grid size G \u2265 g (Euler, 1763).`;
   const d2=`Block-coprime depth n=${depthN}: density = ${blockDiagDensity(g||1,depthN).toFixed(8)}   \u00b7   color mode: ${colorMode}${zoomLevel>1?'   \u00b7   zoom '+zoomLevel.toFixed(2)+'\u00d7':''}`;
   ctx.fillText(d1,TX,ty); ty+=Math.round(dFs*1.7);
   ctx.fillText(d2,TX,ty); ty+=Math.round(dFs*2.4);
@@ -1526,8 +1792,8 @@ async function export4K(){
   ctx.font=`${lFs}px "JetBrains Mono",monospace`;
   ctx.fillStyle='rgba(184,178,166,.62)';
   const lStr=g>0
-    ? `\u25cf Gold = block-coprime on diagonal (|M\u2212r|=${g})  \u00b7  \u25cf Colored = block-coprime off-diagonal  \u00b7  \u25cf Dim = not coprime  \u00b7  \u03c6(${g})/${g} = ${densityStr}`
-    : `\u25cf Gold/Colored = block-coprime (gcd(r,M+j)=1 \u2200j\u22640)  \u00b7  \u25cf Dim/Dark = not coprime  \u00b7  sector hue = angle of (r,M)`;
+    ? `\u25cf Coprime on diagonal (|M\u2212r|=${g})  \u00b7  \u25cf Block-coprime off-diagonal  \u00b7  \u25cf Non-coprime: dim  \u00b7  \u03c6(${g})/${g} = ${densityStr}`
+    : `\u25cf Lit = block-coprime (gcd(r,M+j)=1 \u2200j\u22640)  \u00b7  \u25cf Dim/Dark = non-coprime  \u00b7  sector hue = angle of (r,M)`;
   ctx.fillText(lStr,SIZE/2,ty); ty+=Math.round(lFs*2.4);
 
   // ── LATTICE GRID (fills remaining space) ──────────────────
@@ -1629,6 +1895,166 @@ async function export4K(){
 }
 
 // ══════════════════════════════════════════════════════════
+//  3D EXPORT — captures live WebGL canvas + header block
+// ══════════════════════════════════════════════════════════
+async function export3D(){
+  const btn=document.getElementById('btn-3d-export');
+  const prog=document.getElementById('export-3d-prog');
+  btn.disabled=true; prog.style.display='inline';
+
+  // Force a render frame so WebGL canvas is current
+  if(_3d.renderer) _3d.renderer.render(_3d.scene,_3d.camera);
+  await new Promise(r=>setTimeout(r,40));
+
+  const SIZE=3840;
+  const out=document.createElement('canvas');
+  out.width=SIZE; out.height=SIZE;
+  const ctx=out.getContext('2d');
+  ctx.fillStyle='#020208'; ctx.fillRect(0,0,SIZE,SIZE);
+
+  const TX=Math.round(SIZE*0.042);
+  let ty=Math.round(SIZE*0.022);
+
+  // Tag
+  const tagFs=Math.round(SIZE*0.011);
+  ctx.font=`${tagFs}px "JetBrains Mono",monospace`;
+  ctx.fillStyle='rgba(200,168,74,.42)';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('ANALYTIC NUMBER THEORY  \u00b7  WESSEN GETACHEW',SIZE/2,ty);
+  ty+=Math.round(tagFs*2.6);
+
+  // Title
+  const titleFs=Math.round(SIZE*0.048);
+  ctx.font=`bold ${titleFs}px "Cinzel","JetBrains Mono",monospace`;
+  ctx.fillStyle='#e8e2d6';
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('3D Coprime Lattice',TX,ty);
+  ty+=Math.round(titleFs*1.28);
+
+  // Formula line
+  const fFs=Math.round(SIZE*0.019);
+  ctx.font=`${fFs}px "JetBrains Mono",monospace`;
+  ctx.fillStyle='rgba(61,200,184,.82)';
+  ctx.fillText(`gcd(x,y,z) = 1  \u00b7  density = 1/\u03b6(3) \u2248 0.8319  \u00b7  G = ${_3d.G}  \u00b7  depth n = ${_3d.depthN}`,TX,ty);
+  ty+=Math.round(fFs*2.0);
+
+  // Separator
+  ctx.strokeStyle='rgba(61,200,184,.18)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(TX,ty); ctx.lineTo(SIZE-TX,ty); ctx.stroke();
+  ty+=Math.round(SIZE*0.014);
+
+  // 3D canvas: scale to fill remaining square
+  const src=document.getElementById('canvas3d');
+  const remaining=SIZE-ty-Math.round(SIZE*0.02);
+  const imgSize=Math.min(SIZE-TX*2,remaining);
+  const imgX=TX+(SIZE-TX*2-imgSize)/2;
+  try {
+    ctx.drawImage(src,imgX,ty,imgSize,imgSize);
+  } catch(e){
+    ctx.fillStyle='rgba(61,200,184,.3)';
+    ctx.font=`${Math.round(SIZE*0.02)}px "JetBrains Mono",monospace`;
+    ctx.textAlign='center'; ctx.fillText('WebGL canvas not available for export',SIZE/2,ty+imgSize/2);
+  }
+
+  // Stats bar below image
+  const statsY=ty+imgSize+Math.round(SIZE*0.008);
+  const sFs=Math.round(SIZE*0.010);
+  ctx.font=`${sFs}px "JetBrains Mono",monospace`;
+  ctx.fillStyle='rgba(106,101,96,.55)';
+  ctx.textAlign='center';
+  const stats=document.getElementById('lbl-3d-stats').textContent;
+  ctx.fillText(stats,SIZE/2,statsY);
+
+  // Watermark
+  ctx.fillStyle='rgba(106,101,96,.28)';
+  ctx.textAlign='right'; ctx.textBaseline='bottom';
+  ctx.fillText('wessengetachew.github.io',SIZE-TX,SIZE-Math.round(SIZE*0.007));
+
+  const link=document.createElement('a');
+  link.download=`3d-coprime-G${_3d.G}-n${_3d.depthN}.png`;
+  link.href=out.toDataURL('image/png');
+  link.click();
+
+  btn.disabled=false; prog.style.display='none';
+}
+// ringsActive is reserved for a future rings-on-grid overlay; disabled for now.
+const ringsActive=false;
+
+function setupCanvasEvents(){
+  const cv=document.getElementById('diag-cv');
+
+  // Click / tap → highlight
+  cv.addEventListener('click',e=>{
+    if(_dragged) return;
+    const rect=cv.getBoundingClientRect();
+    const scaleX=cv.width/rect.width;
+    const scaleY=cv.height/rect.height;
+    handleCanvasClick((e.clientX-rect.left)*scaleX,(e.clientY-rect.top)*scaleY);
+  });
+
+  // Mouse drag → pan
+  cv.addEventListener('mousedown',e=>{
+    if(viewMode==='grid'||viewMode==='barrier'||viewMode==='spiral'){
+      isDragging=true; _dragged=false;
+      dragStart={x:e.clientX,y:e.clientY};
+      dragStartPan={x:panX,y:panY};
+      cv.style.cursor='grabbing';
+      e.preventDefault();
+    }
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!isDragging) return;
+    const dx=e.clientX-dragStart.x, dy=e.clientY-dragStart.y;
+    if(Math.abs(dx)>2||Math.abs(dy)>2) _dragged=true;
+    panX=dragStartPan.x+dx; panY=dragStartPan.y+dy;
+    constrainPan(); renderMain();
+  });
+  window.addEventListener('mouseup',()=>{
+    if(isDragging){ isDragging=false; cv.style.cursor=''; }
+  });
+
+  // Wheel → zoom toward cursor
+  cv.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const rect=cv.getBoundingClientRect();
+    const scaleX=cv.width/rect.width;
+    const mx=((e.clientX-rect.left)*scaleX);
+    const my=((e.clientY-rect.top)*scaleX);
+    const {lPad,baseCw}=getGridOrigin();
+    const gx=(mx-lPad-panX)/(baseCw*zoomLevel);
+    const gy=(my-lPad-panY)/(baseCw*zoomLevel);
+    const factor=e.deltaY<0?1.15:1/1.15;
+    zoomLevel=Math.max(1,Math.min(8,zoomLevel*factor));
+    panX=mx-lPad-gx*baseCw*zoomLevel;
+    panY=my-lPad-gy*baseCw*zoomLevel;
+    document.getElementById('sl-zoom').value=zoomLevel;
+    document.getElementById('val-zoom').textContent=
+      zoomLevel===1?'1\u00d7':(zoomLevel%1===0?zoomLevel:zoomLevel.toFixed(2))+'\u00d7';
+    constrainPan(); render();
+  },{passive:false});
+
+  // Touch drag → pan
+  let _tStart={x:0,y:0}, _tPan={x:0,y:0};
+  cv.addEventListener('touchstart',e=>{
+    if(e.touches.length===1){
+      _tStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+      _tPan={x:panX,y:panY}; _dragged=false;
+    }
+    e.preventDefault();
+  },{passive:false});
+  cv.addEventListener('touchmove',e=>{
+    if(e.touches.length===1){
+      const dx=e.touches[0].clientX-_tStart.x, dy=e.touches[0].clientY-_tStart.y;
+      if(Math.abs(dx)>3||Math.abs(dy)>3) _dragged=true;
+      panX=_tPan.x+dx; panY=_tPan.y+dy;
+      constrainPan(); renderMain();
+    }
+    e.preventDefault();
+  },{passive:false});
+  cv.addEventListener('touchend',()=>{ isDragging=false; });
+}
+
+// ══════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded',()=>{
@@ -1637,16 +2063,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   setupCanvasEvents();
   render();
+  // Ensure spiral nav hidden initially
+  const sn=document.getElementById('spiral-nav');
+  if(sn) sn.style.display='none';
 });
 
 if(typeof ResizeObserver!=='undefined'){
-  const ro=new ResizeObserver(()=>{
-    constrainPan();
-    render();
-    if(showComplex) renderComplexLattice();
-  });
+  const ro=new ResizeObserver(()=>{ constrainPan(); render(); });
   ro.observe(document.getElementById('diag-cv-wrap'));
-  ro.observe(document.getElementById('complex-cv-wrap'));
 }
 // ══════════════════════════════════════════════════════════
 //  TAB SWITCHING
@@ -1657,6 +2081,10 @@ function switchTab(name){
   document.getElementById('tab-3d-content').style.display=is2d?'none':'block';
   document.getElementById('tab-btn-2d').classList.toggle('active',is2d);
   document.getElementById('tab-btn-3d').classList.toggle('active',!is2d);
+  // Scroll so the tab bar sits flush under the topnav (50px)
+  const tabBar=document.getElementById('tab-bar');
+  const target=tabBar.getBoundingClientRect().top+window.scrollY-50;
+  window.scrollTo({top:target,behavior:'smooth'});
   if(!is2d) requestAnimationFrame(()=>requestAnimationFrame(()=>init3D()));
 }
 
@@ -1934,207 +2362,6 @@ function set3DZslice(v){
   if(_3d.init) rebuild3DLattice();
 }
 
-function init3D(){
-  if(_3d.init) return;
-  if(typeof THREE==='undefined'){setTimeout(init3D,200);return;}
-  _3d.init=true;
-
-  const wrap=document.getElementById('canvas3d-wrap');
-  const W=wrap.clientWidth||600;
-  const cv=document.getElementById('canvas3d');
-
-  _3d.scene=new THREE.Scene();
-  _3d.scene.background=new THREE.Color(0x020208);
-
-  _3d.camera=new THREE.PerspectiveCamera(55,1,0.01,100);
-  _3d.camera.position.set(0,0,2.4);
-
-  _3d.renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
-  _3d.renderer.setSize(W,W);
-  _3d.renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-
-  // Wire-frame bounding box
-  const boxGeo=new THREE.BoxGeometry(1,1,1);
-  const boxEdges=new THREE.EdgesGeometry(boxGeo);
-  const boxLine=new THREE.LineSegments(boxEdges,new THREE.LineBasicMaterial({color:0x2a2a50,transparent:true,opacity:0.5}));
-  _3d.scene.add(boxLine);
-
-  rebuild3DLattice();
-  animate3D();
-  setup3DEvents();
-
-  new ResizeObserver(()=>{
-    const Wn=wrap.clientWidth||600;
-    _3d.renderer.setSize(Wn,Wn);
-  }).observe(wrap);
-}
-
-function gcd3(a,b,c){return gcd(a,gcd(b,c));}
-
-function build3DCloud(pts,G,size,opacity,alpha){
-  const n=pts.length;
-  const pos=new Float32Array(n*3);
-  const col=new Float32Array(n*3);
-  const half=G/2+0.5;
-  pts.forEach(([x,y,z],i)=>{
-    pos[i*3]  =(x-half)/G;
-    pos[i*3+1]=(y-half)/G;
-    pos[i*3+2]=(z-half)/G;
-    const dx=x-half,dy=y-half,dz=z-half;
-    const h=((Math.atan2(dy,dx)*180/Math.PI)%360+360)%360;
-    const el=Math.atan2(dz,Math.sqrt(dx*dx+dy*dy))/(Math.PI/2);
-    const v=0.65+0.35*Math.abs(el);
-    const [r,cg,cb]=hsv2rgb(h,0.80,v);
-    col[i*3]=r/255;col[i*3+1]=cg/255;col[i*3+2]=cb/255;
-  });
-  const geo=new THREE.BufferGeometry();
-  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
-  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
-  const mat=new THREE.PointsMaterial({
-    size:size,vertexColors:true,transparent:true,
-    opacity:opacity,sizeAttenuation:true,
-    depthWrite:false,blending:THREE.AdditiveBlending
-  });
-  return new THREE.Points(geo,mat);
-}
-
-function rebuild3DLattice(){
-  if(!_3d.scene) return;
-  if(_3d.interior){_3d.scene.remove(_3d.interior);_3d.interior.geometry.dispose();_3d.interior.material.dispose();}
-  if(_3d.boundary){_3d.scene.remove(_3d.boundary);_3d.boundary.geometry.dispose();_3d.boundary.material.dispose();}
-
-  const G=_3d.G, n=_3d.depthN;
-  const interior=[],boundary=[];
-  let total=0;
-
-  for(let x=1;x<=G;x++){
-    for(let y=1;y<=G;y++){
-      for(let z=1;z<=G;z++){
-        // Block-coprime in 3D: gcd(x,y,z)=1 at all depth offsets
-        let ok=true;
-        for(let j=0;j<=n&&ok;j++){
-          if(gcd3(x,y,z+j)!==1) ok=false;
-        }
-        if(!ok) continue;
-        total++;
-        // Z-slice mode
-        if(_3d.sliceMode&&z!==_3d.sliceZ) continue;
-        const isEdge=(x===G||y===G||z===G);
-        if(isEdge) boundary.push([x,y,z]);
-        else interior.push([x,y,z]);
-      }
-    }
-  }
-
-  const ptBase=(_3d.ptVal/100)*(_3d.sliceMode?0.08:0.04)/(_3d.n);
-  const opBase=_3d.opVal/1000;
-
-  if(interior.length>0){
-    _3d.interior=build3DCloud(interior,G,ptBase,opBase*interior.length>50000?opBase*0.5:opBase);
-    _3d.scene.add(_3d.interior);
-  }
-  if(boundary.length>0&&_3d.showBnd){
-    _3d.boundary=build3DCloud(boundary,G,ptBase*2.2,Math.min(0.9,opBase*6));
-    _3d.scene.add(_3d.boundary);
-  }
-
-  const stats=`G=${G}  ·  interior: ${interior.length}  ·  boundary: ${boundary.length}  ·  total coprime: ${total}  ·  density: ${(total/G**3).toFixed(5)}`;
-  document.getElementById('lbl-3d-stats').textContent=stats;
-
-  // Update Z-slice slider max
-  document.getElementById('sl-3d-z').max=G;
-  if(_3d.sliceZ>G) _3d.sliceZ=G;
-  document.getElementById('sl-3d-z').value=_3d.sliceZ;
-  document.getElementById('val-3d-z').textContent=_3d.sliceZ;
-}
-
-function animate3D(){
-  _3d.animId=requestAnimationFrame(animate3D);
-  if(!_3d.renderer) return;
-  if(_3d.autoRot&&!_3d.drag) _3d.rotY+=0.004;
-
-  const group=new THREE.Euler(_3d.rotX,_3d.rotY,0,'YXZ');
-  _3d.scene.rotation.set(_3d.rotX,_3d.rotY,0);
-  _3d.renderer.render(_3d.scene,_3d.camera);
-}
-
-function setup3DEvents(){
-  const wrap=document.getElementById('canvas3d-wrap');
-  wrap.addEventListener('mousedown',e=>{
-    _3d.drag=true;_3d.lastX=e.clientX;_3d.lastY=e.clientY;
-    wrap.classList.add('dragging');e.preventDefault();
-  });
-  window.addEventListener('mousemove',e=>{
-    if(!_3d.drag) return;
-    _3d.rotY+=(e.clientX-_3d.lastX)*0.007;
-    _3d.rotX+=(e.clientY-_3d.lastY)*0.007;
-    _3d.rotX=Math.max(-Math.PI/2,Math.min(Math.PI/2,_3d.rotX));
-    _3d.lastX=e.clientX;_3d.lastY=e.clientY;
-  });
-  window.addEventListener('mouseup',()=>{_3d.drag=false;wrap.classList.remove('dragging');});
-  // Touch
-  let tStart={x:0,y:0};
-  wrap.addEventListener('touchstart',e=>{
-    _3d.drag=true;tStart={x:e.touches[0].clientX,y:e.touches[0].clientY};e.preventDefault();
-  },{passive:false});
-  wrap.addEventListener('touchmove',e=>{
-    if(!_3d.drag) return;
-    _3d.rotY+=(e.touches[0].clientX-tStart.x)*0.007;
-    _3d.rotX+=(e.touches[0].clientY-tStart.y)*0.007;
-    _3d.rotX=Math.max(-Math.PI/2,Math.min(Math.PI/2,_3d.rotX));
-    tStart={x:e.touches[0].clientX,y:e.touches[0].clientY};e.preventDefault();
-  },{passive:false});
-  wrap.addEventListener('touchend',()=>{_3d.drag=false;});
-  // Zoom (wheel = camera Z)
-  wrap.addEventListener('wheel',e=>{
-    e.preventDefault();
-    _3d.camera.position.z=Math.max(0.8,Math.min(5,_3d.camera.position.z+(e.deltaY>0?0.15:-0.15)));
-  },{passive:false});
-}
-
-// ── 3D CONTROL CALLBACKS ──
-function set3DN(n){
-  _3d.n=n;_3d.G=Math.pow(2,n);
-  document.getElementById('sl-3d-G').value=_3d.G;
-  document.getElementById('val-3d-G').textContent=_3d.G;
-  [2,3,4,5].forEach(k=>document.getElementById('p3d-'+k).classList.toggle('active-preset',k===n));
-  init3D(); rebuild3DLattice();
-}
-function set3DG(v){
-  _3d.G=v;_3d.n=Math.log2(v); // may be non-integer
-  document.getElementById('val-3d-G').textContent=v;
-  [2,3,4,5].forEach(k=>{
-    const el=document.getElementById('p3d-'+k);
-    if(el) el.classList.toggle('active-preset',Math.pow(2,k)===v);
-  });
-  init3D(); rebuild3DLattice();
-}
-function set3DOpacity(v){_3d.opVal=v;if(_3d.init) rebuild3DLattice();}
-function set3DPointSize(v){_3d.ptVal=v;if(_3d.init) rebuild3DLattice();}
-function set3DDepth(v){
-  _3d.depthN=v;document.getElementById('val-3d-n').textContent=v;
-  if(_3d.init) rebuild3DLattice();
-}
-function toggle3DRotate(){
-  _3d.autoRot=!_3d.autoRot;
-  document.getElementById('btn-3d-rot').classList.toggle('on',_3d.autoRot);
-}
-function toggle3DBoundary(){
-  _3d.showBnd=!_3d.showBnd;
-  document.getElementById('btn-3d-bnd').classList.toggle('on',_3d.showBnd);
-  if(_3d.init) rebuild3DLattice();
-}
-function toggle3DSlice(){
-  _3d.sliceMode=!_3d.sliceMode;
-  document.getElementById('btn-3d-slice').classList.toggle('on',_3d.sliceMode);
-  const sc=document.getElementById('slice-controls');
-  sc.style.display=_3d.sliceMode?'flex':'none';
-  if(_3d.init) rebuild3DLattice();
-}
-function set3DZslice(v){
-  _3d.sliceZ=v;document.getElementById('val-3d-z').textContent=v;
-  if(_3d.init) rebuild3DLattice();
-}
 </script>
 </body>
 </html>
