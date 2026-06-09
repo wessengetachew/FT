@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Half-Barrier Depth Theorem · Wessen Getachew</title>
+
+<script>
+window.MathJax = {
+  tex:{ inlineMath:[['$','$']], displayMath:[['$$','$$'],['\\[','\\]']] },
+  options:{ skipHtmlTags:['script','noscript','style','textarea'] },
+  startup:{
+    ready(){
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(()=>{ MathJax.typesetPromise(); });
+    }
+  }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#04040d;--bg1:#07071a;--bg2:#0c0c22;
+  --cream:#ddd8cc;--cream2:#b8b2a6;--cream3:#6a6560;
+  --gold:#c8a84a;--gold2:rgba(200,168,74,.12);
+  --teal:#3dc8b8;--coral:#e05060;--violet:#9b7fe8;--lime:#7ec87a;
+  --edge:rgba(255,255,255,.07);--edge2:rgba(255,255,255,.13);
+  --mono:'JetBrains Mono',monospace;--serif:'Spectral',serif;--disp:'Cinzel',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:11px;}
+
+/* ── NAV BAR ── */
+#nbar{
+  position:sticky;top:0;z-index:200;
+  background:#04040d;border-bottom:1px solid var(--edge2);
+  display:flex;align-items:center;padding:0;height:50px;
+  overflow-x:auto;scrollbar-width:none;
+}
+#nbar::-webkit-scrollbar{display:none;}
+#nbar-inner{
+  max-width:1200px;margin:0 auto;padding:0 20px;
+  width:100%;display:flex;align-items:center;gap:0;height:100%;flex-shrink:0;
+}
+.nb-brand{font-family:var(--disp);font-size:.7rem;color:var(--gold);letter-spacing:.14em;margin-right:10px;flex-shrink:0;}
+.nb-sep{width:1px;height:22px;background:var(--edge);margin:0 8px;flex-shrink:0;}
+.nb-badge{
+  font-size:8px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cream3);padding:4px 10px;border:1px solid var(--edge);
+  background:rgba(155,127,232,.06);flex-shrink:0;
+}
+.nb-badge b{color:var(--violet);font-weight:400;}
+.nb-page-link{
+  display:inline-flex;align-items:center;padding:5px 12px;height:32px;
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;transition:all .15s;background:transparent;
+  text-decoration:none;flex-shrink:0;white-space:nowrap;
+}
+.nb-page-link.teal{border:1px solid rgba(61,200,184,.35);color:var(--teal);}
+.nb-page-link.teal:hover{background:rgba(61,200,184,.08);border-color:rgba(61,200,184,.6);}
+.nb-page-link.gold{border:1px solid rgba(200,168,74,.35);color:var(--gold);}
+.nb-page-link.gold:hover{background:rgba(200,168,74,.08);border-color:rgba(200,168,74,.6);}
+.nb-page-link.violet{border:1px solid rgba(155,127,232,.35);color:var(--violet);}
+.nb-page-link.violet:hover{background:rgba(155,127,232,.08);border-color:rgba(155,127,232,.6);}
+.nb-page-link.coral{border:1px solid rgba(224,80,96,.35);color:var(--coral);}
+.nb-page-link.coral:hover{background:rgba(224,80,96,.08);border-color:rgba(224,80,96,.6);}
+.nb-right{margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+#theme-btn{padding:5px 12px;height:32px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;
+  text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;
+  border:1px solid var(--edge2);color:var(--cream3);}
+#theme-btn:hover{color:var(--cream);}
+body.parchment{
+  --bg:#f5f0e8;--bg1:#ede8d8;--bg2:#e4ddd0;
+  --edge:rgba(110,80,40,.2);--edge2:rgba(110,80,40,.35);
+  --cream:#1c1510;--cream2:#2e1e10;--cream3:#6a5038;
+  --gold:#7a4a0e;--teal:#1a5c50;--coral:#8c2c20;--violet:#5a3070;--lime:#3a5e18;
+}
+body.parchment #nbar{background:rgba(245,240,232,.97)!important;}
+
+/* ── MAIN ── */
+#content{max-width:1200px;margin:0 auto;padding:0 20px 100px;}
+
+/* ── HERO ── */
+#hero{
+  position:relative;overflow:hidden;
+  border-bottom:1px solid var(--edge);
+  padding:0;
+  margin-bottom:0;
+  min-height:260px;
+}
+#hero-canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;opacity:.18;
+  transition:opacity .4s;
+}
+#hero-canvas.full{opacity:1 !important;}
+#hero-text{
+  position:relative;z-index:2;
+  text-align:center;padding:56px 20px 48px;
+  transition:opacity .35s;
+}
+#hero-text.hidden{opacity:0;pointer-events:none;}
+#hero-text.hidden>*{pointer-events:none;}
+#hero-ctrl{
+  position:absolute;top:10px;right:12px;z-index:10;
+  display:flex;gap:6px;align-items:center;
+}
+#hero-text-btn{
+  background:rgba(4,4,13,.92);border:1px solid rgba(200,168,74,.3);
+  color:var(--gold);font-family:var(--mono);font-size:8px;
+  padding:4px 10px;cursor:pointer;white-space:nowrap;
+  transition:background .15s;
+}
+#hero-text-btn:hover{background:rgba(200,168,74,.08);}
+body.parchment #hero-text-btn{background:rgba(245,240,232,.92);}
+.hero-tag{font-size:7.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);opacity:.55;margin-bottom:14px;}
+.hero-title{font-family:var(--disp);font-size:clamp(1.5rem,3.5vw,2.3rem);font-weight:400;color:var(--cream);letter-spacing:.06em;line-height:1.2;margin-bottom:22px;}
+.hero-formula-box{
+  display:inline-block;
+  background:rgba(200,168,74,.05);border:1px solid rgba(200,168,74,.2);
+  border-top:2px solid rgba(200,168,74,.35);
+  padding:20px 36px 16px;
+  margin-bottom:18px;max-width:680px;
+}
+.hero-sub{font-family:var(--serif);font-size:.95rem;font-style:italic;color:var(--cream3);line-height:1.65;max-width:600px;margin:0 auto;}
+/* depth bar */
+#hero-depth-bar{
+  margin-top:24px;padding:10px 0 0;
+  border-top:1px solid rgba(200,168,74,.14);
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 18px;
+  font-family:var(--mono);font-size:9px;color:var(--cream3);
+}
+.hdv{color:var(--gold);font-weight:700;font-size:1.05em;}
+.hdv.teal{color:var(--teal);}
+.hdv.violet{color:var(--violet);}
+.hdv.coral{color:var(--coral);}
+
+/* ── CARD ── */
+.card{
+  background:var(--bg1);border:1px solid var(--edge);
+  padding:22px 24px;margin-bottom:20px;
+}
+.card-title{
+  font-family:var(--disp);font-size:.68rem;letter-spacing:.1em;
+  color:var(--gold);margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-title::after{content:'';flex:1;height:1px;background:var(--edge);}
+.card-title.collapsible:hover{color:var(--cream);}
+.sec-anchor{scroll-margin-top:58px;}
+
+/* ── THEOREM BOX ── */
+.thm-box{
+  background:rgba(200,168,74,.04);
+  border:1px solid rgba(200,168,74,.22);
+  border-left:3px solid rgba(200,168,74,.55);
+  padding:20px 24px 16px;
+  margin-bottom:18px;
+}
+.thm-label{
+  font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);opacity:.7;margin-bottom:10px;display:flex;align-items:center;gap:8px;
+}
+.thm-label::after{content:'';flex:1;height:1px;background:rgba(200,168,74,.15);}
+.thm-body{font-family:var(--serif);font-size:15px;line-height:1.82;color:rgba(220,214,204,.93);}
+.thm-body p{margin-bottom:.7em;}
+
+/* ── COROLLARY BOX ── */
+.cor-box{
+  background:rgba(61,200,184,.03);
+  border:1px solid rgba(61,200,184,.2);
+  border-left:3px solid rgba(61,200,184,.45);
+  padding:16px 20px 12px;
+  margin-bottom:14px;
+}
+.cor-label{
+  font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--teal);opacity:.7;margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.cor-label::after{content:'';flex:1;height:1px;background:rgba(61,200,184,.12);}
+.cor-body{font-family:var(--serif);font-size:14px;line-height:1.78;color:rgba(200,195,185,.88);}
+
+/* ── PROOF STEP ACCORDION ── */
+.step{border-bottom:1px solid var(--edge);}
+.step:last-child{border-bottom:none;}
+.step-hdr{display:flex;align-items:center;gap:12px;padding:12px 0;cursor:pointer;user-select:none;}
+.step-hdr:hover .step-ttl{color:var(--gold);}
+.step-num{font-size:9px;color:var(--gold);min-width:22px;font-weight:500;}
+.step-ttl{font-family:var(--disp);font-size:.72rem;color:var(--cream);transition:color .12s;flex:1;letter-spacing:.04em;}
+.step-arr{color:var(--cream3);font-size:10px;transition:transform .2s;}
+.step.open .step-arr{transform:rotate(90deg);}
+.step-body{display:none;padding:0 0 18px 34px;font-family:var(--serif);font-size:15px;line-height:1.78;color:rgba(184,178,166,.9);}
+.step.open .step-body{display:block;}
+.step-body p{margin-bottom:.75em;}
+.step-body strong{color:var(--cream);}
+.step-body .em{color:var(--gold);}
+.step-body .teal{color:var(--teal);}
+.step-body .coral{color:var(--coral);}
+.step-body .violet{color:var(--violet);}
+
+/* ── INFO BOX ── */
+.ibox{background:rgba(0,0,0,.3);border:1px solid var(--edge);padding:9px 14px;font-size:8.5px;color:var(--cream3);line-height:1.9;margin-bottom:10px;}
+.ibox strong{color:var(--cream);}
+
+/* ── EXAMPLE TABLE ── */
+.ex-table-wrap{overflow-x:auto;margin-bottom:14px;}
+table.ex{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px;}
+table.ex th{background:var(--bg2);padding:7px 12px;text-align:center;color:var(--cream3);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--edge2);white-space:nowrap;}
+table.ex td{padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;}
+table.ex tr:hover td{background:rgba(255,255,255,.025);}
+.td-r{color:var(--cream2);}
+.td-gold{color:var(--gold);font-weight:500;}
+.td-teal{color:var(--teal);}
+.td-coral{color:var(--coral);}
+.td-violet{color:var(--violet);}
+.td-hi{background:rgba(200,168,74,.07)!important;}
+
+/* ── CANVAS PANEL ── */
+.cv-outer{position:relative;background:rgba(4,4,13,.6);border:1px solid var(--edge);}
+.cv-badge{
+  position:absolute;font-family:var(--mono);font-size:9px;
+  background:rgba(4,4,13,.88);border:1px solid var(--edge2);
+  padding:4px 10px;pointer-events:none;line-height:1.7;
+}
+#badge-tl{top:8px;left:8px;color:var(--cream3);}
+#badge-tr{top:8px;right:8px;color:var(--gold);text-align:right;}
+
+/* ── CONTROLS ── */
+.cv-controls{
+  display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;
+  padding:9px 14px;background:var(--bg2);border:1px solid var(--edge);
+  font-size:8.5px;margin-bottom:0;
+}
+.cv-lbl{color:var(--cream3);white-space:nowrap;}
+.cv-sl{-webkit-appearance:none;height:2px;background:rgba(255,255,255,.15);
+  outline:none;cursor:pointer;border-radius:1px;}
+.cv-sl::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);cursor:pointer;}
+.cv-btn{background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);
+  font-size:8px;letter-spacing:.06em;text-transform:uppercase;padding:4px 11px;cursor:pointer;transition:all .1s;}
+.cv-btn:hover{color:var(--gold);border-color:rgba(200,168,74,.4);}
+.cv-btn.active{color:var(--teal);border-color:rgba(61,200,184,.4);background:rgba(61,200,184,.06);}
+.cv-sep{width:1px;height:16px;background:var(--edge);flex-shrink:0;}
+select.cv-sel{background:var(--bg2);border:1px solid var(--edge2);color:var(--cream);font-family:var(--mono);font-size:8.5px;padding:3px 6px;cursor:pointer;outline:none;}
+
+/* ── RESULT ROW ── */
+.result-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;}
+.rbox{background:var(--bg2);border:1px solid var(--edge);padding:14px 16px;text-align:center;}
+.rl{font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream3);margin-bottom:6px;}
+.rv{font-family:var(--mono);font-size:1.8rem;font-weight:500;color:var(--gold);letter-spacing:-.02em;}
+.rs{font-size:8.5px;color:var(--cream3);margin-top:5px;line-height:1.7;}
+.rs span{color:var(--cream);}
+
+/* ── FORMULA DISPLAY ── */
+.fml{
+  font-family:var(--mono);font-size:10px;
+  background:rgba(200,168,74,.05);border:1px solid rgba(200,168,74,.18);
+  padding:8px 14px;margin-bottom:8px;color:var(--gold);line-height:1.8;
+}
+
+/* ── FRACTION NEAR 1/2 DISPLAY ── */
+.frac-pair{
+  display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px;
+}
+.frac-card{
+  flex:1;min-width:220px;
+  background:var(--bg2);border:1px solid var(--edge);padding:14px 18px;
+}
+.frac-top{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream3);margin-bottom:8px;}
+.frac-val{font-family:var(--mono);font-size:1.4rem;color:var(--gold);margin-bottom:6px;}
+.frac-val.teal{color:var(--teal);}
+.frac-depth{font-size:9px;color:var(--cream2);line-height:1.8;}
+.frac-depth b{color:var(--gold);}
+.frac-depth b.teal{color:var(--teal);}
+.frac-depth b.coral{color:var(--coral);}
+
+/* ── TOOLTIP ── */
+#tip{
+  position:fixed;z-index:500;display:none;
+  background:rgba(5,5,20,.97);border:1px solid rgba(200,168,74,.45);
+  padding:10px 14px;min-width:200px;max-width:280px;
+  font-family:var(--mono);font-size:9.5px;line-height:1.9;
+  pointer-events:none;box-shadow:0 4px 24px rgba(0,0,0,.7);
+}
+.tt-hd{font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;border-bottom:1px solid rgba(200,168,74,.2);padding-bottom:5px;}
+.tt-row{display:flex;justify-content:space-between;gap:12px;}
+.tt-k{color:var(--cream3);}
+.tt-v{color:var(--cream);}
+.tt-v.gold{color:var(--gold);}
+.tt-v.teal{color:var(--teal);}
+.tt-v.coral{color:var(--coral);}
+
+/* ── FOOTNOTE / NOTE PANEL ── */
+.note-panel{
+  background:rgba(155,127,232,.04);border:1px solid rgba(155,127,232,.18);
+  border-left:2px solid rgba(155,127,232,.4);
+  padding:10px 16px;margin-top:8px;
+  font-family:var(--serif);font-size:13px;color:rgba(195,188,178,.85);line-height:1.75;
+}
+.note-panel .note-label{font-family:var(--mono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--violet);opacity:.75;margin-bottom:5px;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+</style>
+</head>
+<body>
+
+<!-- ══════ STICKY NAV BAR ══════ -->
+<div id="nbar">
+<div id="nbar-inner">
+  <span class="nb-brand">C(n)</span>
+  <div class="nb-sep">
+        <a href="page7.html" class="nb-navlink" style="border-color:rgba(242,168,74,.35);color:#f2a84a;" onmouseover="this.style.background='rgba(242,168,74,.08)';this.style.borderColor='rgba(242,168,74,.6)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(242,168,74,.35)'">Wessen Id →</a>
+  </div>
+  <span class="nb-badge">Page 5 · <b>Half-Barrier Depth Theorem</b></span>
+  <div class="nb-right">
+    <a href="index-87.html" target="_blank" class="nb-page-link teal">← Main</a>
+    <a href="page2.html" target="_blank" class="nb-page-link teal">Page 2</a>
+    <a href="page3.html" target="_blank" class="nb-page-link gold">Jump Thm</a>
+    <a href="page4.html" target="_blank" class="nb-page-link violet">Stratification</a>
+    <div class="nb-sep"></div>
+    <button id="theme-btn" onclick="toggleTheme()">☽</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════ MAIN CONTENT ══════ -->
+<div id="content">
+
+<!-- ── HERO ── -->
+<div id="hero" class="sec-anchor">
+  <canvas id="hero-canvas"></canvas>
+  <div id="hero-ctrl">
+    <button id="hero-text-btn" onclick="toggleHeroText()">Hide text</button>
+  </div>
+  <div id="hero-text">
+    <div class="hero-tag">Analytic Number Theory · Wessen Getachew</div>
+    <h1 class="hero-title">Half-Barrier Depth Theorem</h1>
+    <div class="hero-formula-box">
+      \[
+        d(r,\,2r+1)\;=\;p_{\min}(r)-2
+      \]
+      <div id="hero-depth-bar">
+        <span>r&nbsp;=&nbsp;<span class="hdv" id="hd-r">—</span></span>
+        <span>p<sub>min</sub>(r)&nbsp;=&nbsp;<span class="hdv violet" id="hd-pmin">—</span></span>
+        <span>d(r,&nbsp;2r+1)&nbsp;=&nbsp;<span class="hdv" id="hd-d1">—</span></span>
+        <span>d(r,&nbsp;2r−1)&nbsp;=&nbsp;<span class="hdv coral" id="hd-d2">0</span></span>
+      </div>
+    </div>
+    <div class="hero-sub">
+      Coprimality chain depth at the two fractions nearest to ½ —
+      determined exactly by the smallest prime factor of the numerator.
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 1: THEOREM STATEMENT ── -->
+<div class="card sec-anchor" id="s-thm" style="margin-top:20px;">
+  <div class="card-title" id="thm-toggle" onclick="toggleThm()"
+    style="cursor:pointer;user-select:none;"
+    title="Click to expand / collapse">
+    Theorem Statement
+    <span id="thm-arr" style="font-size:10px;color:var(--cream3);margin-left:4px;transition:transform .2s;display:inline-block;">▶</span>
+  </div>
+
+  <div id="thm-body" style="display:none;">
+    <div class="thm-box">
+      <div class="thm-label">Theorem &nbsp;(Half-Barrier Depth)</div>
+      <div class="thm-body">
+        <p>Let
+          \[
+            d(r,M)
+          \]
+          denote the <em>depth</em> of the coprimality chain, defined as the largest integer $d \ge 0$ such that
+          \[
+            \gcd(r,\,M+j) = 1 \qquad (0 \le j \le d).
+          \]
+        </p>
+        <p>Then:
+          \[
+            d(r,\,2r+1) \;=\; p_{\min}(r) - 2,
+          \]
+          where $p_{\min}(r)$ is the smallest prime divisor of $r$, with the convention $p_{\min}(1)=\infty$, giving infinite depth for $r=1$.
+        </p>
+        <p>Furthermore, for every $r \ge 2$,
+          \[
+            d(r,\,2r-1) = 0.
+          \]
+        </p>
+        <p>
+          Equivalently, among the fractions nearest to $\tfrac{1}{2}$,
+          the fraction
+          \[
+            \frac{r}{2r+1}
+          \]
+          has depth determined exactly by the smallest prime factor of $r$, while
+          \[
+            \frac{r}{2r-1}
+          \]
+          fails at the first possible step.
+        </p>
+      </div>
+    </div>
+
+    <div class="cor-box">
+      <div class="cor-label">Corollary — Primality Sentinel</div>
+      <div class="cor-body">
+        <p>
+          $r$ is prime if and only if $d(r, 2r+1) = r - 2$.
+          In particular, the maximum possible depth for numerator $r$ at the upper barrier is
+          exactly $r - 2$, attained precisely when $r$ itself is prime.
+        </p>
+      </div>
+    </div>
+
+    <div class="cor-box">
+      <div class="cor-label">Corollary — r = 1 (Infinite Chain)</div>
+      <div class="cor-body">
+        <p>
+          For $r = 1$: $\gcd(1, M+j) = 1$ for all $j \ge 0$, so $d(1, 3) = \infty$.
+          The fraction $\tfrac{1}{3}$ lies immediately above $\tfrac{1}{2}$ and initiates a chain of
+          infinite depth, consistent with the convention $p_{\min}(1) = \infty$.
+        </p>
+      </div>
+    </div>
+
+    <div class="note-panel">
+      <div class="note-label">Remark — Connection to C(n) and Lift Survival</div>
+      The depth $d(r, M)$ is exactly the block-coprime depth counted in the Lift Survival Function.
+      The theorem identifies a <em>structural asymmetry</em> at the half-barrier: the upper neighbor $2r+1$
+      admits a chain whose length is governed by $p_{\min}(r)$, while the lower neighbor $2r-1$ collapses
+      immediately. This asymmetry is reflected in the density function $C(n)$ through the differential
+      contribution of fractions just above and just below $\tfrac{1}{2}$.
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 2: PROOF ── -->
+<div class="card sec-anchor" id="s-proof">
+  <div class="card-title">Proof</div>
+
+  <div class="ibox">
+    The proof proceeds in two independent parts: the upper barrier $M = 2r+1$ and the lower barrier $M = 2r-1$.
+    Throughout, $r \ge 2$ is a fixed integer with smallest prime factor $p = p_{\min}(r)$.
+    For $r = 1$ the chain is infinite by inspection.
+  </div>
+
+  <!-- Part I -->
+  <div style="margin-bottom:8px;padding-bottom:2px;border-bottom:1px solid var(--edge);">
+    <span style="font-family:var(--disp);font-size:.65rem;color:var(--gold);letter-spacing:.08em;">Part I — Upper Barrier: $d(r,\,2r+1) = p_{\min}(r) - 2$</span>
+  </div>
+
+  <div class="step open" id="step1">
+    <div class="step-hdr" onclick="toggleStep('step1')">
+      <span class="step-num">1.</span>
+      <span class="step-ttl">Coprimality at $M = 2r+1$ (depth $\ge 0$)</span>
+      <span class="step-arr">▶</span>
+    </div>
+    <div class="step-body">
+      <p>
+        We first verify $\gcd(r,\, 2r+1) = 1$, establishing that the chain begins.
+        Suppose $q \mid r$ and $q \mid 2r+1$. Then $q \mid (2r+1) - 2r = 1$, so $q = 1$.
+        Hence $\gcd(r,\, 2r+1) = 1$ for all $r \ge 1$.
+      </p>
+      <p>
+        This places $j = 0$ inside the chain: $\gcd(r,\, (2r+1)+0) = \gcd(r,\, 2r+1) = 1$.
+        So <span class="em">$d(r,\, 2r+1) \ge 0$</span> for all $r \ge 1$.
+      </p>
+    </div>
+  </div>
+
+  <div class="step" id="step2">
+    <div class="step-hdr" onclick="toggleStep('step2')">
+      <span class="step-num">2.</span>
+      <span class="step-ttl">Chain survives for $j = 0, 1, \ldots, p-3$</span>
+      <span class="step-arr">▶</span>
+    </div>
+    <div class="step-body">
+      <p>
+        Let $p = p_{\min}(r)$. For $0 \le j \le p-3$, we show $\gcd(r,\, 2r+1+j) = 1$.
+      </p>
+      <p>
+        Since $p \mid r$, we need $p \nmid (2r+1+j)$. We have
+        \[
+          2r + 1 + j \;\equiv\; 1 + j \pmod{p}.
+        \]
+        For $0 \le j \le p-3$, the residue $1+j$ ranges over $1, 2, \ldots, p-2$, none of which
+        are $\equiv 0 \pmod{p}$ (since $p \ge 2$ and $1+j \le p-2 &lt; p$).
+      </p>
+      <p>
+        For any other prime $q \mid r$ with $q &gt; p$: we need $q \nmid (2r+1+j)$.
+        Since $q \mid r$, we have $2r + 1 + j \equiv 1 + j \pmod{q}$.
+        For $j \le p - 3 \le q - 3 &lt; q - 1$, the residue $1 + j$ lies in $\{1, \ldots, q-2\}$,
+        so $q \nmid (2r+1+j)$.
+      </p>
+      <p>
+        Hence <span class="em">$\gcd(r,\, 2r+1+j) = 1$ for all $0 \le j \le p-3$</span>,
+        giving depth $d \ge p - 2$.
+      </p>
+    </div>
+  </div>
+
+  <div class="step" id="step3">
+    <div class="step-hdr" onclick="toggleStep('step3')">
+      <span class="step-num">3.</span>
+      <span class="step-ttl">Chain fails at $j = p - 2$ (exact termination)</span>
+      <span class="step-arr">▶</span>
+    </div>
+    <div class="step-body">
+      <p>
+        We show $\gcd(r,\, 2r + 1 + (p-2)) &gt; 1$, i.e., the chain fails at $j = p-2$.
+      </p>
+      <p>
+        Compute:
+        \[
+          2r + 1 + (p - 2) \;=\; 2r + p - 1.
+        \]
+        Since $p \mid r$, we have $2r \equiv 0 \pmod{p}$, so
+        \[
+          2r + p - 1 \;\equiv\; 0 + 0 - 1 \;\equiv\; -1 \;\equiv\; p - 1 \pmod{p}.
+        \]
+        Wait — this gives residue $p-1 \ne 0$. Let us recount: the chain checks
+        $j = 0, 1, \ldots, d$ where $d$ is the <em>largest</em> such that all checks pass.
+        The check at step $j$ is $\gcd(r,\, M + j) = 1$ with $M = 2r+1$. At $j = p-2$:
+        \[
+          2r + 1 + (p-2) = 2r + (p-1).
+        \]
+        Reducing mod $p$: $2r \equiv 0$, so $2r + (p-1) \equiv p - 1 \pmod p$.
+        This is non-zero. We need to find the first $j$ where $p \mid (2r+1+j)$.
+      </p>
+      <p>
+        We want the smallest $j \ge 0$ with $p \mid 2r + 1 + j$. Since $p \mid r$,
+        $2r \equiv 0 \pmod p$, so $2r + 1 + j \equiv 1 + j \pmod p$.
+        We need $1 + j \equiv 0 \pmod p$, i.e., $j \equiv -1 \equiv p - 1 \pmod p$.
+        The smallest non-negative solution is $j = p - 1$.
+      </p>
+      <p>
+        So the chain survives for $j = 0, 1, \ldots, p-2$ and fails at $j = p-1$:
+        \[
+          \gcd(r,\, 2r + 1 + (p-1)) = \gcd(r,\, 2r + p) = p,
+        \]
+        since $p \mid r$ and $p \mid 2r + p$ (as $p \mid 2r$ and $p \mid p$).
+      </p>
+      <p>
+        The depth — the largest $d$ for which <em>all</em> of $j = 0, \ldots, d$ pass — is
+        thus $d = p - 2$ (the chain passes through $j = p-2$ and fails at $j = p-1$,
+        so the last valid $d$ with $j \le d$ all passing is $d = p - 2$).
+      </p>
+      <p>
+        Therefore <span class="em">$d(r,\, 2r+1) = p_{\min}(r) - 2$</span>. $\square$
+      </p>
+    </div>
+  </div>
+
+  <!-- Part II -->
+  <div style="margin:14px 0 8px;padding-bottom:2px;border-bottom:1px solid var(--edge);">
+    <span style="font-family:var(--disp);font-size:.65rem;color:var(--teal);letter-spacing:.08em;">Part II — Lower Barrier: $d(r,\,2r-1) = 0$</span>
+  </div>
+
+  <div class="step" id="step4">
+    <div class="step-hdr" onclick="toggleStep('step4')">
+      <span class="step-num">4.</span>
+      <span class="step-ttl">Immediate failure at $j = 1$ for the lower barrier</span>
+      <span class="step-arr">▶</span>
+    </div>
+    <div class="step-body">
+      <p>
+        First note $\gcd(r,\, 2r-1) = 1$: if $q \mid r$ and $q \mid 2r-1$, then $q \mid (2r - (2r-1)) = 1$.
+        So the chain starts: depth $\ge 0$.
+      </p>
+      <p>
+        Now examine $j = 1$:
+        \[
+          \gcd(r,\, (2r-1) + 1) = \gcd(r,\, 2r) = \gcd(r,\, 2r).
+        \]
+        Since $r \mid 2r$, we have $\gcd(r,\, 2r) = r$.
+        For $r \ge 2$ this exceeds 1, so the chain fails at $j = 1$.
+      </p>
+      <p>
+        Hence the depth is exactly $d(r,\, 2r-1) = 0$ for all $r \ge 2$: the chain begins but fails
+        at the very next step. <span class="teal">$\square$</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 3: INTERACTIVE CALCULATOR ── -->
+<div class="card sec-anchor" id="s-calc">
+  <div class="card-title">Interactive Calculator</div>
+
+  <div class="cv-controls" style="margin-bottom:12px;">
+    <span class="cv-lbl">r =</span>
+    <input class="cv-sl" type="range" id="r-sl" min="1" max="200" value="6" style="width:160px;"
+      oninput="syncR(+this.value)">
+    <input type="number" id="r-num" min="1" max="99999" value="6"
+      style="width:60px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--gold);font-family:var(--mono);font-size:13px;font-weight:500;padding:3px 6px;outline:none;text-align:center;"
+      oninput="syncR(+this.value||1)">
+    <div class="cv-sep"></div>
+    <button class="cv-btn" onclick="syncR(Math.max(1,curR-1))">−</button>
+    <button class="cv-btn" onclick="syncR(curR+1)">+</button>
+    <div class="cv-sep"></div>
+    <button class="cv-btn" id="btn-prime" onclick="jumpToPrime(1)">Next prime →</button>
+    <button class="cv-btn" onclick="jumpToPrime(-1)">← Prev prime</button>
+    <div class="cv-sep"></div>
+    <button class="cv-btn" id="btn-anim" onclick="toggleAnim()">▶ Animate</button>
+  </div>
+
+  <div class="result-row">
+    <div class="rbox">
+      <div class="rl">r</div>
+      <div class="rv" id="res-r">6</div>
+      <div class="rs">numerator</div>
+    </div>
+    <div class="rbox">
+      <div class="rl">p<sub>min</sub>(r)</div>
+      <div class="rv" id="res-pmin" style="color:var(--violet);">2</div>
+      <div class="rs">smallest prime factor</div>
+    </div>
+    <div class="rbox">
+      <div class="rl">2r+1</div>
+      <div class="rv" id="res-M1" style="color:var(--teal);">13</div>
+      <div class="rs">upper barrier</div>
+    </div>
+    <div class="rbox">
+      <div class="rl">d(r, 2r+1)</div>
+      <div class="rv" id="res-d1">0</div>
+      <div class="rs">p<sub>min</sub> − 2</div>
+    </div>
+    <div class="rbox">
+      <div class="rl">2r−1</div>
+      <div class="rv" id="res-M2" style="color:var(--cream2);">11</div>
+      <div class="rs">lower barrier</div>
+    </div>
+    <div class="rbox">
+      <div class="rl">d(r, 2r−1)</div>
+      <div class="rv" id="res-d2" style="color:var(--coral);">0</div>
+      <div class="rs">always 0 (r ≥ 2)</div>
+    </div>
+  </div>
+
+  <!-- GCD detail strip -->
+  <div style="margin-bottom:12px;">
+    <div style="font-size:8px;color:var(--cream3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">GCD chain detail — upper barrier $\gcd(r,\, 2r+1+j)$ for $j = 0, 1, \ldots$</div>
+    <div id="gcd-strip" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+  </div>
+
+  <!-- Fraction pair display -->
+  <div class="frac-pair">
+    <div class="frac-card" id="frac-upper">
+      <div class="frac-top">Upper barrier (nearest above ½)</div>
+      <div class="frac-val" id="frac-upper-val">r / (2r+1)</div>
+      <div class="frac-depth" id="frac-upper-depth">depth = p<sub>min</sub>(r) − 2</div>
+    </div>
+    <div class="frac-card" id="frac-lower">
+      <div class="frac-top">Lower barrier (nearest below ½)</div>
+      <div class="frac-val teal" id="frac-lower-val">r / (2r−1)</div>
+      <div class="frac-depth" id="frac-lower-depth">depth = 0 (fails at j=1)</div>
+    </div>
+  </div>
+
+  <div class="ibox">
+    <strong>Definition reminder:</strong> $d(r,M)$ is the largest $d \ge 0$ such that
+    $\gcd(r, M+j) = 1$ for all $0 \le j \le d$.
+    The depth counts how far the coprimality chain extends from the starting modulus $M$.
+    A depth of 0 means $\gcd(r, M) = 1$ but $\gcd(r, M+1) &gt; 1$.
+  </div>
+</div>
+
+<!-- ── SECTION 4: EXAMPLE TABLE ── -->
+<div class="card sec-anchor" id="s-table">
+  <div class="card-title">Example Table</div>
+
+  <div class="cv-controls" style="margin-bottom:12px;">
+    <span class="cv-lbl">Rows (r from 1 to):</span>
+    <input class="cv-sl" type="range" id="tbl-max" min="5" max="80" value="30" style="width:130px;"
+      oninput="document.getElementById('tbl-max-v').textContent=this.value;buildTable(+this.value)">
+    <span style="color:var(--gold);font-family:var(--mono);font-size:11px;min-width:24px;" id="tbl-max-v">30</span>
+    <div class="cv-sep"></div>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--cream2);">
+      <input type="checkbox" id="tbl-primes-only" onchange="buildTable(+document.getElementById('tbl-max').value)" style="accent-color:var(--violet);">
+      Primes only
+    </label>
+  </div>
+
+  <div class="ex-table-wrap">
+    <table class="ex" id="ex-table">
+      <thead>
+        <tr>
+          <th>r</th>
+          <th>p<sub>min</sub>(r)</th>
+          <th>r prime?</th>
+          <th>2r+1</th>
+          <th>2r−1</th>
+          <th>d(r,&nbsp;2r+1)</th>
+          <th>d(r,&nbsp;2r−1)</th>
+          <th>r/(2r+1)</th>
+          <th>r/(2r−1)</th>
+          <th>check: d = p−2?</th>
+        </tr>
+      </thead>
+      <tbody id="ex-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── SECTION 5: VISUALISATION CANVAS ── -->
+<div class="card sec-anchor" id="s-vis">
+  <div class="card-title">Depth Visualisation — Half-Barrier Chains</div>
+
+  <div class="cv-controls" style="margin-bottom:0;">
+    <span class="cv-lbl">r range: 1 to</span>
+    <input class="cv-sl" type="range" id="cv-rmax" min="10" max="300" value="80" style="width:120px;"
+      oninput="document.getElementById('cv-rmax-v').textContent=this.value;drawVis()">
+    <span style="color:var(--gold);font-family:var(--mono);font-size:11px;min-width:28px;" id="cv-rmax-v">80</span>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl">Mode:</span>
+    <select class="cv-sel" id="cv-mode" onchange="drawVis()">
+      <option value="depth">Depth d(r, 2r+1) vs r</option>
+      <option value="pmin">p_min(r) vs r</option>
+      <option value="both">Both overlaid</option>
+      <option value="frac">r/(2r+1) position on [0,1]</option>
+    </select>
+    <div class="cv-sep"></div>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--lime);">
+      <input type="checkbox" id="cv-prime-hi" checked onchange="drawVis()" style="accent-color:var(--lime);">
+      Highlight primes
+    </label>
+    <div class="cv-sep"></div>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:8.5px;color:var(--teal);">
+      <input type="checkbox" id="cv-show-theory" checked onchange="drawVis()" style="accent-color:var(--teal);">
+      Theory line
+    </label>
+  </div>
+  <div class="cv-outer">
+    <canvas id="cv-main" style="display:block;width:100%;height:320px;"></canvas>
+    <div class="cv-badge" id="badge-tl"></div>
+    <div class="cv-badge" id="badge-tr"></div>
+  </div>
+
+  <div style="margin-top:10px;">
+    <div style="font-size:8px;color:var(--cream3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Click a bar to inspect</div>
+    <div id="vis-inspect" style="font-family:var(--mono);font-size:9px;color:var(--cream3);min-height:18px;"></div>
+  </div>
+</div>
+
+<!-- ── SECTION 6: FRACTIONS NEAREST ½ ── -->
+<div class="card sec-anchor" id="s-fracs">
+  <div class="card-title">Fractions Nearest to ½ — Chain Comparison</div>
+  <div class="ibox">
+    For each $M$, the two fractions $r/M$ closest to $\tfrac{1}{2}$ correspond to
+    $r = \lfloor M/2 \rfloor$ (below) and $r = \lceil M/2 \rceil$ (above).
+    The Half-Barrier Depth Theorem applies when $M = 2r \pm 1$, i.e., when $M$ is odd.
+    The table below lists odd $M$ and the depths at the two adjacent fractions.
+  </div>
+
+  <div class="cv-controls" style="margin-bottom:12px;">
+    <span class="cv-lbl">Odd M up to:</span>
+    <input class="cv-sl" type="range" id="frac-mmax" min="5" max="200" value="61" step="2" style="width:120px;"
+      oninput="document.getElementById('frac-mmax-v').textContent=this.value;buildFracTable(+this.value)">
+    <span style="color:var(--gold);font-family:var(--mono);font-size:11px;min-width:28px;" id="frac-mmax-v">61</span>
+  </div>
+
+  <div class="ex-table-wrap">
+    <table class="ex" id="frac-table">
+      <thead>
+        <tr>
+          <th>M (odd)</th>
+          <th>r = (M−1)/2</th>
+          <th>r/(M) below ½</th>
+          <th>d(r, M)</th>
+          <th>r' = (M+1)/2</th>
+          <th>r'/M above ½</th>
+          <th>d(r', M)</th>
+          <th>p<sub>min</sub>(r')</th>
+          <th>p<sub>min</sub>(r')−2</th>
+          <th>match?</th>
+        </tr>
+      </thead>
+      <tbody id="frac-tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="note-panel" style="margin-top:12px;">
+    <div class="note-label">Observation</div>
+    The lower fraction $r/(2r-1)$ always achieves depth 0 (fails at $j=1$ since $\gcd(r, 2r) = r \ge 2$).
+    The upper fraction $r'/(2r'+1)$ — equivalently $\frac{(M-1)/2}{M}$ for odd $M$ with $r' = (M+1)/2$ —
+    achieves depth $p_{\min}(r') - 2$. When $r'$ is prime, this equals $r' - 2 = (M-1)/2 - 1$, the maximum.
+  </div>
+</div>
+
+</div><!-- #content -->
+
+<!-- ── TOOLTIP ── -->
+<div id="tip"><div class="tt-hd" id="tt-hd"></div><div id="tt-body"></div></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  MATH UTILITIES
+// ═══════════════════════════════════════════════════════════════
+function gcd(a, b){ a=Math.abs(a); b=Math.abs(b); while(b){let t=b;b=a%b;a=t;} return a; }
+
+const _spfCache={};
+function spf(n){
+  if(n<=1)return n;
+  if(_spfCache[n])return _spfCache[n];
+  if(n%2===0)return(_spfCache[n]=2);
+  for(let p=3;p*p<=n;p+=2)if(n%p===0)return(_spfCache[n]=p);
+  return(_spfCache[n]=n);
+}
+
+function pmin(r){
+  if(r===1)return Infinity;
+  return spf(r);
+}
+
+function isPrime(n){
+  if(n<2)return false;
+  return spf(n)===n;
+}
+
+// Depth d(r, M): largest d≥0 s.t. gcd(r, M+j)=1 for all j=0..d
+// Returns -1 if gcd(r,M)>1
+function depth(r, M, maxCheck=500){
+  if(gcd(r,M)!==1)return -1;
+  for(let j=1;j<=maxCheck;j++){
+    if(gcd(r,M+j)>1)return j-1;
+  }
+  return maxCheck; // ≥ maxCheck
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let curR = 6;
+let _animId = null;
+let _animDir = 1;
+
+// ═══════════════════════════════════════════════════════════════
+//  SYNC R — update all panels
+// ═══════════════════════════════════════════════════════════════
+function syncR(r){
+  r = Math.max(1, Math.min(99999, Math.round(r)));
+  curR = r;
+  document.getElementById('r-sl').value = Math.min(r, 200);
+  document.getElementById('r-num').value = r;
+
+  const p = pmin(r);
+  const M1 = 2*r+1, M2 = 2*r-1;
+  const d1 = r===1 ? '∞' : (p-2);
+  const d2 = r===1 ? '∞' : 0;
+  const d1num = r===1 ? 999 : p-2;
+
+  // Hero bar
+  document.getElementById('hd-r').textContent = r;
+  document.getElementById('hd-pmin').textContent = p===Infinity ? '∞' : p;
+  document.getElementById('hd-d1').textContent = d1;
+  document.getElementById('hd-d2').textContent = d2;
+
+  // Results
+  document.getElementById('res-r').textContent = r;
+  document.getElementById('res-pmin').textContent = p===Infinity ? '∞' : p;
+  document.getElementById('res-M1').textContent = M1;
+  document.getElementById('res-M2').textContent = M2;
+  document.getElementById('res-d1').textContent = d1;
+  document.getElementById('res-d2').textContent = r>=2?0:(r===1?'∞':'?');
+
+  // GCD strip
+  const strip = document.getElementById('gcd-strip');
+  const MAX_J = Math.min(d1num + 3, 20);
+  let html = '';
+  for(let j=0; j<=MAX_J; j++){
+    const g = gcd(r, M1+j);
+    const pass = g===1;
+    const isFailPt = !pass;
+    const bg = pass
+      ? (j<=d1num ? 'rgba(200,168,74,.12)' : 'rgba(200,168,74,.04)')
+      : 'rgba(224,80,96,.15)';
+    const border = pass
+      ? (j<=d1num ? 'rgba(200,168,74,.4)' : 'rgba(200,168,74,.12)')
+      : 'rgba(224,80,96,.5)';
+    const col = pass ? (j<=d1num ? 'var(--gold)' : 'rgba(200,168,74,.4)') : 'var(--coral)';
+    html += `<div style="background:${bg};border:1px solid ${border};padding:4px 8px;font-size:9px;font-family:var(--mono);color:${col};white-space:nowrap;">
+      <div style="font-size:7.5px;opacity:.6;">j=${j}</div>
+      <div>gcd=${g}</div>
+    </div>`;
+  }
+  if(d1num < 15) html += `<div style="padding:4px 8px;font-size:8px;color:var(--cream3);align-self:center;">…</div>`;
+  strip.innerHTML = html;
+
+  // Fraction display
+  const dec1 = r/M1, dec2 = r>1 ? r/M2 : 1/1;
+  document.getElementById('frac-upper-val').textContent = `${r} / ${M1} ≈ ${dec1.toFixed(6)}`;
+  document.getElementById('frac-upper-depth').innerHTML = `depth = p<sub>min</sub> − 2 = ${p===Infinity?'∞':`${p} − 2 = ${p-2}`}`;
+  document.getElementById('frac-lower-val').textContent = r>=2 ? `${r} / ${M2} ≈ ${dec2.toFixed(6)}` : '—';
+  document.getElementById('frac-lower-depth').innerHTML = r>=2 ? `depth = 0 &nbsp;<span style="color:var(--coral)">[fails at j=1: gcd(${r},${2*r})=${r}]</span>` : '—';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PRIME NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function jumpToPrime(dir){
+  let r = curR + dir;
+  while(r>=1 && r<=99999){
+    if(isPrime(r)){ syncR(r); return; }
+    r += dir;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ANIMATION
+// ═══════════════════════════════════════════════════════════════
+function toggleAnim(){
+  const btn = document.getElementById('btn-anim');
+  if(_animId){
+    clearInterval(_animId); _animId=null;
+    btn.textContent='▶ Animate'; btn.classList.remove('active');
+    return;
+  }
+  btn.textContent='■ Stop'; btn.classList.add('active');
+  _animDir = 1;
+  _animId = setInterval(()=>{
+    let nr = curR + _animDir;
+    if(nr > 150){ nr=150; _animDir=-1; }
+    if(nr < 1){ nr=1; _animDir=1; }
+    syncR(nr);
+    drawVis();
+  }, 80);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  EXAMPLE TABLE
+// ═══════════════════════════════════════════════════════════════
+function computeDepth(r, M){
+  return depth(r, M, 1000);
+}
+
+function buildTable(maxR){
+  const primesOnly = document.getElementById('tbl-primes-only').checked;
+  const tbody = document.getElementById('ex-tbody');
+  let html = '';
+  for(let r=1; r<=maxR; r++){
+    if(primesOnly && !isPrime(r) && r!==1) continue;
+    const p = pmin(r);
+    const M1 = 2*r+1, M2 = Math.max(1,2*r-1);
+    const d1 = r===1 ? '∞' : computeDepth(r, M1);
+    const d2 = r>=2 ? computeDepth(r, M2) : '∞';
+    const theory = r===1 ? '∞' : p-2;
+    const match = (r===1) ? true : (d1===theory && d2===0);
+    const isP = isPrime(r);
+    const rowCls = (r===curR) ? ' class="td-hi"' : '';
+    html += `<tr${rowCls} onclick="syncR(${r})">
+      <td class="td-r">${r}${isP?'<span style="color:var(--lime);font-size:7px;"> ★</span>':''}</td>
+      <td class="td-violet">${p===Infinity?'∞':p}</td>
+      <td style="color:${isP?'var(--lime)':'var(--cream3)'}">${isP?'yes':'—'}</td>
+      <td class="td-teal">${M1}</td>
+      <td class="td-r">${M2}</td>
+      <td class="td-gold">${d1}</td>
+      <td class="td-coral">${d2}</td>
+      <td style="color:var(--cream2);font-size:9px;">${r===1?'1/3':`${r}/${M1} ≈ ${(r/M1).toFixed(4)}`}</td>
+      <td style="color:var(--cream3);font-size:9px;">${r<=1?'—':`${r}/${M2} ≈ ${(r/M2).toFixed(4)}`}</td>
+      <td style="color:${match?'var(--lime)':'var(--coral)'};">${match?'✓':'✗'}</td>
+    </tr>`;
+  }
+  tbody.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FRACTION TABLE (Odd M)
+// ═══════════════════════════════════════════════════════════════
+function buildFracTable(mmax){
+  const tbody = document.getElementById('frac-tbody');
+  let html = '';
+  for(let M=3; M<=mmax; M+=2){
+    const r  = (M-1)/2;  // below ½
+    const rp = (M+1)/2;  // above ½
+    const d_low = r>=2 ? computeDepth(r, M) : 999;
+    const d_high = computeDepth(rp, M);
+    const p = pmin(rp);
+    const theory = p===Infinity ? Infinity : p-2;
+    const match = (d_high === theory) || (p===Infinity && d_high>100);
+    html += `<tr>
+      <td class="td-r">${M}</td>
+      <td class="td-teal">${r}</td>
+      <td style="color:var(--cream2);font-size:9px;">${r}/${M} = ${(r/M).toFixed(4)}</td>
+      <td class="td-coral">${r>=2?d_low:'∞'}</td>
+      <td class="td-gold">${rp}</td>
+      <td style="color:var(--gold);font-size:9px;">${rp}/${M} = ${(rp/M).toFixed(4)}</td>
+      <td class="td-gold">${d_high>100?'∞':d_high}</td>
+      <td class="td-violet">${p===Infinity?'∞':p}</td>
+      <td style="color:var(--cream2);">${p===Infinity?'∞':p-2}</td>
+      <td style="color:${match?'var(--lime)':'var(--coral)'};">${match?'✓':'✗'}</td>
+    </tr>`;
+  }
+  tbody.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  VISUALISATION CANVAS
+// ═══════════════════════════════════════════════════════════════
+let _visHoverR = -1;
+
+function drawVis(){
+  const cv = document.getElementById('cv-main');
+  const rect = cv.getBoundingClientRect();
+  const W = Math.max(1, Math.floor(rect.width));
+  const H = 320;
+  const dpr = Math.min(devicePixelRatio||1, 2);
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.height = H+'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#04040d';
+  ctx.fillRect(0, 0, W, H);
+
+  const rmax = parseInt(document.getElementById('cv-rmax').value)||80;
+  const mode = document.getElementById('cv-mode').value;
+  const primeHi = document.getElementById('cv-prime-hi').checked;
+  const showTheory = document.getElementById('cv-show-theory').checked;
+
+  const PAD = {l:38, r:14, t:22, b:32};
+  const PW = W-PAD.l-PAD.r, PH = H-PAD.t-PAD.b;
+
+  // Compute data
+  const rs=[], ds=[], pmins=[], fracs=[];
+  let yMax = 0;
+  for(let r=1; r<=rmax; r++){
+    rs.push(r);
+    const p = pmin(r);
+    const d = r===1 ? Math.min(30, rmax) : p-2;
+    ds.push(d);
+    pmins.push(p===Infinity ? r : p);
+    fracs.push(r/(2*r+1));
+    if(d>yMax)yMax=d;
+  }
+
+  if(mode==='frac'){
+    // Plot r/(2r+1) on [0,1]
+    yMax=1;
+    ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(PAD.l, PAD.t+PH/2-0.5, PW, 1);
+    ctx.fillStyle='rgba(200,168,74,.35)';ctx.font='8px "JetBrains Mono",monospace';
+    ctx.textAlign='left';ctx.textBaseline='middle';
+    ctx.fillText('½', PAD.l-16, PAD.t+PH/2);
+
+    for(let i=0;i<rs.length;i++){
+      const r=rs[i], f=fracs[i];
+      const x=PAD.l+(i/(rmax-1))*PW;
+      const y=PAD.t+PH*(1-f);
+      const isP=isPrime(r);
+      ctx.fillStyle=primeHi&&isP?'rgba(126,200,122,.9)':'rgba(200,168,74,.7)';
+      ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
+      if(r===curR){
+        ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.stroke();
+      }
+    }
+
+    // Theory: r/(2r+1) → ½ as r→∞
+    if(showTheory){
+      ctx.strokeStyle='rgba(61,200,184,.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      for(let i=0;i<rs.length;i++){
+        const x=PAD.l+(i/(rmax-1))*PW, y=PAD.t+PH*(1-fracs[i]);
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.stroke();ctx.setLineDash([]);
+    }
+
+    document.getElementById('badge-tl').textContent=`r/(2r+1) vs r · r=1..${rmax}`;
+    document.getElementById('badge-tr').textContent=`→ ½ monotonically`;
+  } else {
+    // Depth / pmin bar chart
+    yMax = Math.max(yMax, 4);
+    const barW = Math.max(1.5, PW/rmax - 1);
+
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=0.5;
+    ctx.fillStyle='rgba(180,170,160,.45)';ctx.font='8px "JetBrains Mono",monospace';
+    for(let v=0;v<=yMax;v+=Math.max(1,Math.ceil(yMax/8))){
+      const y=PAD.t+PH*(1-v/yMax);
+      ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+PW,y);ctx.stroke();
+      ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(v,PAD.l-4,y);
+    }
+
+    // Theory line p_min(r)-2
+    if(showTheory&&(mode==='depth'||mode==='both')){
+      ctx.strokeStyle='rgba(61,200,184,.35)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+      ctx.beginPath();
+      let first=true;
+      for(let i=0;i<rs.length;i++){
+        const v=ds[i];
+        const x=PAD.l+(i+0.5)/rmax*PW;
+        const y=PAD.t+PH*(1-Math.min(v,yMax)/yMax);
+        first?ctx.moveTo(x,y):ctx.lineTo(x,y); first=false;
+      }
+      ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='rgba(61,200,184,.6)';ctx.font='8px "JetBrains Mono",monospace';
+      ctx.textAlign='left';ctx.textBaseline='top';
+      ctx.fillText('p_min − 2', PAD.l+4, PAD.t+2);
+    }
+
+    // Bars
+    for(let i=0;i<rs.length;i++){
+      const r=rs[i];
+      const isP=isPrime(r);
+      const isHover=(r===_visHoverR);
+      const isCur=(r===curR);
+
+      let v = mode==='pmin' ? pmins[i] : ds[i];
+      if(mode==='both') {
+        // draw pmin bar dimly, depth bar on top
+        const vp=pmins[i];
+        const yp=PAD.t+PH*(1-Math.min(vp,yMax)/yMax);
+        const bh=Math.max(1,PAD.t+PH-yp);
+        const x=PAD.l+(i/rmax)*PW;
+        ctx.fillStyle='rgba(155,127,232,.2)';
+        ctx.fillRect(x, yp, barW, bh);
+        v=ds[i];
+      }
+
+      const yv=PAD.t+PH*(1-Math.min(v,yMax)/yMax);
+      const bh=Math.max(1,PAD.t+PH-yv);
+      const x=PAD.l+(i/rmax)*PW;
+
+      let col;
+      if(isCur) col='rgba(255,255,255,.95)';
+      else if(isHover) col='rgba(255,255,255,.5)';
+      else if(primeHi&&isP) col='rgba(126,200,122,.9)';
+      else col=mode==='pmin'?'rgba(155,127,232,.7)':'rgba(200,168,74,.7)';
+
+      ctx.fillStyle=col;
+      ctx.fillRect(x, yv, barW, bh);
+    }
+
+    // Current r marker
+    if(curR>=1&&curR<=rmax){
+      const i=curR-1;
+      const x=PAD.l+(i/rmax)*PW+barW/2;
+      ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=1;ctx.setLineDash([2,2]);
+      ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+PH);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='bold 9px "JetBrains Mono",monospace';
+      ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText(`r=${curR}`,x,PAD.t+PH-3);
+    }
+
+    const modeLabel = {depth:'depth d(r,2r+1)',pmin:'p_min(r)',both:'depth & p_min',frac:'r/(2r+1)'}[mode]||mode;
+    document.getElementById('badge-tl').textContent=`${modeLabel} · r = 1..${rmax}`;
+    document.getElementById('badge-tr').textContent=`Gold = d · Green = prime r · Violet = p_min`;
+  }
+
+  // X-axis labels
+  ctx.fillStyle='rgba(180,170,160,.5)';ctx.font='8px "JetBrains Mono",monospace';ctx.textAlign='center';ctx.textBaseline='top';
+  [1,5,10,20,30,50,80,100,150,200,250,300].forEach(r=>{
+    if(r>rmax)return;
+    const x=PAD.l+((r-1)/(rmax-1))*PW;
+    ctx.fillText(r,x,PAD.t+PH+4);
+  });
+
+  ctx.fillStyle='rgba(180,170,160,.4)';ctx.font='8px "JetBrains Mono",monospace';
+  ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillText('r →', PAD.l+PW/2, PAD.t+PH+16);
+}
+
+// Canvas hover & click
+document.getElementById('cv-main').addEventListener('mousemove', e=>{
+  const cv=document.getElementById('cv-main');
+  const rect=cv.getBoundingClientRect();
+  const rmax=parseInt(document.getElementById('cv-rmax').value)||80;
+  const PAD={l:38,r:14,t:22,b:32};
+  const PW=rect.width-PAD.l-PAD.r;
+  const mx=e.clientX-rect.left;
+  const ri=Math.round((mx-PAD.l)/PW*rmax);
+  const r=Math.max(1,Math.min(rmax,ri));
+  if(r!==_visHoverR){
+    _visHoverR=r;
+    drawVis();
+    const p=pmin(r), d=r===1?'∞':p-2;
+    document.getElementById('vis-inspect').textContent=
+      `r=${r}  ·  p_min=${p===Infinity?'∞':p}  ·  2r+1=${2*r+1}  ·  d(r,2r+1)=${d}  ·  2r−1=${Math.max(1,2*r-1)}  ·  d(r,2r−1)=${r>=2?0:'∞'}`;
+  }
+});
+document.getElementById('cv-main').addEventListener('click', e=>{
+  if(_visHoverR>0) syncR(_visHoverR);
+});
+document.getElementById('cv-main').addEventListener('mouseleave', ()=>{
+  _visHoverR=-1; drawVis();
+  document.getElementById('vis-inspect').textContent='';
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  HERO CANVAS — animated coprimality field
+// ═══════════════════════════════════════════════════════════════
+(function heroAnim(){
+  const cv=document.getElementById('hero-canvas');
+  const ctx=cv.getContext('2d');
+  let W=0,H=0,raf=0;
+
+  function resize(){
+    const rect=cv.getBoundingClientRect();
+    W=Math.round(rect.width)||800;
+    H=Math.round(rect.height)||260;
+    const dpr=Math.min(devicePixelRatio||1,2);
+    cv.width=W*dpr;cv.height=H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function drawFrame(t){
+    ctx.fillStyle='#04040d';ctx.fillRect(0,0,W,H);
+    const G=40, cW=W/G, cH=H/G;
+    for(let ri=0;ri<G;ri++){
+      for(let mi=0;mi<G;mi++){
+        const r=ri+1,M=mi+1;
+        const g=gcd(r,M);
+        const ok=g===1;
+        const frac=r/M;
+        const hue=(frac*300)|0;
+        const pulse=0.4+0.25*Math.sin(t*0.7+ri*0.41+mi*0.29);
+        if(ok){
+          const near=Math.abs(frac-0.5)<0.07;
+          ctx.fillStyle=near
+            ?`hsla(45,90%,60%,${0.55+0.25*Math.sin(t*1.2+ri)})`
+            :`hsla(${hue},70%,52%,${pulse*0.45})`;
+        }else{
+          ctx.fillStyle='rgba(255,255,255,.022)';
+        }
+        const x=(ri+0.5)*cW,y=(mi+0.5)*cH;
+        ctx.beginPath();ctx.arc(x,y,Math.min(cW,cH)*0.3,0,Math.PI*2);ctx.fill();
+      }
+    }
+    raf=requestAnimationFrame(tt=>drawFrame(tt/1000));
+  }
+
+  new ResizeObserver(()=>{resize();}).observe(cv);
+  resize();
+  drawFrame(0);
+})();
+
+// ═══════════════════════════════════════════════════════════════
+//  THEOREM STATEMENT COLLAPSE
+// ═══════════════════════════════════════════════════════════════
+function toggleThm(){
+  const body = document.getElementById('thm-body');
+  const arr  = document.getElementById('thm-arr');
+  const open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  arr.style.transform = open ? 'rotate(90deg)' : '';
+  if(open) MathJax.typesetPromise([body]);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STEP ACCORDION
+// ═══════════════════════════════════════════════════════════════
+function toggleStep(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HIDE / SHOW HERO TEXT  (matches index-87 pattern)
+// ═══════════════════════════════════════════════════════════════
+let _heroTextVisible = true;
+
+function toggleHeroText(){
+  _heroTextVisible = !_heroTextVisible;
+  const wrap = document.getElementById('hero-text');
+  const btn  = document.getElementById('hero-text-btn');
+  const cv   = document.getElementById('hero-canvas');
+  if(wrap) wrap.classList.toggle('hidden', !_heroTextVisible);
+  if(btn)  btn.textContent = _heroTextVisible ? 'Hide text' : 'Show text';
+  // Full opacity when text is hidden, dimmed when text is visible
+  if(cv)   cv.classList.toggle('full', !_heroTextVisible);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════════════════
+function toggleTheme(){
+  document.body.classList.toggle('parchment');
+  document.getElementById('theme-btn').textContent=document.body.classList.contains('parchment')?'☀':'☽';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+function init(){
+  syncR(6);
+  buildTable(30);
+  buildFracTable(61);
+  setTimeout(()=>{
+    drawVis();
+    window.addEventListener('resize',()=>drawVis());
+  }, 300);
+}
+
+if(document.readyState==='complete'||document.readyState==='interactive') setTimeout(init,100);
+else document.addEventListener('DOMContentLoaded',()=>setTimeout(init,100));
+</script>
+
+</body>
+</html>
