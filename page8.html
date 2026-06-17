@@ -1,0 +1,2798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C(n) — Calculator &amp; Tables · Wessen Getachew</title>
+<script>
+window.MathJax={tex:{inlineMath:[['$','$']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea']},startup:{ready(){MathJax.startup.defaultReady();MathJax.startup.promise.then(()=>{MathJax.typesetPromise();});}}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04040d;--bg1:#07071a;--bg2:#0c0c22;
+  --cream:#ddd8cc;--cream2:#b8b2a6;--cream3:#6a6560;
+  --gold:#c8a84a;--teal:#3dc8b8;--coral:#e05060;--violet:#9b7fe8;--lime:#7ec87a;
+  --edge:rgba(255,255,255,.07);--edge2:rgba(255,255,255,.13);
+  --mono:'JetBrains Mono',monospace;--serif:'Spectral',serif;--disp:'Cinzel',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{background:var(--bg);color:var(--cream);font-family:var(--mono);font-size:11px;}
+html,body{max-width:100vw;overflow-x:hidden;}
+
+#topbar{position:sticky;top:0;z-index:200;background:#04040d;border-bottom:1px solid var(--edge2);display:flex;align-items:center;padding:0 16px;height:44px;gap:6px;overflow-x:auto;scrollbar-width:none;}
+#topbar::-webkit-scrollbar{display:none;}
+.tb-brand{font-family:var(--disp);font-size:.68rem;color:var(--gold);letter-spacing:.14em;flex-shrink:0;margin-right:6px;}
+.tb-sep{width:1px;height:20px;background:var(--edge);flex-shrink:0;margin:0 4px;}
+.tb-page{display:inline-flex;align-items:center;padding:3px 9px;height:26px;font-family:var(--mono);font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(200,168,74,.35);color:var(--gold);text-decoration:none;flex-shrink:0;white-space:nowrap;}
+.tb-page:hover{background:rgba(200,168,74,.08);}
+.tb-page.active{background:rgba(200,168,74,.14);border-color:rgba(200,168,74,.7);}
+.tb-page.teal{border-color:rgba(61,200,184,.35);color:var(--teal);}
+.tb-page.teal:hover{background:rgba(61,200,184,.08);}
+.tb-page.violet{border-color:rgba(155,127,232,.35);color:var(--violet);}
+.tb-page.violet:hover{background:rgba(155,127,232,.08);}
+.tb-page.coral{border-color:rgba(224,80,96,.35);color:var(--coral);}
+.tb-page.coral:hover{background:rgba(224,80,96,.08);}
+.tb-page.lime{border-color:rgba(126,200,122,.35);color:var(--lime);}
+.tb-page.lime:hover{background:rgba(126,200,122,.08);}
+
+/* ── CTRL BAR ── */
+#ctrl-bar{background:rgba(6,6,20,.97);border-bottom:1px solid var(--edge2);padding:6px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px;font-family:var(--mono);font-size:9px;}
+@media(max-width:700px){#ctrl-bar{padding:5px 10px;gap:4px 8px;}}
+.cv-lbl{color:var(--cream3);font-size:8px;letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;}
+.cv-sep{width:1px;height:20px;background:var(--edge);flex-shrink:0;}
+.ctrl-sl{-webkit-appearance:none;height:2px;background:rgba(255,255,255,.15);outline:none;cursor:pointer;border-radius:1px;flex-shrink:0;}
+.ctrl-sl::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);cursor:pointer;}
+.ctrl-num{background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--gold);font-family:var(--mono);font-size:12px;font-weight:500;padding:2px 4px;outline:none;text-align:center;flex-shrink:0;}
+.ctrl-num:focus{border-color:rgba(200,168,74,.5);}
+.ctrl-btn{background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;transition:all .12s;flex-shrink:0;}
+.ctrl-btn:hover{color:var(--cream);border-color:var(--edge);}
+.ctrl-btn.gold{border-color:rgba(200,168,74,.4);color:var(--gold);background:rgba(200,168,74,.07);}
+.ctrl-btn.gold:hover{background:rgba(200,168,74,.14);}
+.ctrl-step{width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--edge2);color:var(--teal);cursor:pointer;font-size:13px;flex-shrink:0;transition:background .1s;}
+.ctrl-step:hover{background:rgba(61,200,184,.08);}
+
+/* ── VIEW BUTTONS ── */
+.vbtn{padding:3px 9px;font-family:var(--mono);font-size:8px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--edge2);background:none;color:var(--cream3);cursor:pointer;transition:all .12s;flex-shrink:0;}
+.vbtn:hover{color:var(--cream);}
+.vbtn.act-gold{color:var(--gold);border-color:rgba(200,168,74,.5);background:rgba(200,168,74,.08);}
+.vbtn.act-teal{color:var(--teal);border-color:rgba(61,200,184,.5);background:rgba(61,200,184,.07);}
+.vbtn.act-violet{color:var(--violet);border-color:rgba(155,127,232,.5);background:rgba(155,127,232,.07);}
+.vbtn.act-coral{color:var(--coral);border-color:rgba(224,80,96,.5);background:rgba(224,80,96,.07);}
+.vbtn.act-orange{color:#f2a84a;border-color:rgba(242,168,74,.5);background:rgba(242,168,74,.07);}
+
+/* ── HERO ── */
+#hero-wrap{position:relative;}
+#hero{position:relative;overflow:hidden;height:min(100vw,600px,90vh);max-height:600px;min-height:280px;border-bottom:none;}
+@media(min-width:1024px){#hero{height:min(65vw,1000px,88vh);max-height:1000px;min-height:440px;}}
+@media(max-width:700px){#hero{height:auto;max-height:none;min-height:min(100vw,380px);overflow:visible;padding-bottom:24px;}}
+#hero-cv{position:absolute;inset:0;width:100%;height:100%;opacity:0.2;transition:opacity .5s ease;z-index:0;cursor:default;}
+#hero-cv.pannable{cursor:grab;}
+#hero-cv.pannable.dragging{cursor:grabbing;}
+
+/* Hero text overlay */
+#hero-text{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;pointer-events:none;transition:opacity .35s;}
+#hero-text>*{pointer-events:auto;}
+#hero-text.hidden{opacity:0;pointer-events:none;visibility:hidden;}
+.hero-tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,168,74,.65);margin-bottom:10px;}
+.hero-title{font-family:var(--disp);font-size:clamp(1.2rem,3.5vw,2.4rem);font-weight:400;letter-spacing:.06em;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.9);margin-bottom:14px;text-align:center;}
+.hero-formula{background:rgba(4,4,13,.82);border:1px solid rgba(200,168,74,.28);padding:11px 20px;font-size:clamp(.72rem,1.6vw,1rem);color:var(--gold);max-width:min(660px,90vw);text-align:center;margin-bottom:10px;backdrop-filter:blur(4px);}
+.hero-live{display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:0 6px;padding:9px 16px;background:rgba(4,4,13,.82);border:1px solid rgba(200,168,74,.2);font-family:var(--mono);font-size:clamp(.75rem,1.5vw,.95rem);color:var(--cream);line-height:1.4;text-align:center;backdrop-filter:blur(4px);max-width:min(660px,90vw);}
+.hero-live .hn{color:var(--gold);font-weight:700;font-size:1.1em;}
+.hero-live .hn1{color:var(--teal);font-weight:700;font-size:1.1em;}
+.hero-live .heq{color:var(--cream);padding:0 4px;}
+.hero-live .hresult{color:var(--gold);font-weight:700;font-size:1.3em;letter-spacing:-.01em;}
+
+/* ── VIEW CAPTION BARS ── */
+#view-cap-top{display:none;background:rgba(6,6,20,.96);border-bottom:1px solid rgba(255,255,255,.06);padding:5px 16px;font-family:var(--mono);font-size:9px;letter-spacing:.05em;}
+#view-cap-bot{display:none;background:rgba(6,6,20,.96);border-top:1px solid rgba(255,255,255,.06);padding:5px 16px;}
+
+/* ── VIEW SUB-PANELS ── */
+.view-panel{display:none;background:rgba(6,6,18,.98);border-bottom:1px solid var(--edge);font-family:var(--mono);font-size:9px;}
+.vp-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.06);}
+.vp-title{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;flex:1;}
+.vp-body{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:7px 14px;}
+.vp-note{font-size:8px;color:var(--cream3);line-height:1.8;padding:4px 14px 7px;border-top:1px solid rgba(255,255,255,.04);}
+
+/* ── LIVE BAR ── */
+#live-bar{background:rgba(200,168,74,.04);border-top:1px solid rgba(200,168,74,.15);border-bottom:1px solid rgba(200,168,74,.15);padding:8px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;font-family:var(--mono);font-size:9px;}
+.lv-lbl{color:var(--cream3);}
+.lv-val{color:var(--gold);font-size:13px;font-weight:500;}
+.lv-teal{color:var(--teal);font-size:11px;font-weight:500;}
+.lv-sep{width:1px;height:18px;background:var(--edge);flex-shrink:0;}
+
+/* ── CARDS ── */
+#content{max-width:1200px;margin:0 auto;padding:0 20px 80px;}
+@media(min-width:1024px){#content{max-width:1600px;}}
+.card{background:var(--bg1);border:1px solid var(--edge);padding:20px 22px;margin-bottom:18px;margin-top:18px;}
+.card-title{font-family:var(--disp);font-size:.68rem;letter-spacing:.1em;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--edge);}
+.result-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px;}
+.rbox{background:var(--bg2);border:1px solid var(--edge);padding:14px 16px;text-align:center;position:relative;}
+.rl{font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream3);margin-bottom:6px;}
+.rv{font-family:var(--mono);font-size:1.9rem;font-weight:500;color:var(--gold);letter-spacing:-.02em;word-break:break-all;line-height:1.35;}
+.rs{font-size:8.5px;color:var(--cream3);margin-top:5px;line-height:1.7;}
+.card-nav{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:2px;}
+.card-arr{background:transparent;border:1px solid var(--edge2);color:var(--cream3);font-size:9px;padding:2px 6px;cursor:pointer;line-height:1;transition:all .12s;}
+.card-arr:hover{color:var(--cream);border-color:var(--gold);background:rgba(200,168,74,.08);}
+.pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.pill{font-size:9.5px;font-weight:500;padding:2px 8px;border:1px solid;}
+.pill.sat{color:var(--coral);border-color:rgba(224,80,96,.35);background:rgba(224,80,96,.07);}
+.pill.act{color:var(--teal);border-color:rgba(61,200,184,.28);background:rgba(61,200,184,.05);}
+.ibox{background:rgba(0,0,0,.3);border:1px solid var(--edge);padding:9px 12px;font-size:9px;color:var(--cream3);line-height:1.85;margin-bottom:10px;}
+.ibox strong{color:var(--cream);}
+
+/* ── TABLE ── */
+.tscroll{overflow:auto;max-height:360px;border:1px solid var(--edge);}
+table.dt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px;}
+table.dt th{background:var(--bg2);padding:7px 10px;text-align:right;color:var(--cream3);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--edge2);position:sticky;top:0;white-space:nowrap;}
+table.dt th:first-child{text-align:center;}
+table.dt tbody tr:hover{background:rgba(255,255,255,.025);}
+table.dt tbody tr.cur-row{background:rgba(200,168,74,.06);}
+table.dt td{padding:5px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);}
+table.dt td:first-child{text-align:center;color:var(--cream3);}
+.td-cn{color:var(--gold);font-weight:500;}
+.td-ev{color:var(--teal);font-size:8.5px;}
+.pbar{display:flex;align-items:center;gap:5px;}
+.pbar-fill{height:5px;border-radius:1px;opacity:.7;flex-shrink:0;}
+.exp-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.exp-btn{background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:8px;padding:4px 12px;cursor:pointer;letter-spacing:.08em;transition:all .1s;}
+.exp-btn:hover{color:var(--cream);}
+.exp-btn.gold{border-color:rgba(200,168,74,.4);color:var(--gold);}
+.exp-btn.teal{border-color:rgba(61,200,184,.35);color:var(--teal);}
+.exp-btn.lime{border-color:rgba(126,200,122,.4);color:var(--lime);}
+
+/* ── MODALS ── */
+#dd-overlay,#pd-overlay{display:none;position:fixed;inset:0;z-index:9400;background:rgba(0,0,0,.84);align-items:center;justify-content:center;}
+#dd-overlay.open,#pd-overlay.open{display:flex;}
+#dd-box{background:var(--bg1);border:1px solid rgba(61,200,184,.28);width:min(700px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 80px rgba(0,0,0,.95);}
+#pd-box{background:var(--bg1);border:1px solid rgba(200,168,74,.3);width:min(660px,94vw);max-height:88vh;overflow-y:auto;box-shadow:0 20px 70px rgba(0,0,0,.95);}
+#dd-box::-webkit-scrollbar,#pd-box::-webkit-scrollbar{width:4px;}
+#dd-box::-webkit-scrollbar-thumb,#pd-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);}
+.dd-head{padding:14px 20px;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center;background:rgba(61,200,184,.04);}
+.dd-head-title{font-family:var(--disp);font-size:.8rem;letter-spacing:.06em;color:var(--teal);}
+.dd-head-sub{font-size:8px;color:var(--cream3);margin-top:3px;}
+.dd-close,.pd-close{background:none;border:none;color:var(--cream3);font-size:18px;cursor:pointer;padding:2px 6px;line-height:1;}
+.dd-close:hover,.pd-close:hover{color:var(--cream);}
+.dd-body,.pd-body{padding:18px 22px;}
+.dd-steps,.pd-steps{display:flex;flex-direction:column;gap:10px;}
+.dd-step,.pd-step{background:var(--bg2);border:1px solid var(--edge);padding:13px 17px;}
+.dd-step-num,.pd-step-num{font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);opacity:.7;margin-bottom:4px;}
+.dd-step-title,.pd-step-title{font-family:var(--disp);font-size:.63rem;letter-spacing:.07em;color:var(--cream);margin-bottom:9px;}
+.dd-step-body,.pd-step-body{font-family:var(--serif);font-size:13px;line-height:1.72;color:rgba(184,178,166,.88);}
+.dd-step-body p,.pd-step-body p{margin-bottom:7px;}
+.dd-formula{font-family:var(--mono);font-size:11px;background:rgba(61,200,184,.05);border:1px solid rgba(61,200,184,.15);padding:9px 13px;margin:7px 0;color:var(--teal);line-height:1.8;}
+.dd-formula.gold{background:rgba(200,168,74,.05);border-color:rgba(200,168,74,.15);color:var(--gold);}
+.pd-formula{font-family:var(--mono);font-size:11px;background:rgba(200,168,74,.05);border:1px solid rgba(200,168,74,.15);padding:9px 13px;margin:7px 0;color:var(--gold);line-height:1.8;}
+.kv{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.kv:last-child{border-bottom:none;}
+.kv-k{color:var(--cream3);font-family:var(--mono);font-size:9.5px;}
+.kv-v{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--cream);}
+.kv-v.gold{color:var(--gold);}.kv-v.teal{color:var(--teal);}.kv-v.coral{color:var(--coral);}
+.dd-prime-grid{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0;}
+.dd-pfac{display:flex;flex-direction:column;align-items:center;background:var(--bg2);border:1px solid var(--edge);padding:7px 11px;min-width:76px;}
+.dd-pfac.sat{border-color:rgba(224,80,96,.3);background:rgba(224,80,96,.04);}
+.dd-pfac.act{border-color:rgba(61,200,184,.25);background:rgba(61,200,184,.03);}
+.dd-pfac-p{font-family:var(--mono);font-size:14px;font-weight:500;}
+.dd-pfac-p.sat{color:var(--coral);}.dd-pfac-p.act{color:var(--teal);}
+.dd-pfac-lbl{font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--cream3);margin-top:3px;}
+.dd-pfac-val{font-family:var(--mono);font-size:9px;color:var(--cream2);margin-top:2px;}
+.dd-bar-track,.pd-bar-track{height:6px;background:rgba(255,255,255,.06);border-radius:3px;margin:8px 0 4px;overflow:hidden;}
+.dd-bar-fill,.pd-bar-fill{height:100%;border-radius:3px;}
+.dd-note,.pd-note{font-size:11px;color:var(--cream3);font-style:italic;margin-top:5px;line-height:1.6;}
+.dd-nav{display:flex;gap:8px;margin-bottom:12px;}
+.dd-nav-btn{background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:9px;letter-spacing:.08em;padding:4px 13px;cursor:pointer;transition:all .1s;}
+.dd-nav-btn:hover:not(:disabled){color:var(--teal);border-color:rgba(61,200,184,.4);}
+.dd-nav-btn:disabled{opacity:.25;cursor:default;}
+.dd-foot,.pd-foot{padding:13px 22px;border-top:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.dd-btn,.pd-btn{padding:7px 18px;background:rgba(61,200,184,.1);border:1px solid rgba(61,200,184,.4);color:var(--teal);font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .15s;}
+.dd-btn:hover,.pd-btn:hover{background:rgba(61,200,184,.2);}
+.dd-btn.sec,.pd-btn.sec{background:transparent;border-color:var(--edge2);color:var(--cream3);}
+.dd-btn.sec:hover,.pd-btn.sec:hover{color:var(--cream);}
+.pd-head{padding:14px 20px;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between;align-items:center;background:rgba(200,168,74,.04);}
+.pd-head-title{font-family:var(--disp);font-size:.8rem;letter-spacing:.06em;color:var(--gold);}
+.pd-head-sub{font-size:8px;color:var(--cream3);margin-top:3px;}
+.pd-status{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;margin-bottom:18px;border:1px solid;font-size:9px;letter-spacing:.14em;text-transform:uppercase;}
+.pd-status.sat{color:var(--coral);border-color:rgba(224,80,96,.4);background:rgba(224,80,96,.07);}
+.pd-status.act{color:var(--teal);border-color:rgba(61,200,184,.35);background:rgba(61,200,184,.06);}
+#prime-tbody tr,#dt-body tr{cursor:pointer;transition:background .1s;}
+#prime-tbody tr:hover{background:rgba(200,168,74,.07)!important;}
+#dt-body tr:hover{background:rgba(61,200,184,.05)!important;}
+@media(max-width:700px){#ctrl-bar{padding:6px 12px;}.card{padding:14px 14px;}}
+/* Conformal toggle */
+#hero-conformal-panel{display:none;}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <span class="tb-brand">C(n)</span>
+  <div class="tb-sep"></div>
+  <button id="fs-btn" onclick="toggleFullscreen()" title="Toggle fullscreen"
+    style="background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:12px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;">⛶</button>
+  <div class="tb-sep"></div>
+  <a href="index.html" class="tb-page teal">P1</a>
+  <a href="page2.html" class="tb-page teal">P2</a>
+  <a href="page3.html" class="tb-page">P3</a>
+  <a href="page4.html" class="tb-page violet">P4</a>
+  <a href="page5.html" class="tb-page coral">P5</a>
+  <a href="page6.html" class="tb-page lime">P6</a>
+  <a href="page7.html" class="tb-page">P7</a>
+  <span class="tb-page active">P8 · Tables</span>
+  <a href="page9.html" class="tb-page teal">P9</a>
+</div>
+
+<!-- ── MAIN CTRL BAR — 2 rows ── -->
+<div id="ctrl-bar" style="flex-direction:column;align-items:stretch;padding:0;gap:0;">
+  <!-- ROW 1: N + play + view + misc -->
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;padding:5px 12px;border-bottom:1px solid rgba(255,255,255,.05);">
+    <span class="cv-lbl">N</span>
+    <button class="ctrl-step" onclick="stepN(-1)">−</button>
+    <input class="ctrl-sl" id="sl-n" type="range" min="0" max="1000" value="0" style="width:90px;" oninput="setN(+this.value)">
+    <input class="ctrl-num" id="num-n" type="number" min="0" value="0" style="width:46px;" oninput="setN(+this.value||0)">
+    <button class="ctrl-step" onclick="stepN(1)">+</button>
+    <span class="cv-lbl" style="cursor:pointer;color:var(--violet);white-space:nowrap;" onclick="jumpNextSat()">→sat <b id="next-sat-val" style="color:var(--violet)">—</b></span>
+    <button class="ctrl-btn gold" onclick="togglePlay()" id="play-btn" style="padding:3px 7px;">▶</button>
+    <input class="ctrl-sl" id="sl-spd" type="range" min="60" max="950" value="300" style="width:50px;">
+    <button class="ctrl-btn" onclick="setN(0)" style="padding:3px 7px;">↺</button>
+    <div class="cv-sep"></div>
+    <button class="vbtn act-gold" id="vb-grid" onclick="setView('grid')">Grid</button>
+    <button class="vbtn" id="vb-ring" onclick="setView('ring')">Ring</button>
+    <button class="vbtn" id="vb-farey" onclick="setView('farey')">Farey</button>
+    <button class="vbtn" id="vb-lift" onclick="setView('lift')">Lift</button>
+    <button class="vbtn" id="vb-conformal" onclick="setView('conformal')">Conf</button>
+    <div class="cv-sep"></div>
+    <button class="ctrl-btn gold" onclick="toggleText()" id="txt-btn" style="padding:3px 7px;">Hide text</button>
+    <button id="inspect-btn" onclick="toggleInspect()" style="background:none;border:1px solid rgba(155,127,232,.35);color:rgba(155,127,232,.7);font-family:var(--mono);font-size:8.5px;padding:3px 8px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;transition:all .15s;">⊕ Inspect</button>
+    <button class="ctrl-btn" onclick="export4K()" style="border-color:rgba(61,200,184,.35);color:var(--teal);padding:3px 7px;" title="Download 4K poster PNG">↓ 4K</button>
+    <button class="ctrl-btn" onclick="exportSnap()" style="border-color:rgba(155,127,232,.35);color:var(--violet);padding:3px 7px;" title="Capture hero text + canvas">↓ Snap</button>
+  </div>
+  <!-- ROW 2: G + p±  + rotate + finite + DP -->
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;padding:5px 12px;">
+    <span class="cv-lbl">G</span>
+    <button class="ctrl-step" onclick="stepG(-1)">−</button>
+    <input class="ctrl-sl" id="sl-G" type="range" min="1" max="512" value="30" style="width:75px;" oninput="setG(+this.value)">
+    <input class="ctrl-num" id="num-G" type="number" min="1" max="2048" value="30" style="width:48px;" oninput="setG(+this.value||1)">
+    <button class="ctrl-step" onclick="stepG(1)">+</button>
+    <button onclick="stepGPrime(-1)" title="Previous prime G" style="background:none;border:1px solid rgba(61,200,184,.35);color:var(--teal);font-family:var(--mono);font-size:8px;padding:3px 7px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;">p−</button>
+    <button onclick="stepGPrime(1)" title="Next prime G" style="background:none;border:1px solid rgba(61,200,184,.35);color:var(--teal);font-family:var(--mono);font-size:8px;padding:3px 7px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;">p+</button>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl">Rot</span>
+    <button onclick="rotate(-1)" title="CCW 90°" style="background:none;border:1px solid rgba(200,168,74,.35);color:var(--gold);font-family:var(--mono);font-size:8.5px;padding:3px 8px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;">−i</button>
+    <span id="rot-lbl" style="font-family:var(--mono);font-size:9px;color:var(--cream3);min-width:28px;text-align:center;"> 0°</span>
+    <button onclick="rotate(1)" title="CW 90°" style="background:none;border:1px solid rgba(200,168,74,.35);color:var(--gold);font-family:var(--mono);font-size:8.5px;padding:3px 8px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;">+i</button>
+    <div class="cv-sep"></div>
+    <button id="finite-toggle" onclick="setFiniteMode(!_finiteMode)"
+      style="background:rgba(224,80,96,.08);border:1px solid rgba(224,80,96,.35);color:rgba(224,80,96,.9);font-family:var(--mono);font-size:8px;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;cursor:pointer;line-height:1.3;transition:all .15s;white-space:nowrap;flex-shrink:0;">
+      <span style="font-size:7px;opacity:.6;display:block;line-height:1;">mode</span>∞ ASYMP
+    </button>
+    <div class="cv-sep"></div>
+    <span class="cv-lbl">DP</span>
+    <input class="ctrl-sl" id="dp-sl" type="range" min="2" max="16" value="8" style="width:55px;" oninput="setDP(+this.value)">
+    <span id="dp-val" style="color:var(--gold);font-size:9px;min-width:16px;">8</span>
+  </div>
+</div>
+
+<!-- ── FINITE PANEL ── -->
+<div id="finite-panel" style="display:none;background:rgba(5,5,16,.98);border-bottom:1px solid rgba(61,200,184,.25);padding:7px 20px;display:none;flex-wrap:wrap;align-items:center;gap:6px 14px;font-family:var(--mono);font-size:9px;">
+  <span style="font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:rgba(61,200,184,.7);flex-shrink:0;">Finite: nth prime</span>
+  <button onclick="setFinitePrimes(_finitePrimes-1)" style="width:20px;height:20px;background:none;border:1px solid var(--edge2);color:var(--teal);font-family:var(--mono);font-size:11px;cursor:pointer;padding:0;line-height:1;">▼</button>
+  <input type="range" id="finite-sl" min="0" max="17984" value="1" style="width:140px;accent-color:rgba(61,200,184,.8);" oninput="setFinitePrimes(+this.value)">
+  <button onclick="setFinitePrimes(_finitePrimes+1)" style="width:20px;height:20px;background:none;border:1px solid var(--edge2);color:var(--teal);font-family:var(--mono);font-size:11px;cursor:pointer;padding:0;line-height:1;">▲</button>
+  <input type="number" id="finite-inp" min="0" max="17984" value="1"
+    style="width:52px;background:var(--bg2);border:1px solid var(--edge2);color:var(--lime);font-family:var(--mono);font-size:9px;text-align:center;padding:2px 3px;outline:none;"
+    oninput="setFinitePrimes(+this.value)">
+  <span id="finite-lbl" style="font-family:var(--mono);font-size:8px;color:var(--lime);min-width:90px;">p≤2  (1)</span>
+  <div style="width:1px;height:18px;background:var(--edge);flex-shrink:0;"></div>
+  <span style="font-family:var(--mono);font-size:8px;color:var(--cream3);">Loop to:</span>
+  <input type="number" id="finite-loop-target" min="1" max="17984" value="10"
+    style="width:50px;background:var(--bg2);border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:9px;text-align:center;padding:2px 3px;outline:none;">
+  <button id="finite-play" onclick="toggleFinitePrimeAnim()"
+    style="background:none;border:1px solid rgba(61,200,184,.35);color:rgba(61,200,184,.9);font-family:var(--mono);font-size:8px;letter-spacing:.07em;text-transform:uppercase;padding:4px 10px;cursor:pointer;height:28px;white-space:nowrap;flex-shrink:0;">▶ Play P</button>
+  <label style="display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:8px;color:var(--cream3);cursor:pointer;white-space:nowrap;">
+    <input type="checkbox" id="finite-loop-cb" checked style="accent-color:var(--teal);">Loop
+  </label>
+  <div style="width:1px;height:18px;background:var(--edge);flex-shrink:0;"></div>
+  <!-- Convergence legend -->
+  <span style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:7px;flex-shrink:0;">
+    <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-right:2px;"></span>&lt;0.001%</span>
+    <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin-right:2px;"></span>&lt;0.1%</span>
+    <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--lime);margin-right:2px;"></span>&lt;1%</span>
+    <span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--coral);margin-right:2px;"></span>far</span>
+  </span>
+</div>
+
+<!-- ── HERO ── -->
+<div id="hero-wrap">
+  <div id="hero">
+    <canvas id="hero-cv"></canvas>
+    <div id="hero-text">
+      <div class="hero-tag">Analytic Number Theory · Wessen Getachew</div>
+      <h1 class="hero-title">C(n) — Block-Coprime Density</h1>
+      <div class="hero-formula">
+        $$C(n)\;=\;\zeta(2)\cdot\prod_{p\;\text{prime}}\!\left(1-\frac{\min(n+1,\,p)}{p^2}\right)$$
+      </div>
+      <div class="hero-live">
+        <span>C(<span class="hn" id="hl-n">0</span>)</span>
+        <span class="heq">=</span>
+        <span>ζ(2)·∏<sub>p</sub>(1−min(<span class="hn1" id="hl-n1">1</span>,p)/p²)</span>
+        <span class="heq">=</span>
+        <span class="hresult" id="hl-val">1.00000000</span>
+        <span id="hl-pi" style="display:none;font-family:var(--mono);font-size:.72em;color:var(--violet);opacity:.9;margin-left:.55em;letter-spacing:-.01em;white-space:nowrap;"></span>
+      </div>
+      <div id="hl-sub" style="font-family:'Spectral',serif;font-size:clamp(.75rem,1.3vw,.88rem);font-style:italic;color:rgba(200,195,185,.8);line-height:1.6;max-width:min(580px,88vw);text-align:center;margin-top:7px;padding:0 10px;">
+        Natural density of pairs (r,&thinsp;M) with gcd(r,&thinsp;M+j)=1 for all j=0,…,n, rescaled by ζ(2) so C(0)=1.
+        At n=1: C(1)=ζ(2)·D<sub>FT</sub>=π²/12≈0.5307, where D<sub>FT</sub>=∏<sub>p</sub>(1−2/p²).
+      </div>
+    </div>
+  
+</div>
+
+  <!-- Caption bars -->
+  <div id="view-cap-top"></div>
+
+  <!-- ── SHARED CONTROLS — shown for all views ── -->
+  <div id="vp-shared" style="background:rgba(6,6,20,.98);border-bottom:1px solid var(--edge2);font-family:var(--mono);font-size:9px;">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px 12px;padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.05);">
+      <!-- Color -->
+      <span class="cv-lbl">Color</span>
+      <select id="grid-color-sel" onchange="drawHero()"
+        style="background:var(--bg2);border:1px solid rgba(200,168,74,.35);color:var(--gold);font-family:var(--mono);font-size:8px;padding:2px 5px;outline:none;cursor:pointer;">
+        <optgroup label="── Block Structure ──">
+          <option value="mod_dist" selected>Modular Distance</option>
+          <option value="3state">3-state (gold/teal/dark)</option>
+          <option value="depth">Survival depth</option>
+          <option value="kill">Fail prime spectrum</option>
+          <option value="saturation">Saturation profile</option>
+        </optgroup>
+        <optgroup label="── 2πr/M · Farey ──">
+          <option value="farey_angle">2πr/M Farey rainbow</option>
+          <option value="sector">Sector hue (r/G)</option>
+          <option value="lift_angle">Lift angle r→M+1</option>
+        </optgroup>
+        <optgroup label="── Arithmetic ──">
+          <option value="gcd">GCD(r,M) spectrum</option>
+          <option value="phi">φ(M)/M density</option>
+          <option value="mobius">Möbius μ(M)</option>
+          <option value="quad_res">Quadratic Residue</option>
+          <option value="r_prime">r primality</option>
+        </optgroup>
+        <optgroup label="── Extended ──">
+          <option value="divisibility">Divisibility count</option>
+          <option value="rainbow">Rainbow (r/M hue)</option>
+          <option value="zero_div">Zero Divisors</option>
+          <option value="idem">Idempotents</option>
+        </optgroup>
+      </select>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);flex-shrink:0;"></div>
+      <!-- Label -->
+      <span class="cv-lbl">Label</span>
+      <select id="grid-label-sel" onchange="drawHero()"
+        style="background:var(--bg2);border:1px solid var(--edge2);color:var(--cream);font-family:var(--mono);font-size:8px;padding:2px 5px;outline:none;cursor:pointer;">
+        <option value="none">None</option>
+        <option value="r" selected>r only</option>
+        <option value="M_val">M only</option>
+        <option value="coords">r, M</option>
+        <option value="frac">r/M</option>
+        <option value="gcd">gcd(r,M)</option>
+        <option value="depth">depth d</option>
+        <option value="angle">2πr/M°</option>
+        <option value="phi_M">φ(M)</option>
+        <option value="mobius_lbl">μ(M)</option>
+        <option value="gap_lbl">gap |M−r|</option>
+        <option value="status">ok/cop/no</option>
+      </select>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);flex-shrink:0;"></div>
+      <!-- Gap/diagonal slider -->
+      <span class="cv-lbl" style="color:rgba(200,168,74,.8);">Gap</span>
+      <button onclick="stepGap(-1)" style="width:18px;height:18px;background:none;border:1px solid var(--edge2);color:rgba(200,168,74,.8);font-family:var(--mono);font-size:9px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">▼</button>
+      <input type="range" id="gap-sl" min="0" max="100" step="1" value="0"
+        style="width:70px;accent-color:rgba(200,168,74,.7);" oninput="setGap(+this.value)"
+        title="Highlight diagonal strip |M−r|=g">
+      <button onclick="stepGap(1)" style="width:18px;height:18px;background:none;border:1px solid var(--edge2);color:rgba(200,168,74,.8);font-family:var(--mono);font-size:9px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">▲</button>
+      <span id="gap-lbl" style="font-family:var(--mono);font-size:8px;color:rgba(200,168,74,.85);min-width:22px;">off</span>
+      <span id="gap-phi" style="font-family:var(--mono);font-size:7.5px;color:rgba(61,200,184,.75);min-width:60px;"></span>
+      <button onclick="clearGap()" style="background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:7px;padding:2px 7px;cursor:pointer;">✕</button>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);flex-shrink:0;"></div>
+      <!-- Zoom — always visible for all views -->
+      <span class="cv-lbl">Zoom</span>
+      <button class="ctrl-step" onclick="setZoom(_zoom*.67)" style="font-size:14px;">−</button>
+      <input type="range" id="zoom-sl" min="100" max="3200" step="10" value="100"
+        style="width:70px;accent-color:rgba(61,200,184,.8);" oninput="setZoom(+this.value/100)">
+      <span id="zoom-lbl" style="font-family:var(--mono);font-size:9px;color:var(--teal);min-width:32px;text-align:center;">1×</span>
+      <button class="ctrl-step" onclick="setZoom(_zoom*1.5)" style="font-size:14px;">+</button>
+      <button class="ctrl-btn" onclick="resetView()" style="padding:3px 8px;" title="Reset zoom/pan">↺</button>
+    </div>
+    <!-- View-specific note line -->
+    <div id="vp-note-line" style="padding:4px 14px;font-size:8px;color:var(--cream3);border-top:1px solid rgba(255,255,255,.04);">
+      <span style="color:rgba(200,168,74,.6);">Grid:</span> The fraction of gold cells → C(n) as G→∞. Color and label apply to all views. Scroll/pinch to zoom. Drag to pan.
+    </div>
+  </div>
+
+  <!-- Grid sub-panel (grid-only extras) -->
+  <div class="view-panel" id="vp-grid" style="border-color:rgba(200,168,74,.2);border-top:none;">
+    <div class="vp-body" style="padding:5px 14px;">
+      <span class="cv-lbl" style="color:rgba(200,168,74,.7);font-size:7.5px;">GRID ONLY:</span>
+    </div>
+  </div>
+
+
+  <!-- Ring sub-panel -->
+  <div class="view-panel" id="vp-ring" style="border-color:rgba(61,200,184,.3);">
+    <div class="vp-head"><span class="vp-title" style="color:rgba(61,200,184,.9);">Ring — Concentric Residue Circles</span>
+      <span style="font-size:8px;color:var(--cream3);">r on ring M at angle 2πr/M · gold=block-coprime · teal=coprime only</span>
+    </div>
+    <div class="vp-body">
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:var(--cream2);cursor:pointer;">
+        <input type="checkbox" id="ring-circles" checked style="accent-color:rgba(61,200,184,.8);" onchange="drawHero()">Ring circles</label>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <span class="cv-lbl" style="color:rgba(200,168,74,.75);">Dot scale:</span>
+      <input type="range" id="ring-dot-sc" min="0.3" max="3" step="0.1" value="1" style="width:70px;accent-color:rgba(200,168,74,.8);" oninput="document.getElementById('ring-dot-lbl').textContent=parseFloat(this.value).toFixed(1)+'×';drawHero()">
+      <span id="ring-dot-lbl" style="font-size:8px;color:rgba(200,168,74,.7);min-width:28px;">1.0×</span>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:var(--cream2);cursor:pointer;">
+        <input type="checkbox" id="ring-invert" style="accent-color:var(--gold);" onchange="drawHero()">Invert rings</label>
+    </div>
+    <div class="vp-note"><span style="color:rgba(61,200,184,.6);">Theory:</span> Each ring M holds the φ(M) coprime residues r mod M at angle 2πr/M. Gold = block-coprime (depth ≥ n). The density of gold dots → C(n)/ζ(2) as M max grows.</div>
+  </div>
+
+  <!-- Farey sub-panel -->
+  <div class="view-panel" id="vp-farey" style="border-color:rgba(200,168,74,.3);">
+    <div class="vp-head"><span class="vp-title" style="color:rgba(200,168,74,.9);">Farey Strip — x=r/M · y=log(2/M)</span>
+      <span style="font-size:8px;color:var(--cream3);">Farey mediant structure visible at all scales</span>
+    </div>
+    <div class="vp-body">
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:var(--cream2);cursor:pointer;">
+        <input type="checkbox" id="farey-lines" checked style="accent-color:rgba(200,168,74,.8);" onchange="drawHero()">Level lines</label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:var(--cream2);cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" id="farey-axis" checked style="accent-color:rgba(200,168,74,.6);" onchange="drawHero()">Axis labels</label>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <span class="cv-lbl" style="color:rgba(155,127,232,.8);">Y stretch:</span>
+      <input type="range" id="farey-yexp" min="0.3" max="3" step="0.1" value="1" style="width:70px;accent-color:rgba(155,127,232,.8);" oninput="document.getElementById('farey-ylbl').textContent=parseFloat(this.value).toFixed(1);drawHero()">
+      <span id="farey-ylbl" style="font-size:8px;color:rgba(155,127,232,.7);min-width:20px;">1.0</span>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <span class="cv-lbl" style="color:rgba(61,200,184,.75);">Dot scale:</span>
+      <input type="range" id="farey-dot-sc" min="0.3" max="4" step="0.1" value="1" style="width:70px;accent-color:rgba(61,200,184,.8);" oninput="document.getElementById('farey-dot-lbl').textContent=parseFloat(this.value).toFixed(1)+'×';drawHero()">
+      <span id="farey-dot-lbl" style="font-size:8px;color:rgba(61,200,184,.7);min-width:28px;">1.0×</span>
+    </div>
+    <div class="vp-note"><span style="color:rgba(200,168,74,.6);">Theory:</span> The Farey strip maps (r,M) to x=r/M, y=log(2/M). Farey mediants appear as intermediate points between parent fractions. Prime rows are the cleanest horizontal levels.</div>
+  </div>
+
+  <!-- Lift sub-panel -->
+  <div class="view-panel" id="vp-lift" style="border-color:rgba(155,127,232,.3);">
+    <div class="vp-head"><span class="vp-title" style="color:rgba(155,127,232,.9);">Lift Dynamics — r → r mod (M+1)</span>
+      <span style="font-size:8px;color:var(--cream3);">Teal arcs=lift survives · Coral=broken · Gold=block-coprime</span>
+    </div>
+    <div class="vp-body" style="flex-wrap:wrap;gap:8px 14px;">
+      <!-- Arcs -->
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(155,127,232,.9);cursor:pointer;">
+        <input type="checkbox" id="lift-lines" checked style="accent-color:rgba(155,127,232,.8);" onchange="drawHero()">Lift arcs</label>
+      <span class="cv-lbl" style="color:rgba(155,127,232,.75);">opacity:</span>
+      <button onclick="liftArcOpStep(-1)" style="width:18px;height:18px;background:none;border:1px solid var(--edge2);color:var(--violet);cursor:pointer;font-size:10px;padding:0;line-height:1;">−</button>
+      <input type="range" id="lift-arc-op" min="0.01" max="0.8" step="0.01" value="0.22"
+        style="width:65px;accent-color:rgba(155,127,232,.8);" oninput="document.getElementById('lift-op-lbl').textContent=Math.round(this.value*100)+'%';drawHero()">
+      <button onclick="liftArcOpStep(1)" style="width:18px;height:18px;background:none;border:1px solid var(--edge2);color:var(--violet);cursor:pointer;font-size:10px;padding:0;line-height:1;">+</button>
+      <span id="lift-op-lbl" style="font-size:8px;color:rgba(155,127,232,.7);min-width:28px;">22%</span>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <!-- Block highlight -->
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(200,168,74,.9);cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" id="lift-block" checked style="accent-color:rgba(200,168,74,.8);" onchange="drawHero()">Block-coprime</label>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <!-- ±1 path -->
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(61,200,184,.9);cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" id="lift-npath" checked style="accent-color:rgba(61,200,184,.8);" onchange="drawHero()">±1 path</label>
+      <button onclick="liftNpathStep(-1)" title="Previous n-path (M-1)/2" style="width:18px;height:18px;background:none;border:1px solid rgba(61,200,184,.35);color:var(--teal);cursor:pointer;font-size:10px;padding:0;line-height:1;">−</button>
+      <span id="lift-npath-lbl" style="font-size:8px;color:var(--teal);min-width:18px;text-align:center;">1</span>
+      <button onclick="liftNpathStep(1)" title="Next n-path" style="width:18px;height:18px;background:none;border:1px solid rgba(61,200,184,.35);color:var(--teal);cursor:pointer;font-size:10px;padding:0;line-height:1;">+</button>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <!-- Prime spiral -->
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:rgba(200,168,74,.9);cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" id="lift-spiral" checked style="accent-color:rgba(200,168,74,.8);" onchange="drawHero()">Prime spiral p=</label>
+      <button onclick="liftSpiralStep(-1)" title="Previous prime" style="width:18px;height:18px;background:none;border:1px solid rgba(200,168,74,.35);color:var(--gold);cursor:pointer;font-size:10px;padding:0;line-height:1;">−</button>
+      <span id="lift-spiral-lbl" style="font-size:9px;color:var(--gold);min-width:22px;text-align:center;font-weight:600;">2</span>
+      <button onclick="liftSpiralStep(1)" title="Next prime" style="width:18px;height:18px;background:none;border:1px solid rgba(200,168,74,.35);color:var(--gold);cursor:pointer;font-size:10px;padding:0;line-height:1;">+</button>
+    </div>
+    <div class="vp-note"><span style="color:rgba(155,127,232,.6);">Theory:</span> Each arc connects r on ring M to r mod(M+1) on ring M+1. Prime spiral tracks residues r≡k(mod p). Click a dot on the canvas to highlight + inspect it. Click a row in the table to highlight it.</div>
+    <!-- Spiral point table -->
+    <div id="lift-spiral-table" style="display:none;margin:8px 14px 10px;background:rgba(5,5,18,.98);border:1px solid rgba(200,168,74,.25);max-height:220px;overflow-y:auto;">
+      <div style="display:flex;align-items:center;gap:10px;padding:5px 12px;border-bottom:1px solid rgba(200,168,74,.15);background:rgba(200,168,74,.04);position:sticky;top:0;">
+        <span style="color:var(--gold);font-size:8px;letter-spacing:.1em;text-transform:uppercase;flex:1;">Prime Spiral Points <span id="lift-spiral-count" style="color:var(--cream3);font-weight:400;"></span></span>
+        <button onclick="document.getElementById('lift-spiral-table').style.display='none'" style="background:none;border:none;color:var(--cream3);cursor:pointer;font-size:11px;padding:0;">✕</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:9px;">
+        <thead style="position:sticky;top:32px;background:#07071a;">
+          <tr>
+            <th style="padding:3px 7px;text-align:left;color:var(--cream3);font-size:7.5px;border-bottom:1px solid rgba(255,255,255,.06);">#</th>
+            <th style="padding:3px 7px;text-align:right;color:var(--gold);font-size:7.5px;border-bottom:1px solid rgba(255,255,255,.06);">r</th>
+            <th style="padding:3px 7px;text-align:right;color:var(--cream3);font-size:7.5px;border-bottom:1px solid rgba(255,255,255,.06);">M</th>
+            <th style="padding:3px 7px;text-align:right;color:var(--cream3);font-size:7.5px;border-bottom:1px solid rgba(255,255,255,.06);">r/M</th>
+            <th style="padding:3px 7px;text-align:right;color:var(--teal);font-size:7.5px;border-bottom:1px solid rgba(255,255,255,.06);">r→</th>
+            <th style="padding:3px 7px;text-align:left;color:var(--cream3);font-size:7.5px;border-bottom:1px solid rgba(255,255,255,.06);">status</th>
+          </tr>
+        </thead>
+        <tbody id="lift-spiral-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Conformal sub-panel -->
+  <div class="view-panel" id="vp-conformal" style="border-color:rgba(242,168,74,.3);">
+    <div class="vp-head"><span class="vp-title" style="color:rgba(242,168,74,.9);">Conformal Disk — Möbius map f(z)=(z−i)/(z+i)</span>
+      <span style="font-size:8px;color:var(--cream3);">z = r + iM · coprime lattice mapped to unit disk · red dashes = Re(s)=½</span>
+    </div>
+    <div class="vp-body">
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:var(--cream2);cursor:pointer;">
+        <input type="checkbox" id="conf-critical" checked style="accent-color:rgba(224,80,96,.8);" onchange="drawHero()">Re(s)=½ line</label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:var(--cream2);cursor:pointer;white-space:nowrap;">
+        <input type="checkbox" id="conf-grid" style="accent-color:rgba(200,168,74,.6);" onchange="drawHero()">Grid lines</label>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <span class="cv-lbl" style="color:rgba(242,168,74,.75);">Dot scale:</span>
+      <input type="range" id="conf-dot-sc" min="0.3" max="4" step="0.1" value="1" style="width:70px;accent-color:rgba(242,168,74,.8);" oninput="document.getElementById('conf-dot-lbl').textContent=parseFloat(this.value).toFixed(1)+'×';drawHero()">
+      <span id="conf-dot-lbl" style="font-size:8px;color:rgba(242,168,74,.7);min-width:28px;">1.0×</span>
+    </div>
+    <div class="vp-note"><span style="color:rgba(242,168,74,.6);">Theory:</span> The Möbius map f(z)=(z−i)/(z+i) sends the upper half-plane to the unit disk, with the real line mapping to the boundary circle. Points z=r+iM cluster near the boundary for small M, spread toward the center for large M.</div>
+  </div>
+
+  <!-- Sector Path panel -->
+  <details id="sec-details" style="background:rgba(7,7,18,.98);border:1px solid rgba(155,127,232,.3);font-family:var(--mono);">
+    <summary style="cursor:pointer;padding:7px 14px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(155,127,232,.9);list-style:none;display:flex;align-items:center;gap:6px;user-select:none;">
+      <span style="display:inline-block;transition:transform .15s;">▸</span>
+      Sector Path
+      <span style="font-size:7.5px;color:var(--cream3);font-weight:400;letter-spacing:.04em;text-transform:none;margin-left:6px;">b·r − a·M = s &nbsp;·&nbsp; s=0 is the ray r/M=a/b, s=±1 are Farey neighbours</span>
+    </summary>
+    <style>#sec-details[open]>summary>span:first-child{transform:rotate(90deg);}</style>
+    <div style="padding:10px 14px;border-top:1px solid rgba(155,127,232,.14);">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="cv-lbl">a</span>
+        <div style="display:flex;flex-direction:column;gap:1px;">
+          <button onclick="document.getElementById('sec-a').value=Math.max(1,(+document.getElementById('sec-a').value||1)+1);traceSector();" style="background:none;border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:8px;padding:0 5px;cursor:pointer;line-height:1.4;width:22px;">▲</button>
+          <button onclick="document.getElementById('sec-a').value=Math.max(1,(+document.getElementById('sec-a').value||1)-1);traceSector();" style="background:none;border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:8px;padding:0 5px;cursor:pointer;line-height:1.4;width:22px;">▼</button>
+        </div>
+        <input type="number" id="sec-a" value="1" min="1" max="9999" style="width:54px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:12px;padding:3px 5px;outline:none;text-align:center;">
+        <span class="cv-lbl">/ b</span>
+        <div style="display:flex;flex-direction:column;gap:1px;">
+          <button onclick="document.getElementById('sec-b').value=Math.max(1,(+document.getElementById('sec-b').value||1)+1);traceSector();" style="background:none;border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:8px;padding:0 5px;cursor:pointer;line-height:1.4;width:22px;">▲</button>
+          <button onclick="document.getElementById('sec-b').value=Math.max(1,(+document.getElementById('sec-b').value||1)-1);traceSector();" style="background:none;border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:8px;padding:0 5px;cursor:pointer;line-height:1.4;width:22px;">▼</button>
+        </div>
+        <input type="number" id="sec-b" value="2" min="1" max="9999" style="width:54px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--violet);font-family:var(--mono);font-size:12px;padding:3px 5px;outline:none;text-align:center;">
+        <div class="cv-sep" style="width:1px;height:20px;background:var(--edge);"></div>
+        <label style="font-size:8.5px;color:var(--teal);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="sec-pos" checked style="accent-color:var(--teal);">s = +1</label>
+        <label style="font-size:8.5px;color:var(--cream3);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="sec-ray" style="accent-color:var(--gold);">s = 0 (ray)</label>
+        <label style="font-size:8.5px;color:var(--coral);display:flex;align-items:center;gap:4px;"><input type="checkbox" id="sec-neg" checked style="accent-color:var(--coral);">s = −1</label>
+        <div class="cv-sep" style="width:1px;height:20px;background:var(--edge);"></div>
+        <button onclick="traceSector()" style="background:rgba(155,127,232,.08);border:1px solid rgba(155,127,232,.4);color:var(--violet);font-family:var(--mono);font-size:8.5px;padding:4px 12px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;">Trace path</button>
+        <button onclick="clearSector()" style="background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:8.5px;padding:4px 12px;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;">Clear</button>
+        <span id="sec-info" style="font-size:8px;color:var(--violet);"></span>
+      </div>
+      <!-- Sector point detail table -->
+      <div id="sec-detail" style="display:none;margin-top:10px;background:rgba(5,5,18,.98);border:1px solid rgba(155,127,232,.2);font-family:var(--mono);font-size:9px;max-height:240px;overflow-y:auto;">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid rgba(155,127,232,.15);background:rgba(155,127,232,.05);">
+          <span style="color:var(--violet);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;flex:1;">Sector Points <span id="sec-count" style="color:var(--cream3);font-weight:400;"></span></span>
+          <button onclick="exportSectorCSV()" style="background:none;border:1px solid rgba(61,200,184,.4);color:var(--teal);font-family:var(--mono);font-size:7px;padding:1px 9px;cursor:pointer;">↓ CSV</button>
+          <button onclick="clearSector()" style="background:none;border:1px solid rgba(224,80,96,.35);color:rgba(224,80,96,.75);font-family:var(--mono);font-size:7px;padding:1px 9px;cursor:pointer;">Clear</button>
+        </div>
+        <div id="sec-table-wrap" style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:8.5px;">
+            <thead><tr style="border-bottom:1px solid var(--edge);">
+              <th style="padding:4px 8px;text-align:left;color:var(--cream3);font-size:7.5px;letter-spacing:.1em;">#</th>
+              <th style="padding:4px 8px;text-align:right;color:var(--cream3);">r</th>
+              <th style="padding:4px 8px;text-align:right;color:var(--cream3);">M</th>
+              <th style="padding:4px 8px;text-align:right;color:var(--cream3);">r/M</th>
+              <th style="padding:4px 8px;text-align:right;color:var(--cream3);">s</th>
+              <th style="padding:4px 8px;text-align:right;color:var(--cream3);">gcd</th>
+              <th style="padding:4px 8px;text-align:left;color:var(--cream3);">Status</th>
+              <th style="padding:4px 8px;text-align:right;color:var(--cream3);">depth</th>
+            </tr></thead>
+            <tbody id="sec-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <div id="view-cap-bot"></div>
+</div>
+
+<!-- ── INSPECT PANEL (below canvas) ── -->
+<div id="inspect-panel" style="display:none;background:rgba(5,5,18,.99);border:1px solid rgba(155,127,232,.3);border-top:3px solid rgba(155,127,232,.6);font-family:var(--mono);font-size:9px;">
+  <div style="display:flex;align-items:center;gap:8px;padding:7px 16px;border-bottom:1px solid rgba(155,127,232,.15);background:rgba(155,127,232,.05);">
+    <span style="color:rgba(155,127,232,.8);font-size:8px;letter-spacing:.12em;text-transform:uppercase;flex-shrink:0;">⊕ Inspect</span>
+    <span id="ip-title" style="color:var(--gold);font-size:11px;font-weight:700;letter-spacing:.04em;flex-shrink:0;">—</span>
+    <div style="flex:1;"></div>
+    <button onclick="const ip=document.getElementById('inspect-panel');ip.style.display='none';_clickedCell=null;_liftClickedPt=null;if(_view==='grid'||_view==='lift')drawHero();"
+      style="background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:9px;padding:3px 9px;cursor:pointer;flex-shrink:0;">✕ Close</button>
+  </div>
+  <div id="ip-rows" style="display:flex;flex-wrap:wrap;gap:6px 20px;padding:10px 16px;"></div>
+</div>
+
+<!-- ── LIVE BAR ── -->
+<div id="live-bar">
+  <span class="lv-lbl">C(<span id="lb-n">0</span>)</span>
+  <span style="color:rgba(255,255,255,.2);margin:0 4px;">=</span>
+  <span class="lv-val" id="lb-cn">1.00000000</span>
+  <div class="lv-sep"></div>
+  <span id="lb-gap" style="font-family:var(--mono);font-size:8px;color:var(--cream3);display:none;">gap: <b id="lb-gap-val" style="color:var(--teal);">—</b></span>
+  <div class="lv-sep"></div>
+  <span class="lv-lbl">D(n)</span>
+  <span style="color:rgba(255,255,255,.2);margin:0 4px;">=</span>
+  <span class="lv-teal" id="lb-dn">—</span>
+  <div class="lv-sep"></div>
+  <span class="lv-lbl">Block <span id="lb-block">1</span></span>
+  <div class="lv-sep"></div>
+  <span class="lv-lbl">Sat. <b style="color:var(--coral)" id="lb-sat">0</b></span>
+  <div class="lv-sep"></div>
+  <span class="lv-lbl">Next sat n=<b style="color:var(--violet)" id="lb-next">1</b></span>
+  <div class="lv-sep"></div>
+  <span class="lv-lbl" style="color:var(--cream3);" id="lb-view">grid · G=30</span>
+</div>
+
+<div id="content">
+
+<!-- CALCULATOR -->
+<div class="card">
+  <div class="card-title">Calculator</div>
+  <div class="result-row">
+    <div class="rbox">
+      <div class="rl">C(n)</div>
+      <div class="rv" id="r-cn">1.00000000</div>
+      <div class="rs">ζ(2) × D(n)</div>
+    </div>
+    <div class="rbox">
+      <div class="rl">D(n) raw density</div>
+      <div class="rv" id="r-dn" style="color:var(--teal);font-size:1.5rem;">—</div>
+      <div class="rs">D(n) = C(n)/ζ(2)</div>
+    </div>
+    <div class="rbox">
+      <div class="rl">Block length</div>
+      <div class="rv" id="r-block" style="color:var(--cream);font-size:2.3rem;">1</div>
+      <div class="rs">n+1 consecutive integers</div>
+      <div class="card-nav">
+        <button class="card-arr" onclick="setN(N+1)">▲</button>
+        <button class="card-arr" onclick="setN(Math.max(0,N-1))">▼</button>
+      </div>
+    </div>
+    <div class="rbox">
+      <div class="rl">Saturated primes</div>
+      <div class="rv" id="r-sat" style="color:var(--coral);font-size:2.2rem;">0</div>
+      <div class="rs">p ≤ n+1 → factor=1−1/p<br>next at n = <span id="r-next" style="color:var(--cream)">—</span></div>
+      <div class="card-nav">
+        <button class="card-arr" onclick="jumpNextSat()">▲</button>
+        <button class="card-arr" onclick="jumpPrevSat()">▼</button>
+      </div>
+    </div>
+  </div>
+  <div class="ibox">
+    <strong>Saturation:</strong> prime p is <span style="color:var(--teal)">active</span> (p &gt; n+1) contributing 1−(n+1)/p², or
+    <span style="color:var(--coral)">saturated</span> (p ≤ n+1) contributing 1−1/p.
+    As n→∞, C(n) ∼ ζ(2)·e<sup>−γ</sup>/ln(n+1) (Mertens).
+    At n=1, C(1)=ζ(2)·∏<sub>p</sub>(1−2/p²)≈0.5307 (Feller–Tornier product).
+  </div>
+  <div class="pills" id="sat-pills"></div>
+  <div class="exp-row">
+    <span class="cv-lbl">Export</span>
+    <select id="calc-fmt" style="background:var(--bg2);border:1px solid var(--edge2);color:var(--cream2);font-family:var(--mono);font-size:8px;padding:3px 8px;outline:none;cursor:pointer;">
+      <option value="json">JSON</option><option value="csv">CSV</option><option value="text">Plain text</option>
+    </select>
+    <button class="exp-btn gold" onclick="exportCalc()">Copy</button>
+    <button class="exp-btn teal" onclick="exportCalcDownload()">Download</button>
+    <span id="calc-msg" style="font-size:8px;color:var(--lime);opacity:0;transition:opacity .4s;"></span>
+  </div>
+</div>
+
+<!-- PRIME TABLE -->
+<div class="card">
+  <div class="card-title">Prime Factor Table</div>
+  <div class="tscroll">
+    <table class="dt">
+      <thead><tr><th>p</th><th>Status</th><th>min(n+1,p)</th><th>p²</th><th>Local factor</th><th>log factor</th><th>Partial D(n)</th><th>Partial C(n)</th></tr></thead>
+      <tbody id="prime-tbody"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:6px;font-size:8px;color:var(--cream3);">First 60 primes. <span style="color:var(--violet)">Click any row for step-by-step detail.</span></div>
+  <div class="exp-row"><button class="exp-btn teal" onclick="exportPrimeCSV()">↓ CSV</button></div>
+</div>
+
+<!-- DATA TABLE -->
+<div class="card">
+  <div class="card-title">Data Table — n = 0 to current</div>
+  <div id="dt-scroll" class="tscroll">
+    <table class="dt">
+      <thead><tr><th>n</th><th>Block</th><th>C(n)</th><th>D(n)</th><th>C(n)/C(n−1)</th><th>Δ C(n)</th><th>Sat.</th><th>Event</th></tr></thead>
+      <tbody id="dt-body"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:6px;font-size:8px;color:var(--cream3);"><span style="color:var(--violet)">Click any row for step-by-step derivation.</span> ▼ = saturation drop.</div>
+  <div class="exp-row">
+    <button class="exp-btn teal" onclick="exportDataCSV()">↓ CSV</button>
+    <button class="exp-btn gold" onclick="exportHTMLReport()">↓ HTML Report</button>
+  </div>
+</div>
+
+</div>
+
+<!-- MODALS -->
+<div id="dd-overlay" onclick="if(event.target===this)closeDD()"><div id="dd-box"></div></div>
+<div id="pd-overlay" onclick="if(event.target===this)closePD()"><div id="pd-box"></div></div>
+
+
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════
+//  MATH
+// ═══════════════════════════════════════════
+const ZETA2=Math.PI*Math.PI/6;
+const PS=new Set();
+function sieve(lim){const c=new Uint8Array(lim+1),ps=[];for(let i=2;i<=lim;i++){if(!c[i]){ps.push(i);PS.add(i);for(let j=i*i;j<=lim;j+=i)c[j]=1;}}return ps;}
+const PRIMES=sieve(200000);
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=b;b=a%b;a=t;}return a;}
+function phi(n){let r=n,x=n;for(const p of PRIMES){if(p*p>x)break;if(x%p===0){while(x%p===0)x/=p;r-=r/p;}}if(x>1)r-=r/x;return Math.round(r);}
+function mobius(n){if(n<=1)return n===1?1:0;let x=n,f=0;for(const p of PRIMES){if(p*p>x)break;if(x%p===0){f++;x=Math.floor(x/p);if(x%p===0)return 0;}}if(x>1)f++;return f%2===0?1:-1;}
+
+const _PZ2=0.4522474200410654985;
+const _TAIL2=_PZ2-(function(){let s=0;for(const p of PRIMES)s+=1/(p*p);return s;})();
+function _cnTail(n){return -(n+1)*_TAIL2;}
+const _cn={0:1};
+function getCn(n){if(n in _cn)return _cn[n];let ld=0;for(const p of PRIMES){const m=Math.min(n+1,p);ld+=Math.log(1-m/(p*p));}ld+=_cnTail(n);return(_cn[n]=ZETA2*Math.exp(ld));}
+for(let i=0;i<=300;i++)getCn(i);
+
+// ── FINITE / ASYMPTOTIC MODE ─────────────────────────────────────────
+let _finiteMode=false;
+let _finitePrimes=1;
+
+function getCnFinite(n,numPrimes){
+  if(numPrimes<=0)return ZETA2;
+  let ld=0;
+  const lim=Math.min(numPrimes,PRIMES.length);
+  for(let i=0;i<lim;i++){const p=PRIMES[i];ld+=Math.log(1-Math.min(n+1,p)/(p*p));}
+  return ZETA2*Math.exp(ld);
+}
+
+function getCnDisplay(n){
+  return _finiteMode?getCnFinite(n,_finitePrimes):getCn(n);
+}
+
+function getCnConvergenceGap(n,numPrimes){
+  return Math.abs(getCnFinite(n,numPrimes)-getCn(n))/Math.max(getCn(n),1e-12);
+}
+
+function _finiteColor(gap){
+  if(gap<0.00001)return'var(--gold)';
+  if(gap<0.001)return'var(--teal)';
+  if(gap<0.01)return'var(--lime)';
+  return'var(--coral)';
+}
+
+// Sync G slider to the current truncation prime in finite mode
+const _FINITE_G_CAP=512;
+function _syncGToFinite(){
+  if(!_finiteMode||_finitePrimes<=0)return;
+  const p=PRIMES[_finitePrimes-1];
+  if(!p||p>_FINITE_G_CAP)return;
+  setG(p);
+}
+
+function setFiniteMode(on){
+  _finiteMode=on;
+  const toggle=document.getElementById('finite-toggle');
+  const panel=document.getElementById('finite-panel');
+  if(toggle){
+    toggle.innerHTML=on
+      ?'<span style="font-size:9px;opacity:.6;display:block;line-height:1;">currently</span>⊞ FINITE'
+      :'<span style="font-size:9px;opacity:.6;display:block;line-height:1;">currently</span>∞ ASYMPTOTIC';
+    toggle.style.background=on?'rgba(61,200,184,.12)':'rgba(224,80,96,.08)';
+    toggle.style.borderColor=on?'rgba(61,200,184,.5)':'rgba(224,80,96,.35)';
+    toggle.style.color=on?'rgba(61,200,184,.9)':'rgba(224,80,96,.9)';
+  }
+  if(panel)panel.style.display=on?'flex':'none';
+  if(on)_syncGToFinite();
+  updateUI();
+}
+
+function setFinitePrimes(v){
+  _finitePrimes=Math.max(0,Math.min(PRIMES.length,Math.round(v)));
+  const sl=document.getElementById('finite-sl');
+  const lbl=document.getElementById('finite-lbl');
+  const inp=document.getElementById('finite-inp');
+  if(sl)sl.value=_finitePrimes;
+  if(inp)inp.value=_finitePrimes;
+  if(lbl){
+    if(_finitePrimes===0)lbl.textContent='p≤∅  (ζ(2))';
+    else{const p=PRIMES[_finitePrimes-1]||'?';lbl.textContent=`p≤${p}  (${_finitePrimes})`;}
+  }
+  _syncGToFinite();
+  updateUI();
+}
+
+let _fpAnimTO=null;
+function toggleFinitePrimeAnim(){
+  if(_fpAnimTO){stopFinitePrimeAnim();return;}
+  if(!_finiteMode)setFiniteMode(true);
+  const btn=document.getElementById('finite-play');
+  if(btn){btn.textContent='■ Stop P';btn.style.color='rgba(224,80,96,.9)';}
+  if(_finitePrimes<=0)setFinitePrimes(1);
+  _stepFPA();
+}
+function stopFinitePrimeAnim(){
+  if(_fpAnimTO){clearTimeout(_fpAnimTO);_fpAnimTO=null;}
+  const btn=document.getElementById('finite-play');
+  if(btn){btn.textContent='▶ Play P';btn.style.color='rgba(61,200,184,.9)';}
+}
+function _stepFPA(){
+  const spd=+document.getElementById('sl-spd').value||300;
+  const target=Math.max(1,Math.min(PRIMES.length,parseInt(document.getElementById('finite-loop-target')?.value)||10));
+  const loop=document.getElementById('finite-loop-cb')?.checked!==false;
+  if(_finitePrimes>=target){
+    if(loop)setFinitePrimes(0);
+    else{stopFinitePrimeAnim();return;}
+  }else{
+    setFinitePrimes(_finitePrimes+1);
+  }
+  _fpAnimTO=setTimeout(_stepFPA,Math.max(16,960-spd));
+}
+
+function numSat(n){return PRIMES.filter(p=>p<=n+1).length;}
+function nextSatN(n){const p=PRIMES.find(p=>p>n+1);return p?p-1:null;}
+function prevSatN(n){const ps=PRIMES.filter(p=>p<=n+1);return ps.length>0?ps[ps.length-1]-2:null;}
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let N=0, G=30, _dp=8, _playing=false, _playTimer=null, _textVisible=true;
+let _view='grid';
+// Zoom/pan (grid view)
+let _zoom=1, _panX=0.5, _panY=0.5;
+let _rotSteps=0; // 0=0° 1=90°CW 2=180° 3=270°CW — canvas ctx.rotate transform
+let _isDragging=false, _dragSX=0, _dragSY=0, _panSX=0, _panSY=0;
+// Inspect mode (click handler on/off)
+let _inspectMode=false;
+// Lift: tracked prime index for spiral
+let _liftSpiralPrimeIdx=0;
+// Clicked cell highlight
+let _clickedCell=null; // {r,M} — last clicked (single)
+let _clickedCells=[]; // all clicked cells in inspect mode
+let _gapHighlight=-1; // -1=off, ≥0=highlight diagonal |M-r|=g
+
+// ═══════════════════════════════════════════
+//  CANVAS SETUP
+// ═══════════════════════════════════════════
+const cv=document.getElementById('hero-cv');
+const ctx=cv.getContext('2d');
+const heroEl=document.getElementById('hero');
+const ro=new ResizeObserver(()=>{resizeCV();drawHero();});
+ro.observe(heroEl);
+
+function resizeCV(){
+  const r=heroEl.getBoundingClientRect();
+  const w=r.width||heroEl.offsetWidth||heroEl.clientWidth||window.innerWidth;
+  const h=r.height||heroEl.offsetHeight||heroEl.clientHeight||300;
+  if(w>0&&h>0){cv.width=Math.round(w);cv.height=Math.round(h);}
+}
+
+// ─── Mouse events (grid pan/zoom) ───
+cv.addEventListener('mousedown',e=>{
+  if(_zoom<=1)return; // only drag when zoomed in
+  _isDragging=true;_dragSX=e.clientX;_dragSY=e.clientY;_panSX=_panX;_panSY=_panY;
+  cv.classList.add('dragging');
+  e.preventDefault();
+});
+window.addEventListener('mousemove',e=>{
+  if(!_isDragging)return;
+  const dx=(e.clientX-_dragSX)/cv.clientWidth;
+  const dy=(e.clientY-_dragSY)/cv.clientHeight;
+  const h=.5/_zoom;
+  _dragMoved=true;
+  _panX=Math.max(h,Math.min(1-h,_panSX-dx));
+  _panY=Math.max(h,Math.min(1-h,_panSY-dy));
+  drawHero();
+});
+let _dragMoved=false;
+window.addEventListener('mouseup',()=>{if(_isDragging){setTimeout(()=>{_isDragging=false;_dragMoved=false;},0);}cv.classList.remove('dragging');});
+cv.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const rect=cv.getBoundingClientRect();
+  // Mouse position as 0..1 fraction of the canvas
+  const mx=(e.clientX-rect.left)/rect.width;
+  const my=(e.clientY-rect.top)/rect.height;
+  zoomToward(mx,my,e.deltaY<0?1.25:0.8);
+},{passive:false});
+// Touch
+let _td=0,_tx=0,_ty=0;
+cv.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;_td=Math.sqrt(dx*dx+dy*dy);}
+  else{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY;_panSX=_panX;_panSY=_panY;_dragSX=_tx;_dragSY=_ty;}
+},{passive:true});
+cv.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(e.touches.length===2){
+    const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    const rect=cv.getBoundingClientRect();
+    const pinchMx=((e.touches[0].clientX+e.touches[1].clientX)/2-rect.left)/rect.width;
+    const pinchMy=((e.touches[0].clientY+e.touches[1].clientY)/2-rect.top)/rect.height;
+    zoomToward(pinchMx,pinchMy,d/_td);_td=d;
+  } else if(_zoom>1){
+    const ddx=(e.touches[0].clientX-_dragSX)/cv.clientWidth;
+    const ddy=(e.touches[0].clientY-_dragSY)/cv.clientHeight;
+    _panX=_panSX-ddx/_zoom;
+    _panY=_panSY-ddy/_zoom;
+    _clampPan();
+    drawHero();
+  }
+},{passive:false});
+
+function zoomToward(mx,my,factor){
+  // mx,my are 0..1 fractions of canvas width/height
+  // World fraction under cursor:
+  //   wx = _panX + (mx - 0.5) * W / gridW  but gridW=(W-2*pad)*Z  (pad~3% of min(W,H))
+  // We approximate: use canvas fraction directly via the ratio
+  // wx = _panX + (mx - 0.5) / _zoom  (normalised to grid units 0..1)
+  const wx=_panX+(mx-0.5)/_zoom;
+  const wy=_panY+(my-0.5)/_zoom;
+  const newZoom=Math.max(1,Math.min(32,_zoom*factor));
+  _panX=wx-(mx-0.5)/newZoom;
+  _panY=wy-(my-0.5)/newZoom;
+  _zoom=newZoom;
+  _clampPan();
+  document.getElementById('zoom-lbl').textContent=_zoom.toFixed(1)+'×';
+  const _zsl=document.getElementById('zoom-sl');if(_zsl)_zsl.value=Math.round(_zoom*100);
+  cv.classList.toggle('pannable',_zoom>1&&!_inspectMode);
+  drawHero();
+}
+function _clampPan(){
+  // Allow scrolling so the grid can go fully off screen (but not more than 1 cell off)
+  // panX range: 0 puts right edge of grid at canvas centre → left half empty
+  //             1 puts left edge at canvas centre → right half empty
+  // Allow slight over-pan to always see at least partial grid:
+  const margin=0.5/_zoom; // one cell margin
+  _panX=Math.max(-margin,Math.min(1+margin,_panX));
+  _panY=Math.max(-margin,Math.min(1+margin,_panY));
+  if(_zoom<=1){_panX=.5;_panY=.5;}
+}
+function setZoom(z){
+  const oldZ=_zoom;
+  _zoom=Math.max(1,Math.min(32,z));
+  // Keep canvas centre fixed
+  _clampPan();
+  document.getElementById('zoom-lbl').textContent=_zoom.toFixed(1)+'×';
+  const _zsl2=document.getElementById('zoom-sl');if(_zsl2)_zsl2.value=Math.round(_zoom*100);
+  cv.classList.toggle('pannable',_zoom>1&&!_inspectMode);
+  drawHero();
+}
+function resetView(){
+  _zoom=1;_panX=.5;_panY=.5;
+  document.getElementById('zoom-lbl').textContent='1×';
+  const _zslr=document.getElementById('zoom-sl');if(_zslr)_zslr.value=100;
+  cv.classList.remove('pannable');
+  drawHero();
+}
+
+// ═══════════════════════════════════════════
+//  COLOR HELPERS
+// ═══════════════════════════════════════════
+function cellColor(r,M,n,mode,g,lit){
+  // Helper: is r prime?
+  function isPrime(x){if(x<2)return false;for(let i=2;i*i<=x;i++)if(x%i===0)return false;return true;}
+  // Helper: smallest prime factor
+  function spf(x){for(let i=2;i*i<=x;i++)if(x%i===0)return i;return x;}
+  // Helper: divisor count
+  function ndiv(x){let d=0;for(let i=1;i*i<=x;i++){d+=2;if(i*i===x)d--;}return d;}
+  // Helper: is zero divisor mod M (gcd(r,M)>1 and r<M)
+  function isZeroDiv(r,M){return r>0&&r<M&&gcd(r,M)>1;}
+  // Helper: is idempotent mod M (r*r≡r mod M)
+  function isIdem(r,M){return(r*r)%M===r;}
+
+  switch(mode){
+    case'mod_dist':{
+      const dist=Math.min(r,M-r)/Math.max(1,Math.floor(M/2));
+      const hue=Math.round(240-dist*200);
+      if(lit)return`hsl(${hue},82%,55%)`;
+      if(g===1)return`hsla(${hue},45%,22%,.6)`;
+      return`rgba(30,25,50,.35)`;
+    }
+    case'3state':case'default':
+      if(lit)return null; // radial grad
+      if(g===1)return'rgba(61,200,184,.35)';
+      return'rgba(255,255,255,.05)';
+    case'depth':{
+      const d=getDepth(r,M,n)/Math.max(1,n+1);
+      if(lit)return`hsl(${Math.round(200-d*160)},80%,${Math.round(40+d*25)}%)`;
+      return`rgba(40,30,80,${(.1+d*.15).toFixed(2)})`;
+    }
+    case'saturation':{
+      const sat=numSat(n)/Math.max(1,PRIMES.filter(p=>p<=M).length);
+      const h=Math.round(120-sat*120);
+      return lit?`hsl(${h},75%,52%)`:`hsla(${h},40%,18%,.5)`;
+    }
+    case'kill':case'fail_prime':{
+      if(lit)return'rgba(200,168,74,.85)';
+      const pf=[];let tmp=g;for(let p=2;p*p<=tmp;p++){if(tmp%p===0){pf.push(p);while(tmp%p===0)tmp=Math.floor(tmp/p);}}if(tmp>1)pf.push(tmp);
+      const kp=pf.find(p=>p<=n+1);
+      if(kp===2)return'rgba(224,80,96,.28)';
+      if(kp===3)return'rgba(155,127,232,.24)';
+      if(kp===5)return'rgba(61,200,184,.2)';
+      if(kp===7)return'rgba(126,200,122,.18)';
+      if(kp)return`hsl(${(kp*37)%360},60%,35%)`;
+      return'rgba(255,255,255,.05)';
+    }
+    case'farey_angle':case'rainbow':{
+      const h=Math.round((r/M)*360);
+      return lit?`hsl(${h},78%,58%)`:`hsla(${h},38%,18%,.5)`;
+    }
+    case'sector':{
+      const h=Math.round((r/G)*300);
+      return lit?`hsl(${h},72%,60%)`:`hsla(${h},35%,18%,.45)`;
+    }
+    case'lift_angle':{
+      const r2=(r%(M+1));
+      const h=Math.round((r2/M)*300);
+      return lit?`hsl(${h},75%,58%)`:`hsla(${h},35%,16%,.45)`;
+    }
+    case'gcd':case'gcd_val':{
+      if(g===1)return lit?'rgba(200,168,74,.85)':'rgba(61,200,184,.2)';
+      const gcols={2:'rgba(224,80,96,.85)',3:'rgba(155,127,232,.85)',4:'rgba(200,168,74,.85)',5:'rgba(61,200,184,.85)',6:'rgba(126,200,122,.85)'};
+      const dcols={2:'rgba(224,80,96,.18)',3:'rgba(155,127,232,.16)',4:'rgba(200,168,74,.14)',5:'rgba(61,200,184,.12)',6:'rgba(126,200,122,.12)'};
+      return lit?(gcols[g]||`hsl(${(g*47)%360},65%,55%)`): (dcols[g]||'rgba(255,255,255,.06)');
+    }
+    case'phi':case'phi_ratio':{
+      const t=phi(M)/M;
+      const h=Math.round(t*200+80);
+      return lit?`hsl(${h},75%,55%)`:`hsla(${h},38%,18%,.45)`;
+    }
+    case'mobius':{
+      const mu=mobius(M);
+      if(lit)return mu===0?'rgba(224,80,96,.85)':mu===1?'rgba(200,168,74,.9)':'rgba(61,200,184,.85)';
+      return mu===0?'rgba(224,80,96,.1)':mu===1?'rgba(200,168,74,.08)':'rgba(61,200,184,.08)';
+    }
+    case'quad_res':{
+      // r is a quadratic residue mod M if r=k² mod M for some k
+      let isQR=false;for(let k=0;k<M;k++)if((k*k)%M===r){isQR=true;break;}
+      return lit?(isQR?'rgba(200,168,74,.9)':'rgba(155,127,232,.75)'):'rgba(255,255,255,.05)';
+    }
+    case'r_prime':{
+      const rp=isPrime(r);
+      return lit?(rp?'rgba(61,200,184,.9)':'rgba(200,168,74,.65)'):'rgba(255,255,255,.05)';
+    }
+    case'divisibility':{
+      const nd=ndiv(M);const h=Math.round((nd/12)*200+40);
+      return lit?`hsl(${h},70%,55%)`:`hsla(${h},35%,16%,.4)`;
+    }
+    case'zero_div':case'zeroDivisors':{
+      const zd=isZeroDiv(r,M);
+      return lit?(zd?'rgba(224,80,96,.88)':'rgba(200,168,74,.75)'):'rgba(255,255,255,.05)';
+    }
+    case'idem':case'idempotents':{
+      const id=isIdem(r,M);
+      return lit?(id?'rgba(126,200,122,.9)':'rgba(200,168,74,.6)'):'rgba(255,255,255,.04)';
+    }
+    default:
+      return lit?'rgba(200,168,74,.8)':'rgba(255,255,255,.05)';
+  }
+}
+
+function getDepth(r,M,n){
+  for(let j=0;j<=n;j++)if(gcd(r,M+j)>1)return j;
+  return n+1;
+}
+
+// ═══════════════════════════════════════════
+//  DRAW FUNCTIONS
+// ═══════════════════════════════════════════
+
+function cellXY(r,M,W,H,pad){
+  // Clean pan/zoom model:
+  // gridW = (W-2*pad)*zoom, origin at (W/2 - panX*gridW, H/2 - panY*gridH)
+  // panX=0.5,panY=0.5 at zoom=1 → origin=(pad,pad) i.e. grid fills canvas exactly
+  const cellW=(W-pad*2)/G*_zoom, cellH=(H-pad*2)/G*_zoom;
+  const gridW=(W-pad*2)*_zoom, gridH=(H-pad*2)*_zoom;
+  const ox=W/2-_panX*gridW;  // canvas x of grid left edge
+  const oy=H/2-_panY*gridH;  // canvas y of grid top edge
+  const px=ox+(r-1)*cellW;
+  const py=oy+(M-1)*cellH;
+  return{px,py,cellW,cellH};
+}
+
+function rotate(dir){
+  _rotSteps=(_rotSteps+dir+4)%4;
+  const lbl=document.getElementById('rot-lbl');
+  if(lbl)lbl.textContent=[' 0°',' 90°','180°','270°'][_rotSteps];
+  drawHero();
+}
+
+function drawGrid(){
+  const W=cv.width, H=cv.height;
+  ctx.fillStyle='#04040d'; ctx.fillRect(0,0,W,H);
+
+  // Apply rotation + zoom/pan as one transform block
+  // Everything drawn after ctx.save() is in "rotated world space"
+  // The canvas IS the ground truth — all cell coords, labels, overlays live here
+  ctx.save();
+  if(_rotSteps&3){
+    ctx.translate(W/2,H/2);
+    ctx.rotate((_rotSteps&3)*Math.PI/2);
+    ctx.translate(-W/2,-H/2);
+  }
+
+  const mode=document.getElementById('grid-color-sel').value;
+  const labelMode=document.getElementById('grid-label-sel').value;
+  const pad=Math.min(W,H)*.03;
+  const cellW=(W-pad*2)/G*_zoom, cellH=(H-pad*2)/G*_zoom;
+  const showLbl=labelMode!=='none'&&cellW>14&&cellH>10;
+  const fz=Math.max(9,Math.min(Math.floor(Math.min(cellW,cellH)*.52),18));
+
+  // ── Draw cells ──
+  for(let M=1;M<=G;M++){
+    for(let r=1;r<=G;r++){
+      const {px,py}=cellXY(r,M,W,H,pad);
+      if(px+cellW<0||px>W||py+cellH<0||py>H) continue;
+      const g=gcd(r,M);
+      const lit=isLit(r,M,N);
+      const col=cellColor(r,M,N,mode,g,lit);
+      if(lit&&(mode==='3state'||mode==='kill')){
+        const gr=ctx.createRadialGradient(px+cellW/2,py+cellH/2,0,px+cellW/2,py+cellH/2,Math.min(cellW,cellH)*.55);
+        gr.addColorStop(0,'rgba(220,185,80,.95)'); gr.addColorStop(1,'rgba(160,120,40,.4)');
+        ctx.fillStyle=gr;
+      } else ctx.fillStyle=col||'rgba(200,168,74,.8)';
+      ctx.fillRect(px+.5,py+.5,cellW-1,cellH-1);
+      // Sector dim
+      if(_sectorPts.length>0&&!_sectorPts.some(p=>p.r===r&&p.M===M)){
+        ctx.fillStyle='rgba(0,0,0,.5)';
+        ctx.fillRect(px+.5,py+.5,cellW-1,cellH-1);
+      }
+      ctx.strokeStyle=lit?'rgba(200,168,74,.28)':'rgba(255,255,255,.06)';
+      ctx.lineWidth=.5; ctx.strokeRect(px+.5,py+.5,cellW-1,cellH-1);
+      // Cell labels — drawn in rotated space so they're always upright relative to the rotated grid
+      if(showLbl){
+        let lbl='';
+        if(labelMode==='r') lbl=String(r);
+        else if(labelMode==='gcd'&&g>1) lbl=String(g);
+        else if(labelMode==='frac') lbl=r+'/'+M;
+        else if(labelMode==='depth') lbl=String(getDepth(r,M,N));
+        if(lbl){
+          // Counter-rotate text so labels stay readable regardless of global rotation
+          const cx2=px+cellW/2, cy2=py+cellH/2;
+          ctx.save();
+          ctx.translate(cx2,cy2);
+          ctx.rotate(-(_rotSteps&3)*Math.PI/2); // undo rotation for text
+          ctx.font=`bold ${fz}px 'JetBrains Mono',monospace`;
+          ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.fillStyle='rgba(0,0,0,.7)';
+          ctx.fillText(lbl,1,1);
+          ctx.fillStyle=lit?'rgba(255,235,160,.95)':'rgba(220,215,205,.65)';
+          ctx.fillText(lbl,0,0);
+          ctx.restore();
+        }
+      }
+    }
+  }
+
+  // ── Axis labels (inside rotation = they rotate with the grid) ──
+  if(cellW>8){
+    const axFz=Math.max(8,Math.min(cellW*.38,13))|0;
+    ctx.font=`${axFz}px 'JetBrains Mono',monospace`;
+    // Top axis: r values
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    for(let r=1;r<=G;r++){
+      const {px}=cellXY(r,1,W,H,pad);
+      if(px<0||px>W) continue;
+      ctx.fillStyle=PS.has(r)?'rgba(61,200,184,.85)':'rgba(200,168,74,.6)';
+      ctx.fillText(r,px+cellW/2,pad-1);
+    }
+    // Left axis: M values
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(let M=1;M<=G;M++){
+      const {py}=cellXY(1,M,W,H,pad);
+      if(py<0||py>H) continue;
+      ctx.fillStyle='rgba(200,168,74,.6)';
+      ctx.fillText(M,pad-2,py+cellH/2);
+    }
+    // Axis title 'r →' at top
+    ctx.font=`bold ${Math.max(9,axFz)}px 'JetBrains Mono',monospace`;
+    ctx.fillStyle='rgba(200,168,74,.8)';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('r →',W/2,2);
+    // Axis title 'M ↓' on left (rotated 90° CCW, inside the global transform)
+    ctx.save(); ctx.translate(10,H/2); ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('M ↓',0,0); ctx.restore();
+  }
+
+  // ── Clicked cell highlights (inside rotation — always tracks cells) ──
+  const toHighlight=_clickedCells.length?_clickedCells:(_clickedCell?[_clickedCell]:[]);
+  toHighlight.forEach(({r:cr,M:cM},hi)=>{
+    const {px,py}=cellXY(cr,cM,W,H,pad);
+    const glowR=Math.max(cellW,cellH)*0.6;
+    const grd2=ctx.createRadialGradient(px+cellW/2,py+cellH/2,0,px+cellW/2,py+cellH/2,glowR);
+    grd2.addColorStop(0,'rgba(155,127,232,.35)'); grd2.addColorStop(1,'rgba(155,127,232,0)');
+    ctx.fillStyle=grd2;
+    ctx.fillRect(px-glowR+cellW/2,py-glowR+cellH/2,glowR*2,glowR*2);
+    ctx.strokeStyle=hi===toHighlight.length-1?'rgba(155,127,232,.95)':'rgba(155,127,232,.5)';
+    ctx.lineWidth=2; ctx.setLineDash([]);
+    ctx.strokeRect(px+1,py+1,cellW-2,cellH-2);
+    if(hi===toHighlight.length-1){
+      const cs=Math.min(cellW,cellH)*.25;
+      ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
+      [[px,py,1,1],[px+cellW,py,-1,1],[px,py+cellH,1,-1],[px+cellW,py+cellH,-1,-1]].forEach(([x,y,sx,sy])=>{
+        ctx.beginPath(); ctx.moveTo(x,y+sy*cs); ctx.lineTo(x,y); ctx.lineTo(x+sx*cs,y); ctx.stroke();
+      });
+    }
+  });
+
+  // ── Gap/diagonal highlight ──
+  if(_gapHighlight>=0){
+    for(let r=1;r<=G;r++){
+      const M=r+_gapHighlight;
+      if(M<1||M>G)continue;
+      const{px,py}=cellXY(r,M,W,H,pad);
+      if(px+cellW<0||px>W||py+cellH<0||py>H)continue;
+      // Gold border highlight
+      ctx.strokeStyle='rgba(200,168,74,.85)';ctx.lineWidth=2;ctx.setLineDash([]);
+      ctx.strokeRect(px+1,py+1,cellW-2,cellH-2);
+      // Also M=r+g on other axis
+    }
+    // Also highlight r = M + gap (other diagonal direction)
+    for(let M=1;M<=G;M++){
+      const r=M+_gapHighlight;
+      if(r<1||r>G)continue;
+      const{px,py}=cellXY(r,M,W,H,pad);
+      if(px+cellW<0||px>W||py+cellH<0||py>H)continue;
+      ctx.strokeStyle='rgba(61,200,184,.6)';ctx.lineWidth=1.5;ctx.setLineDash([2,3]);
+      ctx.strokeRect(px+1,py+1,cellW-2,cellH-2);
+    }
+    ctx.setLineDash([]);
+  }
+
+  // ── Sector overlay (inside rotation — tracks with grid) ──
+  drawSectorOverlay(W,H,pad);
+
+  // ── Restore all transforms ──
+  ctx.restore();
+
+  // ── Legend (outside transform = always bottom-right, horizontal) ──
+  ctx.font="8px 'JetBrains Mono',monospace"; ctx.textAlign='right'; ctx.textBaseline='bottom';
+  ctx.fillStyle='rgba(200,168,74,.5)';
+  ctx.fillText(`r×M  G=${G}  n=${N}  rot=${[0,90,180,270][_rotSteps]}°  zoom=${_zoom.toFixed(1)}×`,W-6,H-4);
+}
+
+function isLit(a,b,n){
+  const g=gcd(a,b);if(g===1)return true;
+  const pf=[];let tmp=g;for(let p=2;p*p<=tmp;p++){if(tmp%p===0){pf.push(p);while(tmp%p===0)tmp=Math.floor(tmp/p);}}if(tmp>1)pf.push(tmp);
+  return!pf.some(p=>p<=n+1);
+}
+
+function drawRing(){
+  const W=cv.width,H=cv.height;
+  ctx.fillStyle='#04040d';ctx.fillRect(0,0,W,H);
+  const _ringNeedsTransform=(_rotSteps&3)||_zoom!==1||_panX!==0.5||_panY!==0.5;
+  if(_ringNeedsTransform){
+    ctx.save();
+    if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+    if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
+  }
+  const cx=W/2,cy=H/2,maxR=Math.min(W,H)*.44;
+  const dotSc=+document.getElementById('ring-dot-sc').value||1;
+  const showCircles=document.getElementById('ring-circles').checked;
+  const invert=document.getElementById('ring-invert').checked;
+  const mMax=G;
+
+  // Build coprime sets
+  const copMap=[];
+  for(let M=2;M<=mMax+1;M++){
+    const s=new Set();for(let r=1;r<M;r++)if(gcd(r,M)===1)s.add(r);copMap.push(s);
+  }
+
+  // Ring circles
+  if(showCircles){
+    for(let M=2;M<=mMax;M++){
+      const rho=invert?((mMax+1-M)/mMax)*maxR:(M/mMax)*maxR;
+      ctx.beginPath();ctx.arc(cx,cy,rho,0,2*Math.PI);
+      ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.10)':'rgba(255,255,255,.03)';
+      ctx.lineWidth=PS.has(M)?.5:.25;ctx.stroke();
+    }
+  }
+
+  const mode=document.getElementById('grid-color-sel')?.value||'mod_dist';
+  const dotBase=Math.max(1,Math.min(3.5,maxR/mMax*.35))*dotSc;
+  for(let M=2;M<=mMax;M++){
+    const rho=invert?((mMax+1-M)/mMax)*maxR:(M/mMax)*maxR;
+    const cops=copMap[M-2];
+    cops.forEach(r=>{
+      const theta=2*Math.PI*r/M;
+      const x=cx+rho*Math.cos(theta),y=cy-rho*Math.sin(theta);
+      const lit=isLit(r,M,N);
+      const g=gcd(r,M);
+      let col=cellColor(r,M,N,mode,g,lit);
+      if(!col){// radial grad fallback → flat gold
+        col=lit?'rgba(200,168,74,.85)':'rgba(255,255,255,.06)';
+      }
+      // Dim non-lit a bit more for ring view readability
+      if(!lit){const copOnly=g===1;ctx.fillStyle=copOnly?col||'rgba(61,200,184,.35)':'rgba(255,255,255,.04)';}
+      else ctx.fillStyle=col;
+      ctx.beginPath();ctx.arc(x,y,lit?dotBase*1.3:dotBase*.85,0,6.2832);ctx.fill();
+    });
+  }
+  if(_ringNeedsTransform)ctx.restore();
+  drawSectorOverlay(W,H,0);
+  ctx.font="7px 'JetBrains Mono',monospace";ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.fillStyle='rgba(200,168,74,.4)';
+  ctx.fillText(`Ring  G=${mMax}  n=${N}  rot=${[0,90,180,270][_rotSteps]}°  zoom=${_zoom.toFixed(1)}×`,W-8,H-4);
+}
+
+function drawFarey(){
+  const W=cv.width,H=cv.height;
+  ctx.fillStyle='#04040d';ctx.fillRect(0,0,W,H);
+  const _fareyNeedsTransform=(_rotSteps&3)||_zoom!==1||_panX!==0.5||_panY!==0.5;
+  if(_fareyNeedsTransform){
+    ctx.save();
+    if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+    if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
+  }
+  const mMax=G;
+  const cx=W/2,cy=H/2;
+  const yexp=+document.getElementById('farey-yexp').value||1;
+  const dotSc=+document.getElementById('farey-dot-sc').value||1;
+  const showLines=document.getElementById('farey-lines').checked;
+  const showAxis=document.getElementById('farey-axis').checked;
+
+  if(showLines){
+    for(let M=2;M<=mMax;M++){
+      const rawY=Math.log(2/M)/Math.log(2/mMax);
+      const logY=Math.pow(Math.max(0,rawY),1/yexp);
+      const sy=cy+(logY*1.8-.9)*H/2;
+      ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.07)':'rgba(255,255,255,.03)';
+      ctx.lineWidth=PS.has(M)?.5:.25;
+      ctx.beginPath();ctx.moveTo(0,sy);ctx.lineTo(W,sy);ctx.stroke();
+    }
+  }
+
+  const dotR=Math.max(1.2,Math.min(5,(H*.012)/Math.sqrt(mMax)))*dotSc;
+  for(let M=2;M<=mMax;M++){
+    const rawY=Math.log(2/M)/Math.log(2/mMax);
+    const logY=Math.pow(Math.max(0,rawY),1/yexp);
+    const sy=cy+(logY*1.8-.9)*H/2;
+    if(sy<-5||sy>H+5)continue;
+    const fmode=document.getElementById('grid-color-sel')?.value||'mod_dist';
+    for(let r=1;r<M;r++){
+      if(gcd(r,M)!==1)continue;
+      const fx=r/M*2-1;
+      const sx=cx+fx*W/2;
+      const lit=isLit(r,M,N);
+      const fg=gcd(r,M);
+      let fcol=cellColor(r,M,N,fmode,fg,lit);
+      if(!fcol)fcol=lit?'rgba(200,168,74,.85)':'rgba(255,255,255,.04)';
+      if(!lit)fcol=fcol.replace(/[\d.]+\)$/,m=>String(Math.min(parseFloat(m),.5))+')');
+      ctx.fillStyle=fcol;
+      ctx.beginPath();ctx.arc(sx,sy,lit?dotR:dotR*.7,0,6.2832);ctx.fill();
+    }
+  }
+  if(showAxis){
+    ctx.font="8px 'JetBrains Mono',monospace";ctx.textAlign='right';ctx.textBaseline='middle';
+    for(let M=2;M<=mMax;M+=Math.max(1,Math.floor(mMax/14))){
+      const rawY=Math.log(2/M)/Math.log(2/mMax);
+      const logY=Math.pow(Math.max(0,rawY),1/yexp);
+      const sy=cy+(logY*1.8-.9)*H/2;
+      if(sy<6||sy>H-6)continue;
+      ctx.fillStyle=PS.has(M)?'rgba(61,200,184,.5)':'rgba(106,101,96,.4)';
+      ctx.fillText('M='+M,W-4,sy);
+    }
+    ctx.textAlign='center';ctx.textBaseline='bottom';
+    [0,.25,.5,.75,1].forEach(v=>{
+      const sx=cx+(v*2-1)*W/2;
+      ctx.fillStyle='rgba(106,101,96,.4)';ctx.fillText(v.toFixed(2),sx,H-2);
+    });
+  }
+  if(_fareyNeedsTransform)ctx.restore();
+  drawSectorOverlay(W,H,0);
+  ctx.font="7px 'JetBrains Mono',monospace";ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.fillStyle='rgba(200,168,74,.4)';
+  ctx.fillText(`Farey  G=${mMax}  n=${N}  rot=${[0,90,180,270][_rotSteps]}°  zoom=${_zoom.toFixed(1)}×`,W-8,H-4);
+}
+
+// Lift helper controls
+function liftArcOpStep(d){
+  const sl=document.getElementById('lift-arc-op');
+  if(!sl)return;
+  sl.value=Math.max(.01,Math.min(.8,parseFloat(sl.value)+d*.05)).toFixed(2);
+  document.getElementById('lift-op-lbl').textContent=Math.round(sl.value*100)+'%';
+  drawHero();
+}
+let _liftNpathN=1; // which n-path to highlight: tracks r=(M*_liftNpathN)/(M+1) family
+function liftNpathStep(d){
+  _liftNpathN=Math.max(1,_liftNpathN+d);
+  const lbl=document.getElementById('lift-npath-lbl');
+  if(lbl)lbl.textContent=_liftNpathN;
+  drawHero();
+}
+function liftSpiralStep(d){
+  _liftSpiralPrimeIdx=Math.max(0,_liftSpiralPrimeIdx+d);
+  const p=PRIMES[_liftSpiralPrimeIdx]||2;
+  const lbl=document.getElementById('lift-spiral-lbl');
+  if(lbl)lbl.textContent=p;
+  _liftClickedPt=null;
+  drawHero();
+  if(_view==='lift')buildLiftSpiralTable();
+}
+
+function liftCanvasClick(mx,my,W,H){
+  // Find the closest highlighted point (spiral or npath) to the click
+  const mMax=G;
+  const cx=W/2, cy=H/2, maxR=Math.min(W,H)*.44;
+  const spiralP=PRIMES[_liftSpiralPrimeIdx]||2;
+  const showSpiral=document.getElementById('lift-spiral')?.checked!==false;
+  const showNpath=document.getElementById('lift-npath')?.checked!==false;
+  // Apply inverse of zoom/pan transform to click position
+  const wx=(mx-W*_panX)/_zoom+W*0.5;
+  const wy=(my-H*_panY)/_zoom+H*0.5;
+  let best=null, bestD=Infinity;
+  for(let M=2;M<=mMax;M++){
+    const rho=(M/mMax)*maxR;
+    // Coprime residues for this ring
+    for(let r=1;r<M;r++){
+      if(gcd(r,M)!==1)continue;
+      const onSpiral=showSpiral&&(r===spiralP%M||(spiralP<M&&r===spiralP));
+      const onNpath=showNpath&&(
+        r===Math.floor((M*_liftNpathN)/(_liftNpathN+1))||
+        r===Math.ceil((M*_liftNpathN)/(_liftNpathN+1))
+      );
+      if(!onSpiral&&!onNpath)continue;
+      const theta=2*Math.PI*r/M;
+      const px=cx+rho*Math.cos(theta), py=cy-rho*Math.sin(theta);
+      const d=Math.hypot(wx-px,wy-py);
+      if(d<bestD){bestD=d;best={r,M,onSpiral,onNpath};}
+    }
+  }
+  if(!best||bestD>40)return; // no hit within 40px
+  _liftClickedPt=best;
+  drawHero();
+  showInspectPanel(best.r,best.M,`Lift r=${best.r}, M=${best.M}`);
+  buildLiftSpiralTable();
+}
+
+let _liftClickedPt=null;
+
+function buildLiftSpiralTable(){
+  const mMax=G;
+  const spiralP=PRIMES[_liftSpiralPrimeIdx]||2;
+  const showSpiral=document.getElementById('lift-spiral')?.checked!==false;
+  if(!showSpiral){
+    const t=document.getElementById('lift-spiral-table');
+    if(t)t.style.display='none';
+    return;
+  }
+  const pts=[];
+  for(let M=2;M<=mMax;M++){
+    for(let r=1;r<M;r++){
+      if(gcd(r,M)!==1)continue;
+      if(r!==spiralP%M&&!(spiralP<M&&r===spiralP))continue;
+      const lit=isLit(r,M,N);
+      const r2=r%(M+1);
+      pts.push({r,M,r2,lit,frac:(r/M).toFixed(4)});
+    }
+  }
+  const tbody=document.getElementById('lift-spiral-tbody');
+  const tbl=document.getElementById('lift-spiral-table');
+  if(!tbody||!tbl)return;
+  tbody.innerHTML=pts.map(({r,M,r2,lit,frac},i)=>{
+    const isClicked=_liftClickedPt&&_liftClickedPt.r===r&&_liftClickedPt.M===M;
+    return `<tr onclick="liftTableRowClick(${r},${M})"
+      style="cursor:pointer;background:${isClicked?'rgba(200,168,74,.1)':'transparent'};border-bottom:1px solid rgba(255,255,255,.04);">
+      <td style="padding:3px 7px;color:var(--cream3);">${i+1}</td>
+      <td style="padding:3px 7px;color:var(--gold);font-weight:600;">${r}</td>
+      <td style="padding:3px 7px;">${M}</td>
+      <td style="padding:3px 7px;color:var(--cream3);">${frac}</td>
+      <td style="padding:3px 7px;color:var(--teal);">${r2}</td>
+      <td style="padding:3px 7px;color:${lit?'var(--gold)':'var(--coral)'};">${lit?'block-cop':'—'}</td>
+    </tr>`;
+  }).join('');
+  tbl.style.display='block';
+  document.getElementById('lift-spiral-count').textContent=`(${pts.length} pts, p=${spiralP})`;
+}
+
+function liftTableRowClick(r,M){
+  _liftClickedPt={r,M};
+  drawHero();
+  showInspectPanel(r,M,`Lift r=${r}, M=${M}`);
+  buildLiftSpiralTable(); // re-render to highlight
+}
+
+function drawLift(){
+  const W=cv.width,H=cv.height;
+  ctx.fillStyle='#04040d';ctx.fillRect(0,0,W,H);
+  const _liftNeedsTransform=(_rotSteps&3)||_zoom!==1||_panX!==0.5||_panY!==0.5;
+  if(_liftNeedsTransform){
+    ctx.save();
+    if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+    if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
+  }
+  const mMax=G;
+  const cx=W/2,cy=H/2,maxR=Math.min(W,H)*.44;
+  const showArcs=document.getElementById('lift-lines')?.checked!==false;
+  const arcOp=parseFloat(document.getElementById('lift-arc-op')?.value)||.22;
+  const showNpath=document.getElementById('lift-npath')?.checked!==false;
+  const showSpiral=document.getElementById('lift-spiral')?.checked!==false;
+  const showBlock=document.getElementById('lift-block')?.checked!==false;
+
+  // Current spiral prime
+  const spiralP=PRIMES[_liftSpiralPrimeIdx]||2;
+
+  // Build coprime maps
+  const copMap=[];
+  for(let M=2;M<=mMax+1;M++){
+    const s=new Set();for(let r=1;r<M;r++)if(gcd(r,M)===1)s.add(r);copMap.push(s);
+  }
+  function toXY(r,M){
+    const rho=(M/mMax)*maxR, theta=2*Math.PI*r/M;
+    return[cx+rho*Math.cos(theta), cy-rho*Math.sin(theta)];
+  }
+
+  // Ring circles
+  for(let M=2;M<=mMax;M++){
+    const rho=(M/mMax)*maxR;
+    ctx.beginPath();ctx.arc(cx,cy,rho,0,6.2832);
+    ctx.strokeStyle=PS.has(M)?'rgba(61,200,184,.10)':'rgba(255,255,255,.03)';
+    ctx.lineWidth=PS.has(M)?.6:.25;ctx.stroke();
+  }
+
+  // Lift arcs — drawn first so dots appear on top
+  if(showArcs){
+    for(let M=2;M<mMax;M++){
+      const cops=copMap[M-2], nextSet=copMap[M-1];
+      cops.forEach(r=>{
+        const r2=r%(M+1), lifted=nextSet.has(r2);
+        const[x1,y1]=toXY(r,M);const[x2,y2]=toXY(r2,M+1);
+        ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+        ctx.lineWidth=.8;
+        ctx.strokeStyle=lifted
+          ?`rgba(61,200,184,${arcOp})`
+          :`rgba(224,80,96,${(arcOp*.75).toFixed(3)})`;
+        ctx.stroke();
+      });
+    }
+  }
+
+  const dotBase=Math.max(1.2,Math.min(4,maxR/mMax*.4));
+
+  for(let M=2;M<=mMax;M++){
+    const cops=copMap[M-2];
+    cops.forEach(r=>{
+      const[sx,sy]=toXY(r,M);
+      const lit=isLit(r,M,N);
+
+      // ±1 path: residues r where r*(npathN) ≡ ±1 (mod M)
+      // Simple: track r = floor((M * k) / (k+1)) — the "upper near-integer" family
+      // Actual correct: for a given n, the ±1 path tracks r such that
+      // r/M is near 1/2 — specifically r = (M±1)/2 when M is odd
+      const onNpath=showNpath&&(
+        r===Math.floor((M*_liftNpathN)/(_liftNpathN+1)) ||
+        r===Math.ceil((M*_liftNpathN)/(_liftNpathN+1))
+      );
+
+      // Prime spiral: track residue class r ≡ spiralP mod M (primitive residue of p in ring M)
+      // Show all r on ring M that are in the residue class of spiralP
+      const onSpiral=showSpiral&&(r%spiralP===spiralP%M||r===spiralP%M||(spiralP<M&&r===spiralP));
+
+      const lmode=document.getElementById('grid-color-sel')?.value||'mod_dist';
+      const lg=gcd(r,M);
+      let basecol=cellColor(r,M,N,lmode,lg,lit)||'rgba(200,168,74,.7)';
+      let col, sz=dotBase;
+      if(onNpath&&onSpiral){ col='rgba(255,235,80,.98)'; sz=dotBase*2.6; }
+      else if(onNpath)      { col='rgba(61,200,184,.95)'; sz=dotBase*2.2; }
+      else if(onSpiral)     { col='rgba(200,168,74,.92)'; sz=dotBase*2.0; }
+      else if(showBlock&&lit){ col=basecol; sz=dotBase*1.3; }
+      else if(lg===1)       { col=basecol.replace(/[\d.]+\)$/,m=>String(Math.min(parseFloat(m),.4))+')');}
+      else                  { col='rgba(255,255,255,.04)'; sz=dotBase*.7; }
+
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.arc(sx,sy,sz,0,6.2832);ctx.fill();
+      // Highlight clicked point
+      if(_liftClickedPt&&_liftClickedPt.r===r&&_liftClickedPt.M===M){
+        ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(sx,sy,sz+3,0,6.2832);ctx.stroke();
+        const gr=ctx.createRadialGradient(sx,sy,0,sx,sy,sz*3);
+        gr.addColorStop(0,'rgba(255,255,200,.3)');gr.addColorStop(1,'rgba(255,255,200,0)');
+        ctx.fillStyle=gr;ctx.beginPath();ctx.arc(sx,sy,sz*3,0,6.2832);ctx.fill();
+      }
+    });
+  }
+
+  if(_liftNeedsTransform)ctx.restore();
+  drawSectorOverlay(W,H,0);
+
+  // Legend (outside transform)
+  ctx.font="8px 'JetBrains Mono',monospace";ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.fillStyle='rgba(155,127,232,.6)';
+  ctx.fillText(`Lift  G=${mMax}  n=${N}  p=${spiralP}  rot=${[0,90,180,270][_rotSteps]}°  zoom=${_zoom.toFixed(1)}×`,W-8,H-4);
+  // Color key
+  const ky=H-16,items=[
+    ['rgba(61,200,184,.9)','±1 path'],
+    ['rgba(200,168,74,.9)','prime p='+spiralP],
+    ['rgba(255,235,80,.9)','both'],
+    ['rgba(180,140,60,.7)','block-cop'],
+  ];
+  ctx.textAlign='left';
+  let kx=10;
+  items.forEach(([col,lbl])=>{
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(kx+4,ky,4,0,6.2832);ctx.fill();
+    ctx.fillStyle='rgba(200,195,185,.7)';ctx.fillText(lbl,kx+11,ky+4);
+    kx+=ctx.measureText(lbl).width+24;
+  });
+}
+
+function drawConformal(){
+  const W=cv.width,H=cv.height;
+  ctx.fillStyle='#030310';ctx.fillRect(0,0,W,H);
+  const _confNeedsTransform=(_rotSteps&3)||_zoom!==1||_panX!==0.5||_panY!==0.5;
+  if(_confNeedsTransform){
+    ctx.save();
+    if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+    if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
+  }
+  const cx=W/2,cy=H/2;
+  const R=Math.min(W,H)*.44;
+  const mMax=G;
+  const dotSc=+document.getElementById('conf-dot-sc').value||1;
+  const showCrit=document.getElementById('conf-critical').checked;
+  const showGrid=document.getElementById('conf-grid').checked;
+  const dotRBase=Math.max(.8,Math.min(3,R/mMax*.4))*dotSc;
+
+  // Unit disk boundary
+  ctx.beginPath();ctx.arc(cx,cy,R,0,2*Math.PI);
+  ctx.strokeStyle='rgba(200,168,74,.35)';ctx.lineWidth=1;ctx.stroke();
+
+  // Möbius map: z = x+iy → w = (z-i)/(z+i)
+  function mobMap(x,y){
+    // w = (z-i)/(z+i), z=x+iy
+    // numerator: (x) + i(y-1)
+    // denominator: (x) + i(y+1)
+    const nr=x, ni=y-1;
+    const dr=x, di=y+1;
+    const denom=dr*dr+di*di;
+    if(denom<1e-12)return null;
+    return{u:(nr*dr+ni*di)/denom, v:(ni*dr-nr*di)/denom};
+  }
+
+  // Grid lines in upper half-plane
+  if(showGrid){
+    // Horizontal lines y=const (images = circles tangent to real axis)
+    for(let M=1;M<=mMax;M+=Math.max(1,Math.floor(mMax/20))){
+      const pts=[];
+      for(let r=-mMax*1.5;r<=mMax*1.5;r+=.1){
+        const w=mobMap(r,M);if(!w)continue;
+        if(w.u*w.u+w.v*w.v>1.01)continue;
+        pts.push([cx+w.u*R,cy-w.v*R]);
+      }
+      if(pts.length<2)continue;
+      ctx.strokeStyle='rgba(200,168,74,.06)';ctx.lineWidth=.5;
+      ctx.beginPath();pts.forEach(([px,py],i)=>i===0?ctx.moveTo(px,py):ctx.lineTo(px,py));ctx.stroke();
+    }
+  }
+
+  // Critical line Re(s)=1/2 → x=0.5 in upper half-plane
+  if(showCrit){
+    const pts=[];
+    for(let y=.001;y<=mMax*2;y+=.05){
+      const w=mobMap(.5,y);if(!w)continue;
+      if(w.u*w.u+w.v*w.v>1.01)continue;
+      pts.push([cx+w.u*R,cy-w.v*R]);
+    }
+    if(pts.length>1){
+      ctx.strokeStyle='rgba(224,80,96,.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+      ctx.beginPath();pts.forEach(([px,py],i)=>i===0?ctx.moveTo(px,py):ctx.lineTo(px,py));ctx.stroke();
+      ctx.setLineDash([]);
+      if(pts.length>0){
+        const[lx,ly]=pts[Math.floor(pts.length*.55)];
+        ctx.font="8px 'JetBrains Mono',monospace";ctx.fillStyle='rgba(224,80,96,.75)';
+        ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('Re(s)=½',lx,ly-4);
+      }
+    }
+  }
+
+  // Coprime lattice points
+  for(let M=2;M<=mMax;M++){
+    for(let r=1;r<M;r++){
+      if(gcd(r,M)!==1)continue;
+      const w=mobMap(r/mMax,M/mMax);if(!w)continue;
+      if(w.u*w.u+w.v*w.v>1.005)continue;
+      const px=cx+w.u*R,py=cy-w.v*R;
+      if(px<-dotRBase||px>W+dotRBase||py<-dotRBase||py>H+dotRBase)continue;
+      const lit=isLit(r,M,N);
+      const cg=gcd(r,M);
+      const cmode=document.getElementById('grid-color-sel')?.value||'mod_dist';
+      let ccol=cellColor(r,M,N,cmode,cg,lit)||'rgba(242,168,74,.85)';
+      if(!lit){const copOnly=cg===1;ccol=copOnly?ccol.replace(/[\d.]+\)$/,'.4)'):'rgba(255,255,255,.04)';}
+      ctx.fillStyle=ccol;
+      const dr=lit?dotRBase:dotRBase*.75;
+      ctx.beginPath();ctx.arc(px,py,dr,0,2*Math.PI);ctx.fill();
+    }
+  }
+  if(_confNeedsTransform)ctx.restore();
+  drawSectorOverlay(W,H,0);
+  ctx.font="8px 'JetBrains Mono',monospace";ctx.textAlign='center';ctx.textBaseline='top';
+  ctx.fillStyle='rgba(242,168,74,.45)';
+  ctx.fillText(`Conformal  G=${mMax}  n=${N}  zoom=${_zoom.toFixed(1)}×`,cx,cy+R+6);
+}
+
+function drawHero(){
+  if(!cv.width||!cv.height||cv.width<10||cv.height<10)resizeCV();
+  const W=cv.width,H=cv.height;
+  if(!W||!H||W<10||H<10)return;
+  if(_view==='grid')drawGrid();
+  else if(_view==='ring')drawRing();
+  else if(_view==='farey')drawFarey();
+  else if(_view==='lift')drawLift();
+  else if(_view==='conformal')drawConformal();
+}
+
+// ═══════════════════════════════════════════
+//  VIEW SWITCHING
+// ═══════════════════════════════════════════
+const VIEW_ACT={grid:'act-gold',ring:'act-teal',farey:'act-gold',lift:'act-violet',conformal:'act-orange'};
+const VIEW_COLORS={
+  grid:{top:null,bot:null},
+  ring:{top:'<span style="color:rgba(61,200,184,.9);font-weight:700;font-family:var(--mono);font-size:9px;">Ring View</span><span style="color:rgba(106,101,96,.7);font-family:var(--mono);font-size:9px;">&nbsp;·&nbsp;G={G}&nbsp;·&nbsp;n={N}&nbsp;·&nbsp;angle=2πr/M&nbsp;·&nbsp;gold=block-coprime·teal=coprime</span>',bot:null},
+  farey:{top:'<span style="color:rgba(200,168,74,.9);font-weight:700;font-family:var(--mono);font-size:9px;">Farey Strip</span><span style="color:rgba(106,101,96,.7);font-family:var(--mono);font-size:9px;">&nbsp;·&nbsp;G={G}&nbsp;·&nbsp;n={N}&nbsp;·&nbsp;x=r/M&nbsp;&nbsp;y=log(2/M)</span>',bot:null},
+  lift:{top:'<span style="color:rgba(155,127,232,.9);font-weight:700;font-family:var(--mono);font-size:9px;">Lift Dynamics</span><span style="color:rgba(106,101,96,.7);font-family:var(--mono);font-size:9px;">&nbsp;·&nbsp;G={G}&nbsp;·&nbsp;n={N}&nbsp;·&nbsp;r→r mod(M+1)&nbsp;·&nbsp;teal=survives&nbsp;coral=broken</span>',bot:null},
+  conformal:{top:'<span style="color:rgba(242,168,74,.9);font-weight:700;font-family:var(--mono);font-size:9px;">Conformal Disk</span><span style="color:rgba(106,101,96,.7);font-family:var(--mono);font-size:9px;">&nbsp;·&nbsp;G={G}&nbsp;·&nbsp;n={N}&nbsp;·&nbsp;f(z)=(z−i)/(z+i)</span>',bot:null},
+};
+
+function setView(v){
+  _view=v;
+  // Update button classes
+  ['grid','ring','farey','lift','conformal'].forEach(k=>{
+    const btn=document.getElementById('vb-'+k);
+    if(!btn)return;
+    btn.className='vbtn'+(k===v?' '+VIEW_ACT[k]:'');
+  });
+  // Show/hide sub-panels
+  ['grid','ring','farey','lift','conformal'].forEach(k=>{
+    const p=document.getElementById('vp-'+k);
+    if(p)p.style.display=k===v?'block':'none';
+  });
+  // Caption
+  const top=document.getElementById('view-cap-top');
+  const vc=VIEW_COLORS[v];
+  if(vc&&vc.top){
+    top.style.display='block';
+    top.innerHTML=vc.top.replace(/{G}/g,G).replace(/{N}/g,N);
+  } else top.style.display='none';
+  // Reset zoom on view change
+  resetView();
+  updateLiveLbl();
+  // Update note line
+  const noteEl=document.getElementById('vp-note-line');
+  if(noteEl){
+    const notes={
+      grid:'<span style="color:rgba(200,168,74,.6);">Grid:</span> Gold = block-coprime. Fraction → C(n) as G→∞. Color + label work for all views.',
+      ring:'<span style="color:rgba(61,200,184,.6);">Ring:</span> Each ring M at angle 2πr/M. Gold dot density → C(n)/ζ(2).',
+      farey:'<span style="color:rgba(200,168,74,.6);">Farey:</span> x=r/M, y=log(2/M). Farey mediants at all scales. Prime rows are cleanest.',
+      lift:'<span style="color:rgba(155,127,232,.6);">Lift:</span> Arcs r→r mod(M+1). Survival → C≈0.5307. ±1 path = equatorial residues.',
+      conformal:'<span style="color:rgba(242,168,74,.6);">Conformal:</span> Möbius f(z)=(z−i)/(z+i) maps lattice to unit disk. Red dashes = Re(s)=½.'
+    };
+    noteEl.innerHTML=notes[v]||notes.grid;
+  }
+  // vp-grid only shows for grid view
+  const vpg=document.getElementById('vp-grid');
+  if(vpg)vpg.style.display=v==='grid'?'block':'none';
+  drawHero();
+  if(v==='lift')setTimeout(buildLiftSpiralTable,50);
+}
+
+function updateCap(){
+  const top=document.getElementById('view-cap-top');
+  const vc=VIEW_COLORS[_view];
+  if(vc&&vc.top){top.style.display='block';top.innerHTML=vc.top.replace(/{G}/g,G).replace(/{N}/g,N);}
+}
+
+// ═══════════════════════════════════════════
+//  STATE SETTERS
+// ═══════════════════════════════════════════
+function setN(v){N=Math.max(0,v|0);document.getElementById('sl-n').value=Math.min(N,1000);document.getElementById('num-n').value=N;updateUI();drawHero();updateCap();}
+function stepN(d){setN(N+d);}
+function setG(v){G=Math.max(1,Math.min(2048,v|0));document.getElementById('sl-G').value=Math.min(G,120);document.getElementById('num-G').value=G;updateLiveLbl();updateCap();drawHero();}
+function stepG(d){setG(G+d);}
+function stepGPrime(dir){
+  if(dir>0){const p=PRIMES.find(p=>p>G);if(p)setG(p);}
+  else{let prev=null;for(const p of PRIMES){if(p>=G)break;prev=p;}if(prev)setG(prev);}
+}
+function setGap(v){
+  _gapHighlight=v<=0?-1:v;
+  const lbl=document.getElementById('gap-lbl');
+  const phiEl=document.getElementById('gap-phi');
+  const sl=document.getElementById('gap-sl');
+  if(sl)sl.value=Math.max(0,v);
+  if(lbl)lbl.textContent=_gapHighlight<0?'off':String(_gapHighlight);
+  if(phiEl&&_gapHighlight>=0){
+    // Count pairs on current diagonal and their coprimality stats
+    let total=0,lit=0;
+    for(let r=1;r<=G;r++){const M=r+_gapHighlight;if(M>=1&&M<=G){total++;if(isLit(r,M,N))lit++;}}
+    phiEl.textContent=total>0?`${lit}/${total} lit`:'';
+  } else if(phiEl) phiEl.textContent='';
+  drawHero();
+}
+function stepGap(d){setGap(Math.max(0,_gapHighlight+d)+(d>0&&_gapHighlight<0?1:0));}
+function clearGap(){setGap(-1);}
+function setDP(v){_dp=Math.max(2,Math.min(16,v|0));document.getElementById('dp-val').textContent=_dp;updateUI();}
+function jumpNextSat(){const n=nextSatN(N);if(n!==null)setN(n);}
+function jumpPrevSat(){const n=prevSatN(N);if(n!==null)setN(n);}
+
+function updateLiveLbl(){
+  const modeStr=_finiteMode?`⊞ finite p≤${PRIMES[_finitePrimes-1]||'?'}`:'∞ asymptotic';
+  document.getElementById('lb-view').textContent=`${_view} · G=${G} · ${modeStr}`;
+}
+
+// Detect if x is close to a rational multiple of π^k / integer
+// Stern-Brocot rational approximation of x with denominator ≤ maxQ
+function _bestRat(x,maxQ){
+  let p0=0,q0=1,p1=1,q1=0,bp=null,bq=null,berr=Infinity;
+  for(let i=0;i<10000;i++){
+    const pm=p0+p1,qm=q0+q1;if(qm>maxQ)break;
+    const err=Math.abs(pm/qm-x);
+    if(err<berr){berr=err;bp=pm;bq=qm;}
+    if(pm/qm<x){p0=pm;q0=qm;}else if(pm/qm>x){p1=pm;q1=qm;}else break;
+  }
+  return{p:bp,q:bq,err:berr};
+}
+function _gcd2(a,b){while(b){const t=b;b=a%b;a=t;}return a;}
+
+// Returns annotation string "= pπ²/q" or null
+// Also checks π, ln2, γ secondarily
+function piAnnotation(x){
+  if(!x||!isFinite(x)||x<=0)return null;
+  const PI=Math.PI, PI2=PI*PI;
+
+  // Primary: check x = (p/q)·π²
+  const r=x/PI2;
+  const{p,q,err}=_bestRat(r,480);
+  if(p!==null&&err<2e-9){
+    const g=_gcd2(p,q),pn=p/g,qn=q/g;
+    if(qn<=480){
+      const num=pn===1?'π²':`${pn}π²`;
+      return qn===1?`= ${num}`:`= ${num}/${qn}`;
+    }
+  }
+
+  // Secondary: check x = (p/q)·π
+  const r2=x/PI;
+  const{p:p2,q:q2,err:e2}=_bestRat(r2,120);
+  if(p2!==null&&e2<2e-9){
+    const g=_gcd2(p2,q2),pn=p2/g,qn=q2/g;
+    if(qn<=120){
+      const num=pn===1?'π':`${pn}π`;
+      return qn===1?`= ${num}`:`= ${num}/${qn}`;
+    }
+  }
+
+  // Tertiary: ln 2, γ
+  const LN2=Math.log(2), GAMMA=0.5772156649015329;
+  if(Math.abs(x-LN2)<2e-9)return '= ln 2';
+  if(Math.abs(x-GAMMA)<2e-9)return '= γ';
+
+  return null;
+}
+
+// Format C(n) for display: always show decimal at current DP, append π annotation if found
+function formatCn(x){
+  const dec=x.toFixed(_dp);
+  const ann=piAnnotation(x);
+  if(!ann)return{main:dec,sub:null};
+  return{main:dec,sub:ann};
+}
+
+function updateUI(){
+  const n=N;
+  const Cn=getCnDisplay(n); // uses finite or asymptotic depending on mode
+  const Dn=Cn/ZETA2;
+  const sat=numSat(n),nextN=nextSatN(n);
+  // Convergence color in finite mode
+  const gap=_finiteMode?getCnConvergenceGap(n,_finitePrimes):0;
+  const cnCol=_finiteMode?_finiteColor(gap):'';
+  document.getElementById('hl-n').textContent=n;document.getElementById('hl-n1').textContent=n+1;
+  const hlEl=document.getElementById('hl-val');
+  const {main:cnMain,sub:cnSub}=formatCn(Cn);
+  hlEl.textContent=cnMain;
+  hlEl.style.color=cnCol||'';
+  const piEl=document.getElementById('hl-pi');
+  if(piEl){
+    if(cnSub){piEl.textContent=cnSub;piEl.style.display='';}
+    else piEl.style.display='none';
+  }
+  // Update hero-sub contextual note
+  const subEl=document.getElementById('hl-sub');
+  if(subEl){
+    const piStr=cnSub?` <span style="color:var(--violet);font-style:normal;">${cnSub}</span>`:'';
+    if(n===0){
+      subEl.innerHTML=`Natural density of pairs (r,&thinsp;M) with gcd(r,&thinsp;M+j)=1 for all j=0,…,n, rescaled by ζ(2) so C(0)=1. C(0)=ζ(2)=π²/6≈1.6449.`;
+    } else if(n===1){
+      subEl.innerHTML=`At n=1: C(1)=ζ(2)·D<sub>FT</sub>≈0.5307${piStr}, where D<sub>FT</sub>=∏<sub>p</sub>(1−2/p²)≈0.3226 is the Feller–Tornier Euler product. The classical C<sub>FT</sub>=½(1+D<sub>FT</sub>)≈0.6613 is distinct.`;
+    } else if(n<10){
+      subEl.innerHTML=`C(${n})=ζ(2)·∏<sub>p</sub>(1−min(${n+1},p)/p²)≈${Cn.toFixed(6)}${piStr}. Block length ${n+1}: gcd(r,M+j)=1 for j=0,…,${n}. Sat. primes (p≤${n+1}): ${numSat(n)}.`;
+    } else {
+      const mert=`ζ(2)·e<sup>−γ</sup>/ln(${n+1})≈${(ZETA2*Math.exp(-0.5772156649)/Math.log(n+1)).toFixed(5)}`;
+      subEl.innerHTML=`C(${n})≈${Cn.toFixed(6)}${piStr}. Mertens asymptotic: C(n)∼${mert}. ${numSat(n)} saturated prime${numSat(n)===1?'':'s'}.`;
+    }
+  }
+  document.getElementById('lb-n').textContent=n;
+  const lbCnEl=document.getElementById('lb-cn');
+  const {main:lbMain,sub:lbSub}=formatCn(Cn);
+  lbCnEl.innerHTML=lbMain+(lbSub?` <span style="font-size:.78em;color:var(--violet);opacity:.85;letter-spacing:-.01em">${lbSub}</span>`:'');
+  lbCnEl.style.color=cnCol||'';
+  document.getElementById('lb-dn').textContent=Dn.toFixed(_dp);
+  document.getElementById('lb-block').textContent=n+1;document.getElementById('lb-sat').textContent=sat;
+  document.getElementById('lb-next').textContent=nextN!==null?nextN:'—';
+  // Finite gap indicator
+  const gapEl=document.getElementById('lb-gap');
+  const gapValEl=document.getElementById('lb-gap-val');
+  if(gapEl){
+    if(_finiteMode){
+      gapEl.style.display='';
+      if(gapValEl){
+        const gapPct=(gap*100).toFixed(3)+'%';
+        gapValEl.textContent=gapPct;
+        gapValEl.style.color=_finiteColor(gap);
+      }
+    } else {
+      gapEl.style.display='none';
+    }
+  }
+  const rCnEl=document.getElementById('r-cn');
+  const {main:rcnMain,sub:rcnSub}=formatCn(Cn);
+  rCnEl.innerHTML=rcnMain+(rcnSub?`<div style="font-size:.45em;color:var(--violet);margin-top:4px;line-height:1.5;letter-spacing:-.01em;font-weight:400">${rcnSub}</div>`:'');
+  rCnEl.style.color=cnCol||'var(--gold)';
+  document.getElementById('r-dn').textContent=Dn.toFixed(_dp);
+  document.getElementById('r-block').textContent=n+1;document.getElementById('r-sat').textContent=sat;
+  document.getElementById('r-next').textContent=nextN!==null?nextN:'—';
+  document.getElementById('next-sat-val').textContent=nextN!==null?`n=${nextN}`:'—';
+  document.getElementById('sat-pills').innerHTML=PRIMES.slice(0,30).map(p=>`<div class="pill ${p<=n+1?'sat':'act'}">${p}</div>`).join('');
+  buildPrimeTable();buildDataTable();
+  updateLiveLbl();
+}
+
+// ═══════════════════════════════════════════
+//  PRIME TABLE
+// ═══════════════════════════════════════════
+function buildPrimeTable(){
+  const n=N;let ld=0;
+  const rows=PRIMES.slice(0,60).map(p=>{
+    const m=Math.min(n+1,p),p2=p*p,fac=1-m/p2,lf=Math.log(fac);
+    ld+=lf;const pD=Math.exp(ld),pC=ZETA2*pD;const sat=p<=n+1;
+    const bw=Math.round(fac*60);const bc=sat?'var(--coral)':'var(--teal)';
+    const bar=`<div class="pbar"><span>${fac.toFixed(7)}</span><div class="pbar-fill" style="width:${bw}px;background:${bc};"></div></div>`;
+    return `<tr onclick="showPD(${p})"><td style="color:${sat?'var(--coral)':'var(--teal)'}">${p}</td><td style="font-size:8px;color:${sat?'var(--coral)':'var(--teal)'};">${sat?'SAT':'ACT'}</td><td>${m}</td><td>${p2}</td><td>${bar}</td><td style="color:var(--cream3)">${lf.toFixed(7)}</td><td>${pD.toFixed(7)}</td><td class="td-cn">${pC.toFixed(6)}</td></tr>`;
+  }).join('');
+  document.getElementById('prime-tbody').innerHTML=rows;
+}
+
+// ═══════════════════════════════════════════
+//  DATA TABLE
+// ═══════════════════════════════════════════
+function buildDataTable(){
+  const n=N;for(let i=0;i<=n;i++)getCn(i);
+  const rows=[];
+  for(let i=0;i<=n;i++){
+    const Ci=_cn[i],Di=Ci/ZETA2,sat=numSat(i);
+    const isPrimeSat=(i>0&&PS.has(i+1));
+    const ev=isPrimeSat?`p=${i+1} sat.`:(i===0?'start':'');
+    const ratio=i===0?'—':(_cn[i]/_cn[i-1]).toFixed(5);
+    const delta=i===0?'—':(_cn[i]-_cn[i-1]).toFixed(6);
+    const deltaVal=i===0?null:(_cn[i]-_cn[i-1]);
+    rows.push(`<tr class="${i===n?'cur-row':''}" onclick="showDD(${i})">
+      <td style="color:${i===n?'var(--gold)':'var(--cream3)'};">${i}</td>
+      <td style="color:var(--cream3)">${i+1}</td>
+      <td class="td-cn">${Ci.toFixed(6)}</td>
+      <td>${Di.toFixed(6)}</td>
+      <td style="color:var(--cream2)">${ratio}</td>
+      <td style="color:${isPrimeSat?'var(--coral)':'var(--cream3)'};">${isPrimeSat&&deltaVal!==null?'▼ '+delta:delta}</td>
+      <td style="color:var(--cream3)">${sat}</td>
+      <td class="td-ev">${ev}</td>
+    </tr>`);
+  }
+  document.getElementById('dt-body').innerHTML=rows.join('');
+  const sc=document.getElementById('dt-scroll');sc.scrollTop=sc.scrollHeight;
+}
+
+// ═══════════════════════════════════════════
+//  DATA ROW DETAIL MODAL
+// ═══════════════════════════════════════════
+let _ddN=0;
+function showDD(rowN){_ddN=rowN;renderDD(rowN);document.getElementById('dd-overlay').classList.add('open');}
+function closeDD(){document.getElementById('dd-overlay').classList.remove('open');}
+function ddNav(d){const next=Math.max(0,Math.min(N,_ddN+d));_ddN=next;renderDD(next);}
+
+function renderDD(n){
+  for(let i=0;i<=n;i++)getCn(i);
+  const Cn=getCn(n),Dn=Cn/ZETA2,CnPrev=n>0?getCn(n-1):null;
+  const ratio=CnPrev?Cn/CnPrev:null;
+  const sat=numSat(n),isPrimeSat=(n>0&&PS.has(n+1));
+  const satPrimes=PRIMES.filter(p=>p<=n+1);
+  const actPrimes=PRIMES.filter(p=>p>n+1&&p<=37);
+  const prs=PRIMES.slice(0,30);let la=0;
+  const pfacs=prs.map(p=>{const m=Math.min(n+1,p),f=1-m/(p*p);la+=Math.log(f);return{p,m,sat:p<=n+1,f,runC:ZETA2*Math.exp(la)};});
+  const convPct=Math.min(100,pfacs[pfacs.length-1].runC/Cn*100);
+  const pfcards=pfacs.map(({p,m,sat:s,f})=>`<div class="dd-pfac ${s?'sat':'act'}"><span class="dd-pfac-p ${s?'sat':'act'}">${p}</span><span class="dd-pfac-lbl">${s?'SAT':'ACT'}</span><span class="dd-pfac-val">m=${m}</span><span class="dd-pfac-val">${f.toFixed(5)}</span></div>`).join('');
+  document.getElementById('dd-box').innerHTML=`
+  <div class="dd-head"><div><div class="dd-head-title">n=${n} — Step-by-Step</div><div class="dd-head-sub">Block ${n+1} · C(${n})=${Cn.toFixed(8)}</div></div><button class="dd-close" onclick="closeDD()">✕</button></div>
+  <div class="dd-body">
+  <div class="dd-nav"><button class="dd-nav-btn" onclick="ddNav(-1)" ${n===0?'disabled':''}>← n=${n-1}</button><button class="dd-nav-btn" onclick="ddNav(1)" ${n>=N?'disabled':''}>n=${n+1} →</button></div>
+  <div class="dd-steps">
+  <div class="dd-step"><div class="dd-step-num">Step 01</div><div class="dd-step-title">Block Condition</div><div class="dd-step-body"><p>Require gcd(r,M+j)=1 for j=0,…,${n} — block of <strong>${n+1}</strong> integers.</p><div class="dd-formula">gcd(r,M)=gcd(r,M+1)=…=gcd(r,M+${n})=1</div><div class="kv"><span class="kv-k">Block length</span><span class="kv-v teal">${n+1}</span></div></div></div>
+  <div class="dd-step"><div class="dd-step-num">Step 02</div><div class="dd-step-title">Euler Product (CRT)</div><div class="dd-step-body"><div class="dd-formula gold">D(n)=∏_p(1−min(n+1,p)/p²)</div></div></div>
+  <div class="dd-step"><div class="dd-step-num">Step 03</div><div class="dd-step-title">Local Factors</div><div class="dd-step-body"><div class="dd-prime-grid">${pfcards}</div></div></div>
+  <div class="dd-step"><div class="dd-step-num">Step 04</div><div class="dd-step-title">Running Product → D(n)</div><div class="dd-step-body"><div class="kv"><span class="kv-k">After p=2</span><span class="kv-v">${pfacs[0].runC.toFixed(8)}</span></div><div class="kv"><span class="kv-k">After p=5</span><span class="kv-v">${pfacs[2].runC.toFixed(8)}</span></div><div class="kv"><span class="kv-k">After 30 primes</span><span class="kv-v teal">${pfacs[29].runC.toFixed(8)}</span></div><div class="kv"><span class="kv-k">Final C(${n})</span><span class="kv-v gold">${Cn.toFixed(8)}</span></div><div class="dd-bar-track"><div class="dd-bar-fill" style="width:${convPct.toFixed(1)}%;background:linear-gradient(90deg,var(--teal),var(--gold));"></div></div><div style="font-size:9px;color:var(--cream3);text-align:right;">${convPct.toFixed(2)}% from first 30 primes</div></div></div>
+  <div class="dd-step"><div class="dd-step-num">Step 05</div><div class="dd-step-title">C(n)=ζ(2)×D(n)</div><div class="dd-step-body"><div class="dd-formula gold">C(${n})=ζ(2)×D(${n})</div><div class="kv"><span class="kv-k">ζ(2)</span><span class="kv-v">${ZETA2.toFixed(10)}</span></div><div class="kv"><span class="kv-k">D(${n})</span><span class="kv-v teal">${Dn.toFixed(10)}</span></div><div class="kv"><span class="kv-k">C(${n})</span><span class="kv-v gold">${Cn.toFixed(10)}</span></div></div></div>
+  ${ratio!==null?`<div class="dd-step" style="border-color:${isPrimeSat?'rgba(224,80,96,.3)':'var(--edge)'};">
+  <div class="dd-step-num">Step 06</div><div class="dd-step-title">Ratio${isPrimeSat?' — Saturation Jump':''}</div><div class="dd-step-body">
+  ${isPrimeSat?`<p>Prime p=${n+1} becomes saturated — largest drop.</p>`:'<p>No saturation event.</p>'}
+  <div class="kv"><span class="kv-k">Ratio C(${n})/C(${n-1})</span><span class="kv-v ${isPrimeSat?'coral':'teal'}">${ratio.toFixed(8)}</span></div>
+  <div class="kv"><span class="kv-k">Δ</span><span class="kv-v coral">${(CnPrev-Cn).toFixed(8)}</span></div>
+  </div></div>`:''}
+  <div class="dd-step"><div class="dd-step-num">Step 0${ratio?7:6}</div><div class="dd-step-title">Saturation at n=${n}</div><div class="dd-step-body"><div class="kv"><span class="kv-k">Sat. primes</span><span class="kv-v coral">${satPrimes.slice(0,10).join(', ')}${satPrimes.length>10?'…':''}</span></div><div class="kv"><span class="kv-k">Next sat.</span><span class="kv-v teal">n=${nextSatN(n)}</span></div><div class="dd-note">As n→∞, C(n)∼ζ(2)·e<sup>−γ</sup>/ln(n+1) (Mertens).</div></div></div>
+  </div></div>
+  <div class="dd-foot"><div style="display:flex;gap:8px;"><button class="dd-nav-btn" onclick="ddNav(-1)" ${n===0?'disabled':''}>← prev</button><button class="dd-nav-btn" onclick="ddNav(1)" ${n>=N?'disabled':''}>next →</button></div>
+  <div style="display:flex;gap:8px;"><button class="dd-btn sec" onclick="closeDD()">Close</button><button class="dd-btn" onclick="setN(${n});closeDD();">Set n=${n}</button></div></div>`;
+}
+
+// ═══════════════════════════════════════════
+//  PRIME DETAIL MODAL
+// ═══════════════════════════════════════════
+function showPD(p){
+  const n=N,m=Math.min(n+1,p),p2=p*p,fac=1-m/p2,sat=p<=n+1;
+  let ld=0;for(const pp of PRIMES){if(pp>p)break;ld+=Math.log(1-Math.min(n+1,pp)/(pp*pp));}
+  const partialC=ZETA2*Math.exp(ld);
+  document.getElementById('pd-box').innerHTML=`
+  <div class="pd-head"><div><div class="pd-head-title">Prime p=${p} at n=${N}</div><div class="pd-head-sub">${sat?'Saturated':'Active'} · factor=1−${m}/${p2}=${fac.toFixed(8)}</div></div><button class="pd-close" onclick="closePD()">✕</button></div>
+  <div class="pd-body"><div class="pd-status ${sat?'sat':'act'}">${sat?'⚡ SATURATED':'✓ ACTIVE'}</div>
+  <div class="pd-steps">
+  <div class="pd-step"><div class="pd-step-num">Local Factor</div><div class="pd-step-title">1−min(n+1,p)/p²</div><div class="pd-step-body">
+  <div class="pd-formula">1−min(${n+1},${p})/${p}²=1−${m}/${p2}=${fac.toFixed(10)}</div>
+  <div class="kv"><span class="kv-k">factor</span><span class="kv-v ${sat?'coral':'teal'}">${fac.toFixed(10)}</span></div>
+  <div class="kv"><span class="kv-k">log(factor)</span><span class="kv-v">${Math.log(fac).toFixed(10)}</span></div>
+  </div></div>
+  <div class="pd-step"><div class="pd-step-num">Partial Product</div><div class="pd-step-title">C(n) up to p=${p}</div><div class="pd-step-body">
+  <div class="kv"><span class="kv-k">Partial C after p=${p}</span><span class="kv-v gold">${partialC.toFixed(10)}</span></div>
+  <div class="kv"><span class="kv-k">Full C(${n})</span><span class="kv-v">${getCn(n).toFixed(10)}</span></div>
+  <div class="pd-bar-track"><div class="pd-bar-fill" style="width:${Math.min(100,partialC/getCn(n)*100).toFixed(1)}%;background:linear-gradient(90deg,var(--teal),var(--gold));"></div></div>
+  </div></div>
+  </div></div>
+  <div class="pd-foot"><button class="pd-btn sec" onclick="closePD()">Close</button></div>`;
+  document.getElementById('pd-overlay').classList.add('open');
+}
+function closePD(){document.getElementById('pd-overlay').classList.remove('open');}
+
+// ═══════════════════════════════════════════
+//  ANIMATION
+// ═══════════════════════════════════════════
+function togglePlay(){
+  _playing=!_playing;
+  document.getElementById('play-btn').textContent=_playing?'⏹ Stop':'▶ Play';
+  if(_playing)schedPlay();else if(_playTimer){clearTimeout(_playTimer);_playTimer=null;}
+}
+function schedPlay(){
+  if(!_playing)return;
+  const spd=+document.getElementById('sl-spd').value;
+  _playTimer=setTimeout(()=>{setN(N+1);schedPlay();},Math.max(16,960-spd));
+}
+function toggleText(){
+  _textVisible=!_textVisible;
+  const el=document.getElementById('hero-text');
+  const cv2=document.getElementById('hero-cv');if(!cv2)return;
+  if(_textVisible){
+    el.style.display='flex';
+    requestAnimationFrame(()=>el.classList.remove('hidden'));
+    // Fade canvas back to 20% so text is readable
+    cv2.style.opacity='0.2';
+  } else {
+    el.classList.add('hidden');
+    setTimeout(()=>{if(!_textVisible)el.style.display='none';},380);
+    // Full opacity canvas when text hidden
+    cv2.style.opacity='1';
+  }
+  document.getElementById('txt-btn').textContent=_textVisible?'Hide text':'Show text';
+}
+
+// ═══════════════════════════════════════════
+//  EXPORT HELPERS
+// ═══════════════════════════════════════════
+
+// Shared: render current view to an offscreen canvas of given size
+function _renderViewToCanvas(W,H){
+  const off=document.createElement('canvas');off.width=W;off.height=H;
+  const savedW=cv.width,savedH=cv.height;
+  cv.width=W;cv.height=H;
+  drawHero();
+  off.getContext('2d').drawImage(cv,0,0);
+  cv.width=savedW;cv.height=savedH;
+  drawHero();
+  return off;
+}
+
+// ── EXPORT 1: _renderExport(canvas, W, H, settings) — shared by preview + download ──
+function _renderExport(out,PW,PH,settings){
+  const s=settings||{lblOp:.85,lblSc:1,lblMode:'r',hdrOp:1,cvRatio:.55};
+  const oc=out.getContext('2d');
+  // Scale everything relative to PW
+  const SC=PW/4096;
+  const PAD=Math.round(96*SC);
+  const F={tag:Math.round(26*SC),title:Math.round(68*SC),formula:Math.round(40*SC),
+            val:Math.round(50*SC),ann:Math.round(36*SC),lbl:Math.round(22*SC),
+            val2:Math.round(46*SC),foot:Math.round(24*SC)};
+
+  oc.fillStyle='#04040d';oc.fillRect(0,0,PW,PH);
+  oc.strokeStyle='rgba(255,255,255,.02)';oc.lineWidth=Math.max(1,SC);
+  for(let x=PAD;x<PW-PAD;x+=(PW-PAD*2)/20){oc.beginPath();oc.moveTo(x,0);oc.lineTo(x,PH);oc.stroke();}
+  for(let y2=PAD;y2<PH-PAD;y2+=(PH-PAD*2)/20){oc.beginPath();oc.moveTo(0,y2);oc.lineTo(PW,y2);oc.stroke();}
+
+  const Cn=getCnDisplay(N),Dn=Cn/ZETA2,sat=numSat(N);
+  const piStr=piAnnotation(Cn);
+  const modeLabel=_finiteMode?`Finite ∏ — first ${_finitePrimes} prime${_finitePrimes!==1?'s':''}`:'Asymptotic ∏';
+  const viewName=_view.charAt(0).toUpperCase()+_view.slice(1);
+  const hOp=s.hdrOp;
+  let y=PAD;
+
+  // Tag
+  oc.font=`${F.tag}px 'JetBrains Mono',monospace`;
+  oc.fillStyle=`rgba(200,168,74,${(.6*hOp).toFixed(2)})`;
+  oc.textAlign='center';oc.textBaseline='top';
+  oc.fillText('ANALYTIC NUMBER THEORY  ·  WESSEN GETACHEW  ·  wessengetachew.github.io',PW/2,y);
+  y+=F.tag*1.8;
+
+  // Title
+  oc.font=`400 ${F.title}px 'Georgia',serif`;
+  oc.fillStyle=`rgba(255,255,255,${hOp.toFixed(2)})`;
+  oc.fillText(`C(n) — Block-Coprime Density  [${viewName} View]`,PW/2,y);
+  y+=F.title*1.6;
+
+  // Formula
+  oc.font=`${F.formula}px 'JetBrains Mono',monospace`;
+  oc.fillStyle=`rgba(200,168,74,${(.85*hOp).toFixed(2)})`;
+  oc.fillText('C(n) = ζ(2) · ∏_p ( 1 − min(n+1, p) / p² )',PW/2,y);
+  y+=F.formula*2;
+
+  // Value line — decimal
+  const valLine=`C(${N}) = ζ(2)·∏_p(1−min(${N+1},p)/p²) = ${Cn.toFixed(12)}`;
+  oc.font=`bold ${F.val}px 'JetBrains Mono',monospace`;
+  oc.fillStyle=`rgba(200,168,74,${(.95*hOp).toFixed(2)})`;
+  oc.fillText(valLine,PW/2,y);y+=F.val*1.5;
+
+  // π annotation if present
+  if(piStr){
+    oc.font=`${F.ann}px 'JetBrains Mono',monospace`;
+    oc.fillStyle=`rgba(155,127,232,${(.95*hOp).toFixed(2)})`;
+    oc.fillText(piStr,PW/2,y);y+=F.ann*1.8;
+  } else y+=F.val*0.4;
+
+  // Finite mode info
+  if(_finiteMode){
+    const gap=getCnConvergenceGap(N,_finitePrimes);
+    const gapPct=(gap*100).toFixed(3)+'%';
+    const trueVal=getCn(N);
+    oc.font=`${Math.round(F.ann*.85)}px 'JetBrains Mono',monospace`;
+    oc.fillStyle='rgba(61,200,184,.8)';
+    oc.fillText(`${modeLabel}  ·  gap from asymptotic: ${gapPct}  ·  true C(${N}) = ${trueVal.toFixed(10)}`,PW/2,y);
+    y+=F.ann*1.6;
+  }
+
+  // Contextual note (from hl-sub)
+  const subEl=document.getElementById('hl-sub');
+  if(subEl){
+    const subText=subEl.textContent||subEl.innerText;
+    oc.font=`italic ${Math.round(F.ann*.88)}px 'Georgia',serif`;
+    oc.fillStyle='rgba(184,178,166,.75)';
+    // Word-wrap
+    const words=subText.split(' '),maxW=PW-PAD*3;
+    let line='',lineY=y;
+    for(const w of words){
+      const test=line?line+' '+w:w;
+      if(oc.measureText(test).width>maxW&&line){
+        oc.fillText(line,PW/2,lineY);lineY+=F.ann*1.3;line=w;
+      } else line=test;
+    }
+    if(line){oc.fillText(line,PW/2,lineY);lineY+=F.ann*1.3;}
+    y=lineY+F.ann*0.5;
+  }
+
+  // Divider
+  oc.fillStyle='rgba(200,168,74,.3)';oc.fillRect(PAD,y,PW-PAD*2,2);y+=24;
+
+  // Stats grid (3 cols)
+  const stats=[
+    {l:'n',v:String(N),c:'#ddd8cc'},
+    {l:'Block',v:String(N+1),c:'#ddd8cc'},
+    {l:'C(n)',v:Cn.toFixed(8),c:'#c8a84a'},
+    {l:'D(n)',v:Dn.toFixed(8),c:'#3dc8b8'},
+    {l:'Sat. primes',v:String(sat),c:'#e05060'},
+    {l:'Next sat n',v:String(nextSatN(N)||'—'),c:'#9b7fe8'},
+    {l:'Mode',v:modeLabel,c:'#ddd8cc'},
+    {l:'G',v:String(G),c:'#c8a84a'},
+    {l:'View',v:viewName+` rot=${[0,90,180,270][_rotSteps]}°`,c:'#ddd8cc'},
+    ...(piStr?[{l:'π form',v:piStr,c:'#9b7fe8'}]:[]),
+    ...(sat>0?[{l:'Sat. list',v:PRIMES.filter(p=>p<=N+1).slice(0,8).join(', ')+(sat>8?'…':''),c:'#e05060'}]:[]),
+  ];
+  const cols=3,boxW=Math.floor((PW-PAD*2-32)/cols),boxH=140,rowH=152;
+  stats.forEach(({l,v,c:sc},i)=>{
+    const col=i%cols,row=Math.floor(i/cols);
+    const bx=PAD+col*(boxW+16),by=y+row*rowH;
+    oc.fillStyle='rgba(7,7,26,.9)';oc.fillRect(bx,by,boxW,boxH);
+    oc.strokeStyle='rgba(255,255,255,.07)';oc.lineWidth=1;oc.strokeRect(bx+.5,by+.5,boxW-1,boxH-1);
+    oc.font=`${F.lbl}px 'JetBrains Mono',monospace`;
+    oc.fillStyle='rgba(106,101,96,.8)';oc.textAlign='left';oc.textBaseline='top';
+    oc.fillText(l.toUpperCase(),bx+16,by+12);
+    oc.font=`500 ${F.val2}px 'JetBrains Mono',monospace`;
+    oc.fillStyle=sc;oc.textBaseline='bottom';
+    let vs=v;while(oc.measureText(vs).width>boxW-28&&vs.length>4)vs=vs.slice(0,-1)+'…';
+    oc.fillText(vs,bx+16,by+boxH-10);
+  });
+  const statRows=Math.ceil(stats.length/cols);
+  y+=statRows*rowH+28;
+
+  // Divider
+  oc.fillStyle='rgba(200,168,74,.2)';oc.fillRect(PAD,y,PW-PAD*2,1.5);y+=20;
+
+  // Canvas — fill remaining space (above footer)
+  const footH=64;
+  const canvasY=y+8;
+  const canvasH=Math.max(200,PH-canvasY-footH-16);
+  {
+    const savedLblMode=document.getElementById('grid-label-sel')?.value;
+    const lbl=document.getElementById('grid-label-sel');
+    if(lbl&&s.lblMode)lbl.value=s.lblMode;
+    window._expLblOp=s.lblOp!=null?s.lblOp:.85;
+    window._expLblSc=s.lblSc!=null?s.lblSc:1;
+    const offCv=_renderViewToCanvas(PW-PAD*2,canvasH);
+    window._expLblOp=null;window._expLblSc=null;
+    if(lbl&&savedLblMode)lbl.value=savedLblMode;
+    oc.drawImage(offCv,PAD,canvasY);
+  }
+
+  // Footer
+  const fY=PH-56;
+  oc.fillStyle='rgba(255,255,255,.04)';oc.fillRect(0,fY,PW,56);
+  oc.font=`${F.foot}px 'JetBrains Mono',monospace`;oc.fillStyle='rgba(106,101,96,.6)';
+  oc.textAlign='left';oc.textBaseline='middle';
+  oc.fillText(`Generated by C(n) Explorer · wessengetachew.github.io · ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}`,PAD,fY+28);
+  oc.textAlign='right';
+  oc.fillText(`n=${N}  G=${G}  rot=${[0,90,180,270][_rotSteps]}°  ${_view}  zoom=${_zoom.toFixed(1)}×  ${modeLabel}`,PW-PAD,fY+28);
+
+  // (caller downloads — _renderExport just draws)
+}
+
+// Direct 4K download
+function export4K(){
+  const out=document.createElement('canvas');out.width=4096;out.height=4096;
+  _renderExport(out,4096,4096,{lblOp:.85,lblSc:1,lblMode:document.getElementById('grid-label-sel')?.value||'r',hdrOp:1,cvRatio:.55});
+  _dlCanvas(out,`cn_${_view}_4K_n${N}_G${G}.png`);
+}
+
+// ── EXPORT 2: Snap — hero text overlay ON canvas (matches what you see) ──
+function exportSnap(settings){
+  const s=settings||{};
+  // Render at 2× device pixel ratio for sharpness
+  const rect=document.getElementById('hero').getBoundingClientRect();
+  const W=Math.round(rect.width*2),H=Math.round(rect.height*2);
+
+  // Step 1: render the canvas at 2× size
+  const canvasCopy=_renderViewToCanvas(W,H);
+
+  // Step 2: build the text overlay on a separate canvas
+  const textCv=document.createElement('canvas');textCv.width=W;textCv.height=H;
+  const tc=textCv.getContext('2d');
+  tc.scale(2,2); // so we draw at CSS pixel coords
+
+  const CW=W/2,CH=H/2; // CSS dimensions
+  const Cn=getCnDisplay(N),piStr=piAnnotation(Cn);
+  const gap=_finiteMode?getCnConvergenceGap(N,_finitePrimes):0;
+  const cnCol=_finiteMode?(_finiteMode&&gap<1e-5?'#c8a84a':gap<1e-3?'#3dc8b8':gap<0.01?'#7ec87a':'#e05060'):'#c8a84a';
+
+  // Background gradient (like the hero text box)
+  const grad=tc.createLinearGradient(0,0,0,CH);
+  grad.addColorStop(0,'rgba(4,4,13,.0)');
+  grad.addColorStop(0.3,'rgba(4,4,13,.55)');
+  grad.addColorStop(1,'rgba(4,4,13,.75)');
+  tc.fillStyle=grad;tc.fillRect(0,0,CW,CH);
+
+  // Tag
+  tc.font=`${Math.round(CW*.022)}px 'JetBrains Mono',monospace`;
+  tc.fillStyle='rgba(200,168,74,.65)';tc.textAlign='center';tc.textBaseline='top';
+  const tagY=CH*.14;
+  tc.fillText('ANALYTIC NUMBER THEORY  ·  WESSEN GETACHEW',CW/2,tagY);
+
+  // Title
+  const titleSz=Math.round(CW*.065);
+  tc.font=`400 ${titleSz}px 'Georgia',serif`;tc.fillStyle='#fff';
+  tc.shadowColor='rgba(0,0,0,.8)';tc.shadowBlur=12;
+  tc.fillText('C(n) — Block-Coprime Density',CW/2,tagY+titleSz*1.4);
+  tc.shadowBlur=0;
+
+  // Formula box
+  const fboxY=tagY+titleSz*3.2;
+  const fboxW=CW*.85,fboxH=CH*.16;
+  tc.fillStyle='rgba(4,4,13,.82)';tc.strokeStyle='rgba(200,168,74,.28)';tc.lineWidth=1;
+  tc.fillRect(CW/2-fboxW/2,fboxY,fboxW,fboxH);
+  tc.strokeRect(CW/2-fboxW/2,fboxY,fboxW,fboxH);
+  tc.font=`${Math.round(CW*.032)}px 'JetBrains Mono',monospace`;
+  tc.fillStyle='rgba(200,168,74,.85)';
+  tc.fillText('C(n) = ζ(2) · ∏_p ( 1 − min(n+1, p) / p² )',CW/2,fboxY+fboxH/2);
+
+  // Live value box
+  const lboxY=fboxY+fboxH+CH*.02;
+  const lboxW=CW*.9,lboxH=CH*(_finiteMode||piStr?.16:.13);
+  tc.fillStyle='rgba(4,4,13,.88)';tc.strokeStyle='rgba(200,168,74,.22)';tc.lineWidth=1;
+  tc.fillRect(CW/2-lboxW/2,lboxY,lboxW,lboxH);
+  tc.strokeRect(CW/2-lboxW/2,lboxY,lboxW,lboxH);
+  const lvalSz=Math.round(CW*.028);
+  tc.font=`${lvalSz}px 'JetBrains Mono',monospace`;
+  tc.fillStyle='rgba(220,215,200,.85)';
+  tc.fillText(`C(${N}) = ζ(2)·∏_p(1−min(${N+1},p)/p²) =`,CW/2,lboxY+lvalSz*1.3);
+  // Big value
+  const bigSz=Math.round(CW*.056);
+  tc.font=`bold ${bigSz}px 'JetBrains Mono',monospace`;
+  tc.fillStyle=cnCol;
+  tc.fillText(Cn.toFixed(_dp),CW/2,lboxY+lvalSz*2.4+bigSz*.7);
+  // π annotation
+  if(piStr){
+    const annSz=Math.round(bigSz*.55);
+    tc.font=`${annSz}px 'JetBrains Mono',monospace`;tc.fillStyle='rgba(155,127,232,.95)';
+    tc.fillText(piStr,CW/2,lboxY+lvalSz*2.4+bigSz*1.6+annSz*.9);
+  }
+  // Finite gap indicator
+  if(_finiteMode){
+    const gapSz=Math.round(lvalSz*.85);
+    tc.font=`${gapSz}px 'JetBrains Mono',monospace`;tc.fillStyle='rgba(61,200,184,.75)';
+    tc.fillText(`gap from asymptotic: ${(gap*100).toFixed(4)}%`,CW/2,lboxY+lboxH-gapSz*.8);
+  }
+
+  // Sub text
+  const subEl=document.getElementById('hl-sub');
+  if(subEl){
+    const subText=subEl.textContent||'';
+    const subSz=Math.round(CW*.018);
+    tc.font=`italic ${subSz}px 'Georgia',serif`;tc.fillStyle='rgba(200,195,185,.7)';
+    tc.fillText(subText.slice(0,120)+(subText.length>120?'…':''),CW/2,lboxY+lboxH+subSz*1.4);
+  }
+
+  // Step 3: composite: canvas behind, text on top
+  const final=document.createElement('canvas');final.width=W;final.height=H;
+  const fc=final.getContext('2d');
+  fc.drawImage(canvasCopy,0,0);
+  fc.drawImage(textCv,0,0);
+
+  _dlCanvas(final,`cn_snap_n${N}_G${G}.png`);
+}
+
+function _dlCanvas(canvas,filename){
+  canvas.toBlob(blob=>{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.download=filename;a.href=url;
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},2000);
+  },'image/png');
+}
+
+
+// ═══════════════════════════════════════════
+//  CSV / EXPORT HELPERS
+// ═══════════════════════════════════════════
+function _dlCSV(rows,filename){const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download=filename;a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200);}
+
+function exportDataCSV(){
+  const n=N,rows=[['n','Block','C(n)','D(n)','C(n)/C(n-1)','Delta','Sat','Event']];
+  for(let i=0;i<=n;i++){getCn(i);const Ci=_cn[i],Di=Ci/ZETA2,sat=numSat(i),isPrimeSat=i>0&&PS.has(i+1);rows.push([i,i+1,Ci.toFixed(12),Di.toFixed(12),i===0?'':(Ci/_cn[i-1]).toFixed(10),i===0?'':(Ci-_cn[i-1]).toFixed(12),sat,isPrimeSat?`p=${i+1} sat.`:i===0?'start':'']);}
+  _dlCSV(rows,`cn_data_n${n}.csv`);
+}
+function exportPrimeCSV(){
+  const n=N,rows=[['p','Status','min(n+1,p)','p^2','Local factor','log factor','Partial D','Partial C']];let ld=0;
+  PRIMES.slice(0,60).forEach(p=>{const m=Math.min(n+1,p),p2=p*p,f=1-m/p2,lf=Math.log(f);ld+=lf;rows.push([p,p<=n+1?'SAT':'ACT',m,p2,f.toFixed(12),lf.toFixed(12),Math.exp(ld).toFixed(12),(ZETA2*Math.exp(ld)).toFixed(12)]);});
+  _dlCSV(rows,`cn_primes_n${n}.csv`);
+}
+function exportCalc(){
+  const n=N,Cn=getCn(n),Dn=Cn/ZETA2,fmt=document.getElementById('calc-fmt').value;
+  let txt=fmt==='json'?JSON.stringify({n,block:n+1,'C(n)':Cn,'D(n)':Dn,'sat.primes':numSat(n),'next.sat':nextSatN(n)},null,2):fmt==='csv'?`n,block,C(n),D(n)\n${n},${n+1},${Cn.toFixed(12)},${Dn.toFixed(12)}`:`C(${n})=${Cn.toFixed(12)}\nD(${n})=${Dn.toFixed(12)}\nBlock=${n+1}`;
+  navigator.clipboard.writeText(txt).then(()=>{const msg=document.getElementById('calc-msg');if(msg){msg.textContent='✓ Copied';msg.style.opacity='1';setTimeout(()=>msg.style.opacity='0',1800);}});
+}
+function exportCalcDownload(){
+  const n=N,Cn=getCn(n),fmt=document.getElementById('calc-fmt').value;
+  let txt=`C(${n})=${Cn.toFixed(12)}\nBlock=${n+1}`,ext='txt',mime='text/plain';
+  if(fmt==='json'){txt=JSON.stringify({n,'C(n)':Cn},null,2);ext='json';mime='application/json';}
+  else if(fmt==='csv'){txt=`n,C(n)\n${n},${Cn.toFixed(12)}`;ext='csv';mime='text/csv';}
+  const a=document.createElement('a');a.href='data:'+mime+';charset=utf-8,'+encodeURIComponent(txt);a.download=`cn_n${n}.${ext}`;a.click();
+}
+function exportHTMLReport(){
+  const n=N,Cn=getCn(n),Dn=Cn/ZETA2,sat=numSat(n);
+  let prRows='',ld=0;
+  PRIMES.slice(0,60).forEach(p=>{const m=Math.min(n+1,p),p2=p*p,f=1-m/p2,lf=Math.log(f);ld+=lf;const pD=Math.exp(ld),pC=ZETA2*pD,s=p<=n+1;prRows+=`<tr><td style="color:${s?'#e05060':'#3dc8b8'}">${p}</td><td>${s?'SAT':'ACT'}</td><td>${m}</td><td>${p2}</td><td>${f.toFixed(8)}</td><td>${lf.toFixed(8)}</td><td>${pD.toFixed(8)}</td><td style="color:#c8a84a">${pC.toFixed(7)}</td></tr>`;});
+  let dtRows='';
+  for(let i=0;i<=n;i++){getCn(i);const Ci=_cn[i],Di=Ci/ZETA2,si=numSat(i),isSat=i>0&&PS.has(i+1);const ev=isSat?`p=${i+1} sat.`:i===0?'start':'';const ratio=i===0?'—':(_cn[i]/_cn[i-1]).toFixed(6);dtRows+=`<tr ${i===n?'style="background:rgba(200,168,74,.06)"':''}><td>${i}</td><td>${i+1}</td><td style="color:#c8a84a">${Ci.toFixed(8)}</td><td style="color:#3dc8b8">${Di.toFixed(8)}</td><td>${ratio}</td><td>${si}</td><td style="color:#3dc8b8">${ev}</td></tr>`;}
+  const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>C(n) Report — n=${n}</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#04040d;color:#ddd8cc;font-family:'JetBrains Mono',monospace;font-size:11px;}.page{max-width:1100px;margin:0 auto;padding:40px 24px 80px;}header{text-align:center;padding:36px 0 28px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:28px;}.brand{font-size:7.5px;letter-spacing:.3em;text-transform:uppercase;color:#c8a84a;opacity:.5;margin-bottom:10px;}h1{font-size:1.6rem;color:#ddd8cc;font-weight:400;letter-spacing:.05em;margin-bottom:12px;}.formula{display:inline-block;font-size:.88rem;color:#c8a84a;background:rgba(200,168,74,.06);border:1px solid rgba(200,168,74,.2);padding:9px 20px;margin-bottom:8px;}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:11px;margin-bottom:24px;}.sb{background:#07071a;border:1px solid rgba(255,255,255,.07);padding:13px 15px;text-align:center;}.sl{font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:#6a6560;margin-bottom:5px;}.sv{font-size:1.4rem;font-weight:500;color:#c8a84a;}.sec{font-size:.6rem;letter-spacing:.1em;color:#c8a84a;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.07);margin:24px 0 12px;}table{width:100%;border-collapse:collapse;font-size:10px;}th{background:#0c0c22;padding:6px 10px;text-align:right;color:#6a6560;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12);white-space:nowrap;}th:first-child{text-align:center;}td{padding:5px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.07);}td:first-child{text-align:center;color:#6a6560;}footer{text-align:center;padding:22px 0;border-top:1px solid rgba(255,255,255,.07);color:#6a6560;font-size:8.5px;margin-top:36px;}</style></head><body><div class="page"><header><div class="brand">Analytic Number Theory · Wessen Getachew</div><h1>C(n) — Block-Coprime Density</h1><div class="formula">C(n)=ζ(2)·∏_p(1−min(n+1,p)/p²)</div></header><div class="stats"><div class="sb"><div class="sl">C(n)</div><div class="sv">${Cn.toFixed(6)}</div></div><div class="sb"><div class="sl">D(n)</div><div class="sv" style="color:#3dc8b8;font-size:1.2rem;">${Dn.toFixed(6)}</div></div><div class="sb"><div class="sl">n</div><div class="sv" style="color:#ddd8cc">${n}</div></div><div class="sb"><div class="sl">Block</div><div class="sv" style="color:#ddd8cc">${n+1}</div></div><div class="sb"><div class="sl">Sat. primes</div><div class="sv" style="color:#e05060">${sat}</div></div><div class="sb"><div class="sl">Next sat. n</div><div class="sv" style="color:#3dc8b8;font-size:1.2rem;">${nextSatN(n)||'—'}</div></div></div><div class="sec">Prime Factor Table</div><table><thead><tr><th>p</th><th>Status</th><th>min(n+1,p)</th><th>p²</th><th>Local factor</th><th>log factor</th><th>Partial D</th><th>Partial C</th></tr></thead><tbody>${prRows}</tbody></table><div class="sec">Data Table — n=0 to ${n}</div><table><thead><tr><th>n</th><th>Block</th><th>C(n)</th><th>D(n)</th><th>C(n)/C(n−1)</th><th>Sat.</th><th>Event</th></tr></thead><tbody>${dtRows}</tbody></table><footer>Wessen Getachew · wessengetachew.github.io · ${date} · n=${n} · C(${n})=${Cn.toFixed(12)}</footer></div></body></html>`;
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download=`cn_report_n${n}.html`;a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200);
+}
+
+// ═══════════════════════════════════════════
+//  SECTOR PATH STATE + LOGIC
+// ═══════════════════════════════════════════
+let _sectorPts=[];  // [{r,M,s}]
+let _sectorFrac=null; // {a,b,offs}
+
+function traceSector(){
+  const a=Math.max(1,Math.min(9999,parseInt(document.getElementById('sec-a').value)||1));
+  const b=Math.max(1,Math.min(9999,parseInt(document.getElementById('sec-b').value)||1));
+  const offs=[];
+  if(document.getElementById('sec-pos').checked) offs.push(1);
+  if(document.getElementById('sec-ray').checked) offs.push(0);
+  if(document.getElementById('sec-neg').checked) offs.push(-1);
+  if(!offs.length){document.getElementById('sec-info').textContent='select at least one of +1/ray/−1';return;}
+  _sectorFrac={a,b,offs};
+  const pts=[];
+  for(let M=1;M<=G;M++){
+    for(const s of offs){
+      const num=s+a*M;
+      if(num%b!==0)continue;
+      const r=num/b;
+      if(r>=1&&r<=G)pts.push({r,M,s});
+    }
+  }
+  pts.sort((p,q)=>p.M-q.M||p.r-q.r);
+  _sectorPts=pts;
+  document.getElementById('sec-info').textContent=pts.length?`${pts.length} point(s) · ${a}/${b}`:`no points for ${a}/${b} in G=${G}`;
+  buildSectorTable(pts,a,b);
+  drawHero();
+}
+
+function clearSector(){
+  _sectorPts=[];_sectorFrac=null;
+  document.getElementById('sec-info').textContent='';
+  document.getElementById('sec-detail').style.display='none';
+  document.getElementById('sec-tbody').innerHTML='';
+  drawHero();
+}
+
+const SEC_COLS=['#f2c44a','#3dc8b8','#9b7fe8','#ff8c69','#a8e6cf','#ffd700','#ff6b9d','#c3b1e1'];
+
+function buildSectorTable(pts,a,b){
+  if(!pts.length){document.getElementById('sec-detail').style.display='none';return;}
+  document.getElementById('sec-detail').style.display='block';
+  document.getElementById('sec-count').textContent=`(${pts.length})`;
+  const rows=pts.map(({r,M,s},i)=>{
+    const g2=gcd(r,M);
+    const lit=isLit(r,M,N);
+    const copOnly=!lit&&g2===1;
+    const status=lit?'<span style="color:var(--gold)">block-cop</span>':copOnly?'<span style="color:var(--teal)">coprime</span>':'<span style="color:var(--cream3)">—</span>';
+    const depth=getDepth(r,M,N);
+    const sLabel=s===0?'ray':s>0?'+1':'−1';
+    const col=SEC_COLS[i%SEC_COLS.length];
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);">
+      <td style="padding:3px 8px;color:${col};font-weight:600;">${i+1}</td>
+      <td style="padding:3px 8px;text-align:right;color:var(--gold);">${r}</td>
+      <td style="padding:3px 8px;text-align:right;">${M}</td>
+      <td style="padding:3px 8px;text-align:right;color:var(--cream3);">${(r/M).toFixed(4)}</td>
+      <td style="padding:3px 8px;text-align:right;color:var(--violet);">${sLabel}</td>
+      <td style="padding:3px 8px;text-align:right;">${g2}</td>
+      <td style="padding:3px 8px;">${status}</td>
+      <td style="padding:3px 8px;text-align:right;color:var(--teal);">${depth}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('sec-tbody').innerHTML=rows;
+}
+
+function exportSectorCSV(){
+  if(!_sectorPts.length)return;
+  const rows=[['#','r','M','r/M','s','gcd','lit','depth']];
+  _sectorPts.forEach(({r,M,s},i)=>{
+    const g2=gcd(r,M),lit=isLit(r,M,N),depth=getDepth(r,M,N);
+    rows.push([i+1,r,M,(r/M).toFixed(6),s===0?'ray':s>0?'+1':'-1',g2,lit?'block-cop':gcd(r,M)===1?'coprime':'neither',depth]);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\r\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a2=document.createElement('a');
+  a2.download='sector_path.csv';a2.href=url;a2.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1200);
+}
+
+// Draw sector highlights on grid canvas (uses rotated coords)
+// Map (r,M) → canvas (x,y) centre for the current view (accounts for zoom/pan)
+function sectorPtXY(r,M,W,H){
+  const mMax=G;
+  if(_view==='grid'){
+    const pad=Math.min(W,H)*.03;
+    const {px,py,cellW,cellH}=cellXY(r,M,W,H,pad);
+    return{x:px+cellW/2, y:py+cellH/2, sz:Math.min(cellW,cellH)*.45, isGrid:true, px,py,cellW,cellH};
+  }
+  // For other views apply the zoom/pan offset to the logical centre coords
+  const zx=(x)=>W*_panX+(x-W*.5)*_zoom;
+  const zy=(y)=>H*_panY+(y-H*.5)*_zoom;
+  const cx=W/2, cy=H/2;
+  if(_view==='ring'||_view==='lift'){
+    const maxR=Math.min(W,H)*.44;
+    const invert=_view==='ring'&&document.getElementById('ring-invert')?.checked;
+    const rho=invert?((mMax+1-M)/mMax)*maxR:(M/mMax)*maxR;
+    const theta=2*Math.PI*r/M;
+    const rx=cx+rho*Math.cos(theta), ry=cy-rho*Math.sin(theta);
+    return{x:zx(rx), y:zy(ry), sz:Math.max(5,6*_zoom), isGrid:false};
+  }
+  if(_view==='farey'){
+    const yexp=+document.getElementById('farey-yexp')?.value||1;
+    const rawY=Math.log(2/M)/Math.log(2/mMax);
+    const logY=Math.pow(Math.max(0,rawY),1/yexp);
+    const sy=cy+(logY*1.8-.9)*H/2;
+    const sx=cx+(r/M*2-1)*W/2;
+    return{x:zx(sx), y:zy(sy), sz:Math.max(5,7*_zoom), isGrid:false};
+  }
+  if(_view==='conformal'){
+    const R2=Math.min(W,H)*.44;
+    // Möbius map
+    const zr=r/mMax, zi=M/mMax;
+    const nr=zr, ni=zi-1, dr=zr, di=zi+1;
+    const denom=dr*dr+di*di;
+    if(denom<1e-12)return null;
+    const u=(nr*dr+ni*di)/denom, v=(ni*dr-nr*di)/denom;
+    const rx=cx+u*R2, ry=cy-v*R2;
+    return{x:zx(rx), y:zy(ry), sz:Math.max(5,6*_zoom), isGrid:false};
+  }
+  return null;
+}
+
+function drawSectorOverlay(W,H,pad){
+  if(!_sectorPts.length)return;
+  ctx.setLineDash([]);
+
+  // Get all point positions
+  const positions=_sectorPts.map(({r,M})=>sectorPtXY(r,M,W,H));
+
+  // Connect path line
+  if(positions.length>1){
+    ctx.strokeStyle='rgba(155,127,232,.5)';ctx.lineWidth=1.5;ctx.setLineDash([3,4]);
+    ctx.beginPath();
+    positions.forEach((pt,i)=>{
+      if(!pt)return;
+      i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y);
+    });
+    ctx.stroke();ctx.setLineDash([]);
+  }
+
+  _sectorPts.forEach(({r,M,s},i)=>{
+    const pt=positions[i];
+    if(!pt)return;
+    const col=SEC_COLS[i%SEC_COLS.length];
+    const sLabel=s===0?'0':s>0?'+1':'−1';
+
+    if(pt.isGrid){
+      // Grid: fill rect + border + badge
+      const {px,py,cellW,cellH}=pt;
+      if(px+cellW<0||px>W||py+cellH<0||py>H)return;
+      ctx.fillStyle=col+'44';ctx.fillRect(px+.5,py+.5,cellW-1,cellH-1);
+      ctx.strokeStyle=col;ctx.lineWidth=2;ctx.strokeRect(px+1,py+1,cellW-2,cellH-2);
+      const fz=Math.max(8,Math.min(Math.floor(cellW*.45),14));
+      ctx.font=`bold ${fz}px 'JetBrains Mono',monospace`;
+      ctx.textAlign='center';ctx.textBaseline='top';
+      ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillText(i+1,pt.x+1,py+3);
+      ctx.fillStyle=col;ctx.fillText(i+1,pt.x,py+2);
+      ctx.font=`${Math.max(7,fz-2)}px 'JetBrains Mono',monospace`;
+      ctx.textBaseline='bottom';
+      ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillText(sLabel,pt.x+1,py+cellH-1);
+      ctx.fillStyle='rgba(200,180,255,.9)';ctx.fillText(sLabel,pt.x,py+cellH-2);
+    } else {
+      // Other views: glow ring + dot + number label
+      const sz=pt.sz;
+      // Glow
+      const grd=ctx.createRadialGradient(pt.x,pt.y,0,pt.x,pt.y,sz*2.2);
+      grd.addColorStop(0,col+'88');grd.addColorStop(1,col+'00');
+      ctx.fillStyle=grd;ctx.beginPath();ctx.arc(pt.x,pt.y,sz*2.2,0,6.2832);ctx.fill();
+      // Ring
+      ctx.strokeStyle=col;ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(pt.x,pt.y,sz,0,6.2832);ctx.stroke();
+      // Dot centre
+      ctx.fillStyle=col;ctx.beginPath();ctx.arc(pt.x,pt.y,sz*.45,0,6.2832);ctx.fill();
+      // Number + s label
+      ctx.font=`bold ${Math.max(9,sz*.9)|0}px 'JetBrains Mono',monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillText(i+1,pt.x+1,pt.y-sz*1.6+1);
+      ctx.fillStyle=col;ctx.fillText(i+1,pt.x,pt.y-sz*1.6);
+      ctx.font=`${Math.max(7,sz*.7)|0}px 'JetBrains Mono',monospace`;
+      ctx.fillStyle='rgba(200,180,255,.85)';ctx.fillText(sLabel,pt.x,pt.y+sz*1.7);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════
+//  CLICK HANDLER — cell inspect popup
+// ═══════════════════════════════════════════
+// Un-rotate a canvas pixel (mx,my) back to the unrotated coordinate space
+function unrotateClick(mx,my,W,H){
+  if(!(_rotSteps&3))return{x:mx,y:my};
+  // Rotation was: translate(W/2,H/2) rotate(steps*pi/2) translate(-W/2,-H/2)
+  // Inverse: translate(W/2,H/2) rotate(-steps*pi/2) translate(-W/2,-H/2)
+  const cx=W/2,cy=H/2,a=-(_rotSteps&3)*Math.PI/2;
+  const dx=mx-cx,dy=my-cy;
+  return{x:cx+dx*Math.cos(a)-dy*Math.sin(a), y:cy+dx*Math.sin(a)+dy*Math.cos(a)};
+}
+
+// Center canvas view on a grid fraction position fx,fy (0..1)
+function centerOnFrac(fx,fy,targetZoom){
+  const newZ=Math.max(1,Math.min(16,targetZoom||_zoom));
+  _zoom=newZ;
+  _panX=Math.max(0.5/newZ,Math.min(1-0.5/newZ,fx));
+  _panY=Math.max(0.5/newZ,Math.min(1-0.5/newZ,fy));
+  document.getElementById('zoom-lbl').textContent=_zoom.toFixed(1)+'×';
+  cv.classList.toggle('pannable',_zoom>1&&!_inspectMode);
+  drawHero();
+}
+
+// Center view on grid cell (r,M) without changing zoom
+function centerOnCell(r,M){
+  // In our model: panX = fraction of grid at canvas centre
+  // Cell r centre is at fraction (r-0.5)/G of the grid
+  _panX=(r-0.5)/G;
+  _panY=(M-0.5)/G;
+  _clampPan();
+  drawHero();
+}
+
+cv.addEventListener('click',e=>{
+  if(_dragMoved)return;
+  const rect=cv.getBoundingClientRect();
+  const scaleX=cv.width/rect.width, scaleY=cv.height/rect.height;
+  const rawMx=(e.clientX-rect.left)*scaleX;
+  const rawMy=(e.clientY-rect.top)*scaleY;
+  const W=cv.width, H=cv.height;
+  // Un-rotate click to canonical coordinates
+  const{x:mx,y:my}=unrotateClick(rawMx,rawMy,W,H);
+
+  if(_view==='grid'){
+    const pad=Math.min(W,H)*.03;
+    const cellW=(W-pad*2)/G*_zoom, cellH=(H-pad*2)/G*_zoom;
+    const gridW=(W-pad*2)*_zoom, gridH=(H-pad*2)*_zoom;
+    const ox=W/2-_panX*gridW; // left edge of grid
+    const oy=H/2-_panY*gridH; // top edge of grid
+    const r=Math.floor((mx-ox)/cellW)+1;
+    const M=Math.floor((my-oy)/cellH)+1;
+    if(r<1||r>G||M<1||M>G)return;
+    if(!_inspectMode){
+      // Zoom to this cell — zoom to 4x if at 1x, otherwise 2x more, cap 16x
+      const newZ=_zoom<=1?4:Math.min(16,_zoom*2);
+      centerOnCell(r,M); // first center
+      _zoom=newZ;
+      document.getElementById('zoom-lbl').textContent=_zoom.toFixed(1)+'×';
+      cv.classList.toggle('pannable',true);
+      drawHero();
+    } else {
+      // Inspect mode: select + keep centered as user zooms
+      _clickedCell={r,M};
+      if(!_clickedCells.some(p=>p.r===r&&p.M===M))_clickedCells.push({r,M});
+      drawHero();
+      showInspectPanel(r,M);
+      centerOnCell(r,M);
+    }
+  } else if(_view==='lift'){
+    liftCanvasClick(mx,my,W,H);
+  }
+});
+
+// Close inspect panel when clicking outside hero+panel (but not during drag)
+document.addEventListener('click',e=>{
+  if(_isDragging)return;
+  if(!e.target.closest('#hero-cv')&&!e.target.closest('#inspect-panel')&&!e.target.closest('#lift-spiral-table')){
+    const ip=document.getElementById('inspect-panel');
+    if(ip)ip.style.display='none';
+    _clickedCell=null;
+    if(_view==='grid')drawHero();
+  }
+});
+
+function toggleInspect(){
+  _inspectMode=!_inspectMode;
+  const btn=document.getElementById('inspect-btn');
+  if(btn){
+    btn.style.color=_inspectMode?'rgba(155,127,232,1)':'rgba(155,127,232,.7)';
+    btn.style.background=_inspectMode?'rgba(155,127,232,.12)':'none';
+    btn.style.borderColor=_inspectMode?'rgba(155,127,232,.7)':'rgba(155,127,232,.35)';
+    btn.textContent=_inspectMode?'⊕ Inspect ON':'⊕ Inspect';
+  }
+  cv.style.cursor=_inspectMode?'crosshair':(_zoom>1?'grab':'default');
+  if(!_inspectMode){
+    _clickedCell=null;_clickedCells=[];
+    const ip=document.getElementById('inspect-panel');if(ip)ip.style.display='none';
+    if(_view==='grid')drawHero();
+  }
+}
+
+function showInspectPanel(a,b,title){
+  const g2=gcd(a,b);
+  const lit=isLit(a,b,N);
+  const copOnly=!lit&&g2===1;
+  const depth=getDepth(a,b,N);
+  const pf=[];let tmp=g2;
+  for(let p=2;p*p<=tmp;p++){if(tmp%p===0){pf.push(p);while(tmp%p===0)tmp=Math.floor(tmp/p);}}
+  if(tmp>1)pf.push(tmp);
+  const killP=pf.find(p=>p<=N+1);
+  const status=lit
+    ?`<b style="color:var(--gold)">block-coprime</b> depth=${depth}`
+    :copOnly?`<b style="color:var(--teal)">coprime only</b>`
+    :`<b style="color:var(--coral)">not coprime</b>`;
+  document.getElementById('ip-title').textContent=title||`r=${a}, M=${b}`;
+  document.getElementById('ip-rows').innerHTML=
+    kv('gcd',g2)+kv('status',status,true)+kv('r/M',(a/b).toFixed(5))
+    +(g2>1?kv('gcd primes ≤n+1',`<span style="color:var(--coral)">${pf.filter(p=>p<=N+1).join(', ')||'—'}</span>`,true):'')
+    +(killP?kv('blocked by',`<span style="color:var(--coral)">p=${killP}</span>`,true):'');
+  document.getElementById('inspect-panel').style.display='block';
+}
+function kv(k,v,raw=false){
+  return `<div style="display:flex;flex-direction:column;min-width:80px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:5px 10px;">
+    <span style="font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--cream3);margin-bottom:3px;">${k}</span>
+    <span style="font-size:11px;font-weight:500;">${raw?v:`<span style="color:var(--cream)">${v}</span>`}</span>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  KEYBOARD
+// ═══════════════════════════════════════════
+function toggleFullscreen(){
+  const btn=document.getElementById('fs-btn');
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+    if(btn){btn.textContent='⊠';btn.style.color='var(--gold)';}
+  }else{
+    document.exitFullscreen().catch(()=>{});
+    if(btn){btn.textContent='⛶';btn.style.color='';}
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const btn=document.getElementById('fs-btn');if(!btn)return;
+  if(!document.fullscreenElement){btn.textContent='⛶';btn.style.color='';}
+  else{btn.textContent='⊠';btn.style.color='var(--gold)';}
+});
+
+function panCanvas(dx,dy){
+  // dx,dy: +1 = move view right/down, -1 = move view left/up
+  const step=0.08/_zoom; // one cell-ish at this zoom level
+  _panX+=dx*step;
+  _panY+=dy*step;
+  _clampPan();
+  drawHero();
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('dd-overlay').classList.contains('open')){if(e.key==='ArrowLeft')ddNav(-1);else if(e.key==='ArrowRight')ddNav(1);else if(e.key==='Escape')closeDD();return;}
+  if(document.getElementById('pd-overlay').classList.contains('open')){if(e.key==='Escape')closePD();return;}
+  const tag=(document.activeElement||{}).tagName||'';if(tag==='INPUT'||tag==='SELECT')return;
+  // Canvas navigation when zoomed in: WASD or arrow keys
+  if(_zoom>1){
+    if(e.key==='ArrowRight'||e.key==='d'){e.preventDefault();panCanvas(1,0);return;}
+    if(e.key==='ArrowLeft'||e.key==='a'){e.preventDefault();panCanvas(-1,0);return;}
+    if(e.key==='ArrowUp'||e.key==='w'){e.preventDefault();panCanvas(0,-1);return;}
+    if(e.key==='ArrowDown'||e.key==='s'){e.preventDefault();panCanvas(0,1);return;}
+  }
+  // N navigation when zoom=1
+  if(e.key==='ArrowRight'||e.key==='+'){e.preventDefault();stepN(1);}
+  else if(e.key==='ArrowLeft'||e.key==='-'){e.preventDefault();stepN(-1);}
+  else if(e.key==='ArrowUp'){e.preventDefault();jumpNextSat();}
+  else if(e.key==='ArrowDown'){e.preventDefault();jumpPrevSat();}
+  else if(e.key===' '){e.preventDefault();togglePlay();}
+  else if(e.key==='Escape'){resetView();}
+  else if(e.key==='i'||e.key==='I'){toggleInspect();}
+  else if(e.key==='='||e.key==='z'){setZoom(_zoom*1.5);}
+  else if(e.key==='-'&&_zoom>1){setZoom(_zoom*0.75);}
+  else if(e.key==='0'){resetView();}
+  else if(e.key==='1')setView('grid');else if(e.key==='2')setView('ring');
+  else if(e.key==='3')setView('farey');else if(e.key==='4')setView('lift');
+  else if(e.key==='5')setView('conformal');
+});
+
+// ═══════════════════════════════════════════
+//  INIT — defer until layout is painted
+// ═══════════════════════════════════════════
+function _init(){
+  resizeCV();
+  setView('grid');
+  updateUI();
+  // Ensure canvas redraws if ResizeObserver fires before init
+  setTimeout(()=>{resizeCV();drawHero();},100);
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(()=>requestAnimationFrame(_init)));
+}else{
+  requestAnimationFrame(()=>requestAnimationFrame(_init));
+}
+</script>
+</body>
+</html>
