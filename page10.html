@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Saturated–Active Prime Partition — Page 10</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']]
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+:root{
+  --gold:#c8a84a; --teal:#3dc8b8; --coral:#e05060; --violet:#9b7fe8;
+  --cream:#e0d5cd; --cream3:#cfc6bc; --bg:#04040d;
+  --serif:'Spectral',Georgia,serif; --display:'Cinzel',serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--cream);font-family:var(--serif);line-height:1.65;}
+.topbar{display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.07);
+  flex-wrap:wrap;position:sticky;top:0;background:rgba(4,4,13,.96);backdrop-filter:blur(6px);z-index:10;}
+.topbar a{display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-family:var(--mono);
+  font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;
+  background:transparent;text-decoration:none;flex-shrink:0;white-space:nowrap;}
+.topbar a.p7{border:1px solid rgba(242,168,74,.35);color:#f2a84a;}
+.topbar a.p7:hover{background:rgba(242,168,74,.08);border-color:rgba(242,168,74,.6);}
+.topbar a.p8{border:1px solid rgba(155,127,232,.35);color:var(--violet);}
+.topbar a.p8:hover{background:rgba(155,127,232,.08);border-color:rgba(155,127,232,.6);}
+.topbar a.p9{border:1px solid rgba(61,200,184,.35);color:var(--teal);}
+.topbar a.p9:hover{background:rgba(61,200,184,.08);border-color:rgba(61,200,184,.6);}
+.topbar a.p10{border:1px solid rgba(224,80,96,.45);color:var(--coral);}
+.topbar a.p10:hover{background:rgba(224,80,96,.08);border-color:rgba(224,80,96,.7);}
+.wrap{max-width:880px;margin:0 auto;padding:48px 24px 90px;}
+h1{font-family:var(--display);font-size:28px;font-weight:600;letter-spacing:.02em;color:var(--gold);
+  text-align:center;margin:0 0 6px;line-height:1.3;}
+.subtitle{text-align:center;color:var(--cream3);font-size:14px;font-style:italic;margin-bottom:6px;}
+.byline{text-align:center;font-family:var(--mono);font-size:11px;color:var(--cream3);letter-spacing:.04em;margin-bottom:36px;}
+.byline b{color:var(--teal);font-weight:600;}
+.abstract{border:1px solid rgba(200,168,74,.25);border-left:3px solid var(--gold);background:rgba(200,168,74,.04);
+  padding:18px 22px;margin-bottom:36px;font-size:14.5px;color:var(--cream3);}
+.abstract b{color:var(--gold);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  display:block;margin-bottom:8px;}
+.acc{border:1px solid rgba(255,255,255,.08);border-radius:3px;margin-bottom:10px;overflow:hidden;}
+.acc-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;
+  background:rgba(255,255,255,.02);transition:background .15s;}
+.acc-h:hover{background:rgba(255,255,255,.04);}
+.acc-h .num{font-family:var(--mono);color:var(--gold);font-size:12px;margin-right:10px;}
+.acc-h .ttl{font-family:var(--display);font-size:15px;letter-spacing:.01em;color:var(--cream);flex:1;}
+.acc-h .car{font-family:var(--mono);color:var(--cream3);font-size:13px;transition:transform .2s;}
+.acc.open .car{transform:rotate(90deg);}
+.acc-b{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+.acc.open .acc-b{max-height:none;}
+.acc-b-in{padding:4px 22px 20px;font-size:14.5px;color:var(--cream3);}
+.acc-b-in ul{padding-left:20px;}
+.acc-b-in li{margin-bottom:10px;}
+.eq{overflow-x:auto;margin:14px 0;padding:10px 4px;}
+.tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:2px;margin-left:8px;}
+.tag.def{border:1px solid rgba(61,200,184,.35);color:var(--teal);}
+.tag.lemma{border:1px solid rgba(155,127,232,.35);color:var(--violet);}
+.verify{margin-top:8px;border-collapse:collapse;width:100%;font-family:var(--mono);font-size:11.5px;}
+.verify th,.verify td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.07);text-align:left;}
+.verify th{color:var(--gold);font-weight:600;text-transform:uppercase;font-size:9.5px;letter-spacing:.06em;}
+.verify td.val{color:var(--cream);}
+.verify td.match{color:var(--teal);}
+.note{font-size:12px;color:var(--cream3);font-style:italic;margin-top:10px;}
+.footer{text-align:center;font-family:var(--mono);font-size:10px;color:rgba(207,198,188,.4);margin-top:60px;}
+</style>
+</head>
+<body>
+<div id="wg-pagenav" style="position:sticky;top:0;z-index:9999;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:8px 14px;background:#04040d;border-bottom:1px solid rgba(255,255,255,.13);font-family:'JetBrains Mono',monospace;">
+<span style="font-family:'Cinzel',serif;font-size:.7rem;color:#c8a84a;letter-spacing:.14em;margin-right:8px;flex-shrink:0;">WESSEN GETACHEW</span>
+<a href="index.html" target="_blank" title="C(n) Block-Coprime Density — Page 1" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(200,168,74,.35);color:#c8a84a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#c8a84a14';this.style.borderColor='#c8a84a'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(200,168,74,.35)'">P1</a>
+<a href="page2.html" target="_blank" title="Gap Diagonal Identity — Page 2" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(61,200,184,.35);color:#3dc8b8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#3dc8b814';this.style.borderColor='#3dc8b8'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(61,200,184,.35)'">P2</a>
+<a href="page3.html" target="_blank" title="Jump Theorem — Saturation Transitions" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(200,168,74,.35);color:#c8a84a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#c8a84a14';this.style.borderColor='#c8a84a'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(200,168,74,.35)'">P3</a>
+<a href="page4.html" target="_blank" title="C(n,d) Modular Distance Stratification — Page 4" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(155,127,232,.35);color:#9b7fe8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#9b7fe814';this.style.borderColor='#9b7fe8'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(155,127,232,.35)'">P4</a>
+<a href="page5.html" target="_blank" title="Half-Barrier Depth Theorem — Page 5" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(224,80,96,.35);color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(224,80,96,.35)'">P5</a>
+<a href="page6.html" target="_blank" title="Page 6" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(126,200,122,.35);color:#7ec87a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#7ec87a14';this.style.borderColor='#7ec87a'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(126,200,122,.35)'">P6</a>
+<a href="page7.html" target="_blank" title="Primorial Survivor Count — Page 7" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(242,168,74,.35);color:#f2a84a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#f2a84a14';this.style.borderColor='#f2a84a'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(242,168,74,.35)'">P7</a>
+<a href="page8.html" target="_blank" title="Page 8" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(155,127,232,.35);color:#9b7fe8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#9b7fe814';this.style.borderColor='#9b7fe8'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(155,127,232,.35)'">P8</a>
+<a href="page9.html" target="_blank" title="Lattice Sieve — Rail(G,n) — Page 9" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid rgba(61,200,184,.35);color:#3dc8b8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#3dc8b814';this.style.borderColor='#3dc8b8'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(61,200,184,.35)'">P9</a>
+<a href="page10.html" title="Saturated–Active Partition — Page 10 (current)" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;background:#e0506022;border:1px solid #e05060;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;font-weight:600;">P10</a>
+</div>
+<div class="topbar">
+</div>
+
+<div class="wrap">
+
+  <h1>A Continuous Generalization of the Feller–Tornier Constant<br>via Saturated Prime Partitions and the Wrench Method</h1>
+  <div class="subtitle">Eliminating prime products from the block-coprime density $C(n)$ via the classical Wrench technique (prime zeta function + Möbius inversion to Riemann zeta values)</div>
+  <div class="byline">Author: <b>Wessen Getachew</b> &nbsp;·&nbsp; June 2026</div>
+
+  <div class="abstract">
+    <b>Abstract</b>
+    We present a generalized framework for evaluating the arithmetic density of $n+1$ consecutive integers checked
+    for mutual coprimality. The Feller–Tornier constant $C_{FT}$ (its $n=1$ member) and related sieve constants have historically
+    been treated as isolated infinite products over primes. We introduce a dynamic parameter $n$ that partitions
+    the prime universe into a <i>saturated</i> domain ($p\le n+1$) and an <i>active</i> domain ($p>n+1$), separating
+    global geometric scaling via $\zeta(2)$ from local sifting constraints $D(n)$. Using the classical Wrench technique — logarithm–Maclaurin expansion, the prime zeta function $P(s)$, and its
+    Möbius inversion $P(s)=\sum_m \tfrac{\mu(m)}{m}\ln\zeta(ms)$ (Wrench 1961) — the active tail $\Omega(n)$ is rewritten as a
+    convergent series of classical Riemann zeta values, eliminating all prime-product dependence. The result is verified numerically
+    against direct sieve computation for $n=1$.
+  </div>
+
+  <div class="acc open">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§1</span><span class="ttl">Introduction &amp; Historical Context</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      <ul>
+        <li><b>The baseline grid.</b> At $n=0$, density maps to $C(0)=1$ and raw density $D(0)=\dfrac{1}{\zeta(2)}=\dfrac{6}{\pi^2}$.</li>
+        <li><b>The Feller–Tornier core.</b> At $n=1$: $D(1)=\prod_p\left(1-\dfrac{2}{p^2}\right)\approx 0.322634$, with classical variant
+          $C_{FT}=\dfrac{1+D(1)}{2}\approx 0.661317$.</li>
+        <li><b>The problem of isolation.</b> The Feller–Tornier constant and related sieve constants have traditionally been computed
+          one value at a time. The contribution here is organizational: exhibiting them as integer samples $C(n)$ of one
+          continuous family governed by block length $n$ — the same $n$ that drives the depth slider across Pages 4, 6, 8, and 9.
+          The computational method (prime zeta + Möbius inversion) is the classical Wrench technique, not new here.</li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§2</span><span class="ttl">Theoretical Framework &amp; the Saturated–Active Partition</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      <ul>
+        <li><b>Block length.</b> Formulate the condition for checking $n+1$ consecutive integers for mutual coprimality.</li>
+        <li><b>Density relation.</b><span class="tag def">DEF</span>
+          <div class="eq">$$D(n)=\frac{C(n)}{\zeta(2)}$$</div></li>
+        <li><b>The prime state machine.</b> Threshold condition $p\le n+1$:
+          <ul>
+            <li><b>Saturated domain</b> ($p\le n+1$): rigid factor $\left(1-\dfrac1p\right)$ — already at maximum block depth.</li>
+            <li><b>Active domain</b> ($p>n+1$): dynamic factor $\left(1-\dfrac{n+1}{p^2}\right)$ — scaling with block size.</li>
+          </ul>
+        </li>
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§3</span><span class="ttl">Derivation of the Master Density Function</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      <li><b>Product decomposition.</b>
+        <div class="eq">$$D(n)=\left[\prod_{p\le n+1}\left(1-\frac1p\right)\right]\cdot\Omega(n)$$</div>
+      </li>
+      <li><b>Active tail.</b><span class="tag def">DEF</span>
+        <div class="eq">$$\Omega(n)=\prod_{p>n+1}\left(1-\frac{n+1}{p^2}\right)$$</div>
+      </li>
+    </div></div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§4</span><span class="ttl">Algebraic Isolation of $\Omega(n)$ — Elimination of Prime Products</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      <li><b>Logarithmic transformation.</b>
+        <div class="eq">$$\ln\Omega(n)=\sum_{p>n+1}\ln\left(1-\frac{n+1}{p^2}\right)$$</div></li>
+      <li><b>Maclaurin expansion</b> with $\ln(1-x)=-\sum_{k=1}^\infty \dfrac{x^k}{k}$, $x=\dfrac{n+1}{p^2}$:
+        <div class="eq">$$\ln\Omega(n)=-\sum_{k=1}^\infty \frac{(n+1)^k}{k}\sum_{p>n+1}\frac{1}{p^{2k}}$$</div></li>
+      <li><b>Truncated prime zeta function.</b><span class="tag def">DEF</span>
+        $P_{>n+1}(s)=P(s)-\sum_{p\le n+1}p^{-s}$:
+        <div class="eq">$$\Omega(n)=\exp\left(-\sum_{k=1}^\infty \frac{(n+1)^k}{k}\,P_{>n+1}(2k)\right)$$</div></li>
+      <li><b>Möbius inversion to Riemann zeta space.</b> The exact dictionary mapping prime zeta to classical zeta:
+        <div class="eq">$$P(2k)=\sum_{m=1}^\infty \frac{\mu(m)}{m}\ln\zeta(2km)$$</div>
+        At this point no prime appears explicitly anywhere in the closed form — $\Omega(n)$, and hence $C(n)$, is expressed
+        purely through Riemann zeta values $\zeta(4),\zeta(6),\zeta(8),\dots$</li>
+      <li><span class="tag lemma">LEMMA</span> As $k\to\infty$, $\ln\zeta(2km)\to 0$ exponentially fast, guaranteeing extreme
+        convergence under any truncation of the series.</li>
+    </div></div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§5</span><span class="ttl">Explicit Step Evaluations ($n=1$, $n=2$) — Numerically Verified</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      <li><b>Case $n=1$ (the Feller–Tornier bridge).</b> $p=2$ is the sole saturated prime:
+        <div class="eq">$$C(1)=\zeta(2)\cdot\frac12\cdot\exp\left(\frac{103}{192}-2\ln\zeta(2)-\ln\zeta(4)-\frac83\ln\zeta(6)-\cdots\right)$$</div>
+      </li>
+      <li><b>Case $n=2$.</b> $p=2$ and $p=3$ both collapse into the saturated domain, changing
+        the leading coefficient to $\dfrac13$ and shifting the active-tail subtraction terms accordingly.</li>
+
+      <table class="verify">
+        <tr><th>Method</th><th>$C(1)$</th></tr>
+        <tr><td>Direct sieve, primes&nbsp;&lt;&nbsp;2,000,000</td><td class="val">0.530711854809731695…</td></tr>
+        <tr><td>Zeta series ($k\le40$, Möbius $m\le60$)</td><td class="val">0.530711820472044794…</td></tr>
+        <tr><td>Known lift-survival constant $C\approx$</td><td class="match">0.530711806246…</td></tr>
+      </table>
+      <div class="note">All three agree to 7 decimal places; the residual divergence is truncation error in the sieve
+        bound and series cutoff, not a flaw in the derivation. The product-elimination step in §4 is confirmed sound.</div>
+    </div></div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§6</span><span class="ttl">Asymptotic Analysis &amp; Connection to Sieve Theory</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      <li><b>Mertens' theorem convergence.</b> As $n\to\infty$, $\Omega(n)$ stabilizes toward a bounded analytic limit, so
+        the dominant asymptotic decay is driven entirely by the saturated harmonic product:
+        <div class="eq">$$D(n)\sim \frac{e^{-\gamma}}{\ln(n+1)}$$</div></li>
+      <li><b>Mapping to the twin-prime constant $C_2$.</b> The active-tail equations intersect with the local
+        prime-sifting obstructions found in Hardy–Littlewood-type limits.</li>
+    </div></div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§7</span><span class="ttl">Numerical Verification &amp; Algorithmic Proof</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      Empirical convergence between raw sieve simulation and the higher-order Riemann zeta expansion is shown in §5
+      for $n=1$. The same procedure generalizes directly: for any $n$, sieve $D(n)$ over primes up to a large bound,
+      then compare against the truncated zeta series with the saturated coefficient $\prod_{p\le n+1}(1-1/p)$.
+    </div></div>
+  </div>
+
+  <div class="acc">
+    <div class="acc-h" onclick="this.parentElement.classList.toggle('open')">
+      <span><span class="num">§8</span><span class="ttl">Conclusion &amp; Open Inquiries</span></span>
+      <span class="car">▸</span>
+    </div>
+    <div class="acc-b"><div class="acc-b-in">
+      The saturated–active partition exhibits a fragmented family of constants — the Feller–Tornier constant ($n=1$),
+      its higher-$n$ analogues, and the lift-survival constant $C(1)$ — as one continuous ladder indexed by block length $n$,
+      with every term expressible purely in Riemann zeta values. Open directions include mapping the saturation
+      step-function directly onto the error-term behavior of the Selberg sieve, and extending the closed form
+      beyond $n=2$ to a fully general $k$-th saturated-coefficient formula.
+    </div></div>
+  </div>
+
+  <div class="footer">Wessen Getachew · wessengetachew.github.io · Page 10</div>
+</div>
+</body>
+</html>
