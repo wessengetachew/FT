@@ -11,7 +11,7 @@ C(n) = ζ(2) · ∏ₚ (1 − min(n+1, p) / p²)
 ## Pages
 
 1. [P1 — C(n): Block-Coprime Density](https://wessengetachew.github.io/FT/)
-2. [P2 — Gap Diagonal Identity](https://wessengetachew.github.io/page2.html)
+2. [P2 — Gap Diagonal Identity](https://wessengetachew.github.io/FT/page2.html)
 3. [P3 — Jump Theorem: Saturation Transitions](https://wessengetachew.github.io/page3.html)
 4. [P4 — C(n,d): Modular Distance Stratification](https://wessengetachew.github.io/page4.html)
 5. [P5 — Half-Barrier Depth Theorem](https://wessengetachew.github.io/page5.html)
