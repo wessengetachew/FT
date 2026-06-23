@@ -1,138 +1,84 @@
 # C(n) — Block-Coprime Density
 
-**Analytic Number Theory · Wessen Getachew**
-[wessengetachew.github.io/FT](https://wessengetachew.github.io/FT)
-
----
-
-## Series
-
-| Page | Topic |
-|------|-------|
-| **[Index — C(n)](index.html)** ← you are here | Block-Coprime Density explorer |
-| [P2 — Gap Diagonal](page2.html) | Gap Diagonal Identity |
-| [P3 — Saturation](page3.html) | Saturation Transitions |
-| [P4 — C(n,d) Stratification](page4.html) | Modular Distance Stratification |
-| [P5 — Goldbach Structure](page5.html) | Goldbach Coprime Structure |
-| [P6 — C_sD(n) Lattice](page6.html) | s-Dimensional Generalisation |
-| [P7 — Wessen Identity](page7.html) | Wessen Identity |
-
----
-
-## What This Page Is
-
-This is the main explorer for **C(n)** — the block-coprime density constant. C(n) measures the natural density of integer pairs (r, M) for which gcd(r, M+j) = 1 for every j = 0, 1, …, n, rescaled by ζ(2) so that C(0) = 1.
-
-At n = 1 it recovers C(1) = ζ(2)·D_FT ≈ 0.5307, where D_FT = ∏_p(1 − 2/p²) is the Feller–Tornier Euler product. The classical Feller–Tornier constant C_FT = ½(1 + D_FT) ≈ 0.6613 is a distinct object.
-
-### Formula
+An interactive exploration of the block-coprime density function
 
 ```
-C(n) = ζ(2) · ∏_p ( 1 − min(n+1, p) / p² )
+C(n) = ζ(2) · ∏ₚ (1 − min(n+1, p) / p²)
 ```
 
-An exact closed form over all primes p, converging absolutely for every finite n. Computed using all primes up to 1,500,000 (114,155 primes) with an analytic tail correction for p > 1,500,000, giving full double-precision accuracy.
+— the natural density of integers coprime to each of `n+1` consecutive moduli, rescaled by `ζ(2)` so `C(0) = 1`. At `n = 1` it reduces to the classical Feller–Tornier constant (`≈ 0.5307`). The site presents this single object as a 2D coprimality lattice, a continuous curve, a Fourier spectrum, and a complex-analytic surface, each numerically verified against direct sieving.
+
+## Pages
+
+1. [P1 — C(n): Block-Coprime Density](https://wessengetachew.github.io/index.html)
+2. [P2 — Gap Diagonal Identity](https://wessengetachew.github.io/page2.html)
+3. [P3 — Jump Theorem: Saturation Transitions](https://wessengetachew.github.io/page3.html)
+4. [P4 — C(n,d): Modular Distance Stratification](https://wessengetachew.github.io/page4.html)
+5. [P5 — Half-Barrier Depth Theorem](https://wessengetachew.github.io/page5.html)
+6. [P6 — s-Dimensional C_sD(n)](https://wessengetachew.github.io/page6.html)
+7. [P7 — Primorial Survivor Count (The Wessen Identity)](https://wessengetachew.github.io/page7.html)
+8. [P8 — C(n) Calculator](https://wessengetachew.github.io/page8.html)
+9. [P9 — Lattice Sieve: Rail(G,n)](https://wessengetachew.github.io/page9.html)
+10. [P10 — Saturated–Active Partition](https://wessengetachew.github.io/page10.html)
+11. [P11 — The Continuous Curve C(t)](https://wessengetachew.github.io/page11.html)
+12. [P12 — The Jump Spectrum](https://wessengetachew.github.io/page12.html)
+13. [P13 — The Complex Extension](https://wessengetachew.github.io/page13.html)
+14. [P14 — The Character Twist](https://wessengetachew.github.io/page14.html)
+15. [P15 — C(t,s) Surface Explorer](https://wessengetachew.github.io/page15.html)
 
 ---
 
-## The Block-Coprime Lattice
+## Page details
 
-The hero canvas plots all pairs (r, M) with 1 ≤ r, M ≤ G:
+### P1 — C(n): Block-Coprime Density
+The entry point. States the defining Euler product, its rescaling convention, and the `n = 1` reduction to the Feller–Tornier constant `C_FT = ½(1 + D_FT) ≈ 0.6613`, distinguishing it from the related `D_FT = ∏ₚ(1 − 2/p²)`. Includes the main interactive lattice canvas with Grid/Ring view toggle, 14+ color modes, sector path tracing, inspect mode, gap/diagonal highlighting, π² annotation via Stern–Brocot mediants, global rotation controls, a prime sieve out to 1.5M, and 4K/8K image export.
 
-- **Gold** — block-coprime at depth n: gcd(r, M+j) = 1 for all j = 0, …, n
-- **Teal** — coprime at j = 0 only (depth < n)
-- **Invisible** — not coprime to M
+### P2 — Gap Diagonal Identity
+Explores the identity governing gaps along the diagonal of the coprimality lattice, with 3D and Field tab visualizations of how gap structure evolves with `n`.
 
-Four views are available:
+### P3 — Jump Theorem: Saturation Transitions
+Characterizes the points at which `C(n)` "saturates" as `n` crosses each prime threshold, visualizing the discrete jump transitions in the underlying Euler product.
 
-| View | Description |
-|------|-------------|
-| **Grid** | Square lattice (r, M) |
-| **Ring** | Concentric residue rings; dot r at angle 2πr/M |
-| **Farey** | Hyperbolic strip x = r/M, y = log(2/M) |
-| **Lift** | Survival dynamics of the block-coprime condition |
+### P4 — C(n,d): Modular Distance Stratification
+Decomposes `C(n) = Σ_d w(d) · C(n,d)` by modular distance `d`, stratifying the block-coprime density into components indexed by distance from the diagonal.
 
-### Color Modes (18 total)
+### P5 — Half-Barrier Depth Theorem
+A Goldbach-flavored exploration of coprime structure, with arc diagrams comparing observed coprime/prime-pair behavior against Hardy–Littlewood predictions.
 
-Farey angle (2πr/M rainbow), Farey proximity (1/p), lift angle, 3-state (gold/teal/dark), survival depth, block window j-index, saturation profile, fail-prime spectrum, GCD(r,M) spectrum, φ(M)/M density, Möbius μ(M), quadratic residues, r primality, mod class (r mod M / M), rainbow (r/M hue), divisibility count, zero divisors, idempotents, modular distance.
+### P6 — s-Dimensional C_sD(n)
+Generalizes the construction to an `s`-dimensional Euler product, `C_sD(n) = ζ(s) · ∏ₚ(1 − min(n+1,p)/p^s)`, extending the block-coprime density beyond the `s = 2` case.
 
----
+### P7 — Primorial Survivor Count (The Wessen Identity)
+Presents the Wessen Identity: for any admissible `k`-tuple `H` and primorial `p#`, the exact count of `h ∈ [1, p#]` coprime to `p#` equals `∏(q − ν_H(q))` over primes `q ≤ p`. Verified with 2,807 independent checks, zero failures — the most rigorously checked result on the site.
 
-## Controls
+### P8 — C(n) Calculator
+The most feature-rich page: five visualization views (Grid, Ring, Farey, Lift, Smith Chart), 15 color modes, BigInt arbitrary-precision arithmetic for exact computation at large `n`, 4K/8K exports, and URL state preservation for sharing specific configurations.
 
-| Control | Description |
-|---------|-------------|
-| **N slider** | Depth n — sets the block-coprime threshold. Animate with ▶ Play. |
-| **G slider** | Grid size — number of (r, M) rows and columns rendered, up to 5000. |
-| **⊞ Finite** | Switch to finite-prime approximation mode. Slider selects how many primes to include: 0 gives ζ(2) (empty product baseline), up to all 114,155 primes ≤ 1,500,000. Colour tracks the convergence gap to the asymptotic value (gold < 0.001%, teal < 0.1%, lime < 1%, coral = far). |
-| **p± / p²±** | Step n to the next or previous prime or prime-square saturation point. |
-| **Color** | 18 color modes for the hero lattice. Hero-local setting, independent of the global mode. |
-| **Label** | Overlay per-cell labels: r/M ratio, depth, GCD, or none. |
-| **Gap g** | Highlight only pairs with gap \|M − r\| = g. Off = show all. |
-| **Goldbach** | Overlay prime-pair sums for a chosen even N. Pairs mode shows (p₁, p₂) with p₁ + p₂ = N. |
-| **Row shift** | Shift columns by a fixed offset for helical/diagonal pattern exploration. |
-| **Inspect (⊕)** | Click mode: pin points and read full details (r, M, depth, GCD, gap, angle). |
-| **Zoom / Pan** | Scroll to zoom, drag to pan in Ring and Farey views. |
-| **Rotation** | Rotate the grid or ring view in steps of 90° or by continuous angle. |
+### P9 — Lattice Sieve: Rail(G,n)
+Visualizes `Rail(G,n)` with Ring and Farey views, seven color schemes, and full keyboard navigation for exploring the rail structure interactively.
 
----
+### P10 — Saturated–Active Partition
+Partitions the lattice into "saturated" and "active" regions as `n` grows, visualizing where the block-coprime condition has stabilized versus where it is still changing.
 
-## Exports
+### P11 — The Continuous Curve C(t)
+Extends `C(n)` from integer `n` to a continuous real variable `t`, presenting `C(t)` as a single interpolated curve rather than a discrete sequence.
 
-| Export | Output |
-|--------|--------|
-| **↓ 4K Export** | 3840 × 5400 poster — title, formula, hero canvas, data footer. Respects current color mode. Includes π² annotation where applicable. |
-| **Grid + Ring 8K** | 7680 × 4320 side-by-side with title header and stat footer. |
-| **Grid + Farey 8K** | 7680 × 4320 side-by-side with Farey strip as right panel. |
-| **Grid PNG** | Hero grid canvas only with stat boxes. |
-| **Ring PNG** | Ring view with stat boxes. |
-| **Cube 4K** | 3D cube projection export. |
-| **Chart PNG / CSV** | Euler product convergence chart or data table. |
-| **Data Table CSV** | C(n), D(n), saturation flags, prime indicators for n = 0…N_max. |
-| **DOM Page** | Full page snapshot as self-contained HTML. |
+### P12 — The Jump Spectrum
+Computes the Fourier transform of the jump structure of `C(t)`: `F(ξ) = Σₚ e^{i(p−1)ξ} / [p(p−1)]`, which encodes the distribution of primes across residue classes. The spectrum chart is featured prominently in the hero section with a Hide/Show toggle.
+
+### P13 — The Complex Extension
+Extends `C(n)` to a complex variable, with verified results on exponent laws, monodromy behavior, and previously unidentified zeros within the critical strip.
+
+### P14 — The Character Twist
+Introduces a Dirichlet-character twist on the base construction, examining how the block-coprime density behaves under character-weighted sieving.
+
+### P15 — C(t,s) Surface Explorer
+A 3D surface explorer (built with Three.js) rendering `C(t,s)` jointly over the continuous parameter `t` and the dimension parameter `s`, unifying the P6 and P11 generalizations into a single explorable surface.
 
 ---
 
-## π² Annotation
+## Notes
 
-When the displayed C(n) value is a rational multiple of π² — as occurs in finite-prime mode, where the partial product equals ζ(2) · (rational) = (π²/6) · (rational) — the exact closed form is shown in violet beside the decimal.
-
-Examples with finite-prime mode active:
-
-| Primes included | Value | Exact form |
-|-----------------|-------|------------|
-| 1 (p = 2) | 1.233700… | = π²/8 |
-| 2 (p ≤ 3) | 1.096622… | = π²/9 |
-| 3 (p ≤ 5) | 1.052757… | = 8π²/75 |
-| ∞ (asymptotic) | C(0) = 1 | — |
-
-Detection uses a Stern–Brocot mediants search on val/π² up to denominator 480 with tolerance 2×10⁻⁹. The annotation appears in all canvas exports.
-
----
-
-## Mathematical Background
-
-C(n) is the exact Euler-product expression for block-coprime density in the modular arithmetic lattice. Key values:
-
-- **C(0) = 1** — all coprime pairs (r, M) with gcd(r, M) = 1; density = 6/π²; rescaling makes this 1
-- **C(1) ≈ 0.530712** — the Feller–Tornier lift survival constant; C(1) = ζ(2) · D_FT
-- **C(n) → 0** as n → ∞ — the block-coprime condition becomes increasingly restrictive
-- **Saturation jumps** occur at prime values of n+1 (where the factor for p = n+1 switches from (1 − (n+1)/p²) = 0 to 1) and at prime-square values
-
-The product telescopes exactly: for n ≥ p − 1, the factor for prime p contributes 1 − 1 = 0 unless n+1 > p, at which point min(n+1, p) = p and the factor is (1 − 1/p) = (p−1)/p. This transition structure is the subject of P3 (Saturation) and P4 (C(n,d) Stratification).
-
-The relationship C(n) = ζ(2) · ∏_{p ≤ n+1} ((p−1)/p) · ∏_{p > n+1} (1 − (n+1)/p²) makes explicit the connection to primorial products and the Wessen Identity on P7.
-
----
-
-## Computation Notes
-
-- Sieve of Eratosthenes to 1,500,000 — 114,155 primes
-- Smallest prime factor (SPF) table to 1,500,000 for factorisation
-- Analytic tail correction: log ∏_{p > 1.5M}(1 − (n+1)/p²) ≈ −(n+1) · Σ_{p > 1.5M} p⁻² using the prime zeta function P(2) = Σ_p p⁻² ≈ 0.452247
-- C(n) cache for n = 0 … 600 computed at startup
-- Block-coprime depth array uses true unbounded depths (Int16Array, per-cell upper bound = r), not capped at any fixed MAX_N — so the grid canvas responds correctly at all values of n
-
----
-
-*wessengetachew.github.io/FT · June 2026*
+- All pages are self-contained single-file HTML/JS applications — no build step, no dependencies beyond what's loaded via CDN.
+- Every numerical claim on the site is checked against direct sieving before being presented.
+- Where a result is classical (e.g. the Feller–Tornier constant), it is named as such. The site's contribution is the visual and continuous-curve presentation, not new underlying number theory.
