@@ -211,6 +211,9 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
 <a href="page13.html" target="_blank" title="The Complex Extension — Page 13" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">P13</a>
 <a href="page14.html" target="_blank" title="The Character Twist — Page 14" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #7ec87a59;color:#7ec87a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#7ec87a14';this.style.borderColor='#7ec87a'" onmouseout="this.style.background='transparent';this.style.borderColor='#7ec87a59'">P14</a>
 <a href="page15.html" target="_blank" title="C(t,s) Surface Explorer — Page 15" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #c8a84a59;color:#c8a84a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#c8a84a14';this.style.borderColor='#c8a84a'" onmouseout="this.style.background='transparent';this.style.borderColor='#c8a84a59'">P15</a>
+
+<a href="page16.html" target="_blank" title="The Decay Theorem — Page 16" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #3dc8b859;color:#3dc8b8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#3dc8b814';this.style.borderColor='#3dc8b8'" onmouseout="this.style.background='transparent';this.style.borderColor='#3dc8b859'">P16</a>
+<a href="#" onclick="openOpener();return false;" title="Open the Welcome / Opener Teaser on the home page" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">Opener</a>
 </div>
 <div id="nbar">
   <div id="nbar-inner">
@@ -235,9 +238,9 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
   <div id="hero-ctrl">
     <button class="hc-btn" id="hero-text-btn" onclick="toggleHeroText()">Hide text</button>
   </div>
-  <div id="hero-text-wrap">
+  <div id="hero-text-wrap" style="overflow-y:auto;max-height:100%;">
     <div class="hero-tag">Analytic Number Theory · Wessen Getachew</div>
-    <h1 class="hero-title">C<sub>sD</sub>(n) — s-Dimensional Generalization</h1>
+    <h1 class="hero-title">C<sub>sD</sub>(n) — Varying the Exponent s</h1>
     <div class="hero-formula">
       $$C_{sD}(n)\;=\;\zeta(s)\cdot\prod_{p\;\text{prime}}\!\left(1-\frac{\min(n+1,\,p)}{p^s}\right)$$
       <div class="hero-live">
@@ -251,10 +254,21 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
       </div>
     </div>
     <div class="hero-sub">
-      Two independent axes. <b>Dimension s</b> sets the field: the raw coprime density of s integers is
-      1/&zeta;(s) &mdash; the floor each dimension sits on (6/&pi;&sup2; in 2D, rising toward 1 as s&rarr;&infin;).
-      <b>Block length n</b> sets the depth: each prime saturates at n = p&minus;1, pulling the density down from that
-      floor. C<sub>sD</sub>(n) is the whole surface over (s, n); s=2 recovers C(n). The lattice shows the s=2 slice.
+      Two independent axes. <b>Exponent s</b> controls the baseline: at n=0 the formula gives
+      C<sub>sD</sub>(0) = &zeta;(s) &middot; &prod;<sub>p</sub>(1 &minus; 1/p<sup>s</sup>) = 1 for all s,
+      because &prod;<sub>p</sub>(1 &minus; 1/p<sup>s</sup>) = 1/&zeta;(s) is Euler's product formula.
+      The natural floor — the raw density before any block condition — is 1/&zeta;(s)
+      (6/&pi;&sup2; &asymp; 0.608 at s=2, rising toward 1 as s &rarr; &infin;).
+      <b>Block length n</b> sets the depth: each prime saturates at n = p&minus;1 exactly as in C(n).
+      C<sub>sD</sub>(n) is C(n)'s formula with p&sup2; replaced by p<sup>s</sup> throughout.
+      Setting s=2 recovers C(n) exactly. The lattice always shows the s=2 slice.
+      <br><br>
+      <em>Note on the name:</em> "s-dimensional" refers to the exponent in the Euler product —
+      it does not mean a geometric s-dimensional lattice is being built. The connection to the
+      classical result that s randomly chosen integers are simultaneously coprime with probability
+      1/&zeta;(s) is real but indirect: that result uses s as a <em>count</em> of integers,
+      whereas here s is an <em>exponent</em> in the Euler product. Both produce 1/&zeta;(s) at
+      n=0, but by different reasoning.
     </div>
   </div>
 </div>
@@ -382,9 +396,22 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
 <div class="card sec-anchor" id="s-theory">
   <div class="card-title">Structure and Derivation</div>
   <div class="ibox">
-    <strong>Setup.</strong> For integer $s \geq 2$, the probability that $s$ randomly chosen positive integers
-    are mutually coprime equals $1/\zeta(s)$. The block-coprime condition shifts each local Euler factor at prime $p$
-    from $1 - 1/p^s$ to $1 - \min(n+1,p)/p^s$. Multiplying by $\zeta(s)$ normalizes so that $C_{sD}(0) = 1$.
+    <strong>Setup.</strong>
+    The classical result (Cesàro, 1884) is that the probability s randomly chosen positive integers are
+    <em>simultaneously</em> coprime equals 1/&zeta;(s). This gives a natural baseline: at n=0, the block-coprime
+    condition is trivially satisfied, and the formula should equal 1. That forces the normalization factor &zeta;(s),
+    since &prod;<sub>p</sub>(1&minus;1/p<sup>s</sup>) = 1/&zeta;(s) by Euler's product formula.
+    <br><br>
+    What this page does: take C(n)'s formula and replace the exponent 2 everywhere with a free parameter s.
+    The local Euler factor at prime p shifts from (1&minus;min(n+1,p)/p&sup2;) to (1&minus;min(n+1,p)/p<sup>s</sup>).
+    The saturation jumps at n = p&minus;1 and the self-similarity structure of C(n) all carry through unchanged —
+    only the baseline and the rate of decay with n change as s varies. The result is a two-parameter surface
+    C<sub>sD</sub>(n) over (s, n); everything on this page is a consequence of that substitution.
+    <br><br>
+    <strong>What is new here vs. classical:</strong> the <em>block condition</em> min(n+1,p) is not classical —
+    it comes from the C(n) construction on Page 1. Letting s vary is a natural exploration of how the saturation
+    structure changes when the exponent changes. This is not a known family in the literature; it is a
+    parameterization introduced here to study how C(n)'s behavior depends on the underlying field structure.
   </div>
   <div class="steps-toolbar">
     <button class="steps-btn" onclick="stepsExpandAll()">Expand all</button>
@@ -395,7 +422,12 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
       <div class="step-hdr" onclick="this.parentElement.classList.toggle('open')">
         <span class="step-num">01</span><span class="step-ttl">Local Factor at Prime p</span><span class="step-arr">▶</span>
       </div>
-      <div class="step-body"><p>Fix a prime $p$. The s-dimensional block constraint eliminates $\min(n+1,p)$ residue classes mod $p$ from the $p^s$ total. The surviving fraction is $$\ell_p(n,s)=1-\frac{\min(n+1,p)}{p^s}.$$ At saturation $p \leq n+1$: $\ell_p = 1 - p^{1-s}$. Before saturation: $\ell_p = 1-(n+1)/p^s$.</p></div>
+      <div class="step-body"><p>Fix a prime $p$. In C(n)'s original formula, the local Euler factor at prime $p$ is $(1 - \min(n+1,p)/p^2)$. Replacing the exponent 2 with $s$ gives the local factor
+      $$\ell_p(n,s)=1-\frac{\min(n+1,p)}{p^s}.$$
+      At saturation ($p \leq n+1$): $\ell_p = 1 - p^{1-s}$.
+      Before saturation: $\ell_p = 1-(n+1)/p^s$.
+      The saturation threshold $p = n+1$ is unchanged from C(n) — it depends only on the block length $n$, not on $s$.
+      </p></div>
     </div>
     <div class="step">
       <div class="step-hdr" onclick="this.parentElement.classList.toggle('open')">
@@ -1040,5 +1072,11 @@ document.addEventListener('fullscreenchange',()=>{
 </script>
 <button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 <button id="fs-btn-p6" onclick="toggleFSP6()" title="Toggle fullscreen">⛶</button>
+<script>
+function openOpener(){
+  sessionStorage.setItem('wg_open_opener','1');
+  window.open('index.html','_blank');
+}
+</script>
 </body>
 </html>

@@ -43,6 +43,9 @@ html,body{max-width:100vw;overflow-x:hidden;}
 @media(max-width:700px){#ctrl-bar{padding:5px 10px;gap:4px 8px;}}
 .cv-lbl{color:var(--cream3);font-size:8px;letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;}
 .cv-sep{width:1px;height:20px;background:var(--edge);flex-shrink:0;}
+.cv-btn{background:none;border:1px solid var(--edge2);color:var(--lime);font-family:var(--mono);font-size:9px;padding:3px 8px;cursor:pointer;flex-shrink:0;transition:all .12s;}
+.cv-btn:hover{border-color:var(--lime);background:rgba(126,200,122,.1);}
+.cv-sl{accent-color:var(--lime);flex-shrink:0;}
 .ctrl-sl{-webkit-appearance:none;height:2px;background:rgba(255,255,255,.15);outline:none;cursor:pointer;border-radius:1px;flex-shrink:0;}
 .ctrl-sl::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);cursor:pointer;}
 .ctrl-num{background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--gold);font-family:var(--mono);font-size:12px;font-weight:500;padding:2px 4px;outline:none;text-align:center;flex-shrink:0;}
@@ -65,12 +68,59 @@ html,body{max-width:100vw;overflow-x:hidden;}
 
 /* ── HERO ── */
 #hero-wrap{position:relative;}
+/* ── CANVAS FULLSCREEN ── */
+#p8-fs-wrap:fullscreen,#p8-fs-wrap:-webkit-full-screen{
+  display:flex;flex-direction:column;align-items:center;background:#04040d;
+  width:100vw;height:100vh;overflow-y:auto;padding:0 0 24px;box-sizing:border-box;
+}
+#p8-fs-wrap:fullscreen #hero,#p8-fs-wrap:-webkit-full-screen #hero{
+  width:min(98vw,900px)!important;max-height:min(74vh,900px)!important;
+  aspect-ratio:1/1;flex-shrink:0;position:sticky;top:0;z-index:10;
+}
+#p8-fs-wrap:fullscreen #hero-cv,#p8-fs-wrap:-webkit-full-screen #hero-cv{opacity:1!important;}
+#p8-fs-wrap:fullscreen #p8-fs-ctrl-bar,#p8-fs-wrap:-webkit-full-screen #p8-fs-ctrl-bar{display:flex!important;}
+#p8-fs-wrap.p8-fs-hidden:fullscreen #hero,#p8-fs-wrap.p8-fs-hidden:-webkit-full-screen #hero{
+  max-height:min(92vh,1100px)!important;
+}
+#p8-fs-ctrl-bar{
+  display:none;flex-direction:column;width:min(98vw,900px);gap:0;flex-shrink:0;
+  background:rgba(4,4,13,.98);border:1px solid var(--edge2);margin-top:4px;
+}
+/* Collapsible sections inside fullscreen ctrl-bar */
+.p8-fs-section{border-bottom:1px solid var(--edge2);}
+.p8-fs-section-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 12px;cursor:pointer;user-select:none;
+  font-family:var(--mono);font-size:8px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--cream3);background:rgba(255,255,255,.025);
+}
+.p8-fs-section-hd:hover{background:rgba(255,255,255,.05);}
+.p8-fs-section-hd .arr{transition:transform .15s;font-size:9px;}
+.p8-fs-section.open .arr{transform:rotate(90deg);}
+.p8-fs-section-body{display:none;}
+.p8-fs-section.open .p8-fs-section-body{display:block;}
+#p8-fs-btn{
+  background:none;border:1px solid var(--edge2);color:var(--cream3);
+  width:32px;height:28px;font-size:13px;cursor:pointer;display:inline-flex;
+  align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;
+}
+#p8-fs-btn:hover{background:rgba(200,168,74,.1);border-color:rgba(200,168,74,.4);color:var(--gold);}
+@media(max-width:700px){
+  #p8-fs-wrap:fullscreen #hero,#p8-fs-wrap:-webkit-full-screen #hero{
+    width:100vw!important;max-height:50vh!important;
+  }
+}
 #hero{position:relative;overflow:hidden;
   /* Square canvas: height tracks the element width via aspect-ratio */
   width:100%;aspect-ratio:1/1;max-height:90vh;}
 @media(min-width:1024px){#hero{max-height:88vh;}}
 @media(max-width:700px){#hero{aspect-ratio:1/1;max-height:100vw;}}
 #hero-cv{position:absolute;inset:0;width:100%;height:100%;opacity:0.2;transition:opacity .5s ease;z-index:0;cursor:default;}
+#compare-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;background:#04040d;height:min(78vh,720px);min-height:320px;}
+.cmp-cell{position:relative;border:1px solid var(--edge2);overflow:hidden;cursor:pointer;background:#04040d;transition:border-color .15s;}
+.cmp-cell:hover{border-color:rgba(155,127,232,.5);}
+.cmp-cell canvas{width:100%;height:100%;display:block;}
+.cmp-label{position:absolute;top:5px;left:7px;z-index:2;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;background:rgba(4,4,13,.75);border:1px solid;border-radius:2px;padding:2px 7px;pointer-events:none;}
 #hero-cv.pannable{cursor:grab;}
 #hero-cv.pannable.dragging{cursor:grabbing;}
 /* Text overlay — centered on canvas */
@@ -224,6 +274,9 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
 <a href="page13.html" target="_blank" title="The Complex Extension — Page 13" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">P13</a>
 <a href="page14.html" target="_blank" title="The Character Twist — Page 14" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #7ec87a59;color:#7ec87a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#7ec87a14';this.style.borderColor='#7ec87a'" onmouseout="this.style.background='transparent';this.style.borderColor='#7ec87a59'">P14</a>
 <a href="page15.html" target="_blank" title="C(t,s) Surface Explorer — Page 15" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #c8a84a59;color:#c8a84a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#c8a84a14';this.style.borderColor='#c8a84a'" onmouseout="this.style.background='transparent';this.style.borderColor='#c8a84a59'">P15</a>
+
+<a href="page16.html" target="_blank" title="The Decay Theorem — Page 16" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #3dc8b859;color:#3dc8b8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#3dc8b814';this.style.borderColor='#3dc8b8'" onmouseout="this.style.background='transparent';this.style.borderColor='#3dc8b859'">P16</a>
+<a href="#" onclick="openOpener();return false;" title="Open the Welcome / Opener Teaser on the home page" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">Opener</a>
 </div>
 <div id="topbar">
   <span class="tb-brand">C(n)</span>
@@ -263,6 +316,8 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
     <button class="ctrl-btn" onclick="export4K()" style="border-color:rgba(61,200,184,.35);color:var(--teal);padding:3px 7px;" title="Download 4K poster PNG">↓ 4K</button>
     <button class="ctrl-btn" onclick="exportSnap()" style="border-color:rgba(155,127,232,.35);color:var(--violet);padding:3px 7px;" title="Capture hero text + canvas">↓ Snap</button>
     <button class="ctrl-btn" onclick="openMultiExport()" style="border-color:rgba(126,200,122,.45);color:var(--lime);padding:3px 7px;font-weight:600;" title="Multi-view 2×2 export">↓ Multi</button>
+    <button class="ctrl-btn" id="compare-btn" onclick="toggleCompare()" style="border-color:rgba(155,127,232,.45);color:var(--violet);padding:3px 7px;font-weight:600;" title="Live side-by-side: Grid · Ring · Farey · Smith Chart">⊞ Compare</button>
+    <button id="p8-fs-btn" onclick="p8ToggleFs()" title="Canvas-only fullscreen — canvas sticks at top, all controls scroll below">⛶</button>
   </div>
   <!-- ROW 2: G + p±  + rotate + finite + DP -->
   <div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;padding:5px 12px;">
@@ -271,6 +326,7 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
     <input class="ctrl-sl" id="sl-G" type="range" min="1" max="512" value="30" style="width:75px;" oninput="setG(+this.value)">
     <input class="ctrl-num" id="num-G" type="number" min="1" max="2048" value="30" style="width:48px;" oninput="setG(+this.value||1)">
     <button class="ctrl-step" onclick="stepG(1)">+</button>
+    <button id="g-play-btn" onclick="toggleGPlay()" title="Ping-pong G from 1 to current max" style="background:rgba(200,168,74,.08);border:1px solid rgba(200,168,74,.4);color:var(--gold);font-family:var(--mono);font-size:8px;padding:3px 7px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;">▶ G</button>
     <button onclick="stepGPrime(-1)" title="Previous prime G" style="background:none;border:1px solid rgba(61,200,184,.35);color:var(--teal);font-family:var(--mono);font-size:8px;padding:3px 7px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;">p−</button>
     <button onclick="stepGPrime(1)" title="Next prime G" style="background:none;border:1px solid rgba(61,200,184,.35);color:var(--teal);font-family:var(--mono);font-size:8px;padding:3px 7px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;">p+</button>
     <div class="cv-sep"></div>
@@ -322,7 +378,9 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
   </span>
 </div>
 
-<!-- ── HERO ── -->
+<!-- ── HERO — wrapped in fullscreen div so canvas sticks at top
+     and all controls scroll below it in canvas-fullscreen mode ── -->
+<div id="p8-fs-wrap">
 <div id="hero-wrap">
   <div id="hero">
     <canvas id="hero-cv"></canvas>
@@ -339,6 +397,40 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
         At n=1: C(1)=ζ(2)·D<sub>FT</sub>≈0.5307, where D<sub>FT</sub>=∏<sub>p</sub>(1−2/p²) is the Feller–Tornier Euler product (irrational — not a clean multiple of π²).
       </div>
     </div>
+  </div>
+</div>
+
+  <!-- Controls bar shown inside fullscreen — all control panels relocate here -->
+  <div id="p8-fs-ctrl-bar"></div>
+</div>
+
+<!-- ── COMPARE — live 2×2 side-by-side: Grid · Ring · Farey · Smith Chart.
+     Renders into the shared offscreen cv/ctx pair one view at a time (same
+     trick as the Multi-export composite) and snapshots each into its own
+     small visible canvas, so it stays in sync with G/n/rotation/Advanced
+     filters without needing four independent draw engines. ── -->
+<div id="compare-wrap" style="display:none;">
+  <div id="compare-grid">
+    <div class="cmp-cell" onclick="setView('grid');toggleCompare()" title="Click to switch to Grid view">
+      <div class="cmp-label" style="color:rgba(200,168,74,.9);border-color:rgba(200,168,74,.4);">Grid</div>
+      <canvas id="cmp-cv-grid"></canvas>
+    </div>
+    <div class="cmp-cell" onclick="setView('ring');toggleCompare()" title="Click to switch to Ring view">
+      <div class="cmp-label" style="color:rgba(61,200,184,.9);border-color:rgba(61,200,184,.4);">Ring</div>
+      <canvas id="cmp-cv-ring"></canvas>
+    </div>
+    <div class="cmp-cell" onclick="setView('farey');toggleCompare()" title="Click to switch to Farey view">
+      <div class="cmp-label" style="color:rgba(200,168,74,.9);border-color:rgba(200,168,74,.4);">Farey</div>
+      <canvas id="cmp-cv-farey"></canvas>
+    </div>
+    <div class="cmp-cell" onclick="setView('conformal');toggleCompare()" title="Click to switch to Smith Chart view">
+      <div class="cmp-label" style="color:rgba(242,168,74,.9);border-color:rgba(242,168,74,.4);">Smith</div>
+      <canvas id="cmp-cv-conformal"></canvas>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:6px;font-family:var(--mono);font-size:8px;color:var(--cream3);">
+    <span>Live mirror of G / n / rotation / Advanced filters · click any pane to switch to that view</span>
+    <button onclick="renderCompareGrid()" style="background:none;border:1px solid var(--edge2);color:var(--cream2);font-family:var(--mono);font-size:7.5px;padding:3px 8px;cursor:pointer;">↻ Refresh</button>
   </div>
 </div>
 
@@ -416,6 +508,8 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
       <button onclick="stepGap(1)" style="width:18px;height:18px;background:none;border:1px solid var(--edge2);color:rgba(200,168,74,.8);font-family:var(--mono);font-size:9px;cursor:pointer;padding:0;line-height:1;flex-shrink:0;">▲</button>
       <span id="gap-lbl" style="font-family:var(--mono);font-size:8px;color:rgba(200,168,74,.85);min-width:22px;">off</span>
       <span id="gap-phi" style="font-family:var(--mono);font-size:7.5px;color:rgba(61,200,184,.75);min-width:60px;"></span>
+      <button id="gap-half-btn" onclick="toggleGapHalfLock()" title="Lock gap = ½G (tracks G slider automatically)"
+        style="background:none;border:1px solid rgba(200,168,74,.35);color:rgba(200,168,74,.6);font-family:'JetBrains Mono',monospace;font-size:7.5px;padding:2px 7px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;transition:all .15s;">½G</button>
       <button onclick="clearGap()" style="background:none;border:1px solid var(--edge2);color:var(--cream3);font-family:var(--mono);font-size:7px;padding:2px 7px;cursor:pointer;">✕</button>
       <button id="gap-play-btn" onclick="toggleGapPlay()"
         style="background:rgba(200,168,74,.07);border:1px solid rgba(200,168,74,.4);color:var(--gold);font-family:var(--mono);font-size:8px;padding:3px 8px;cursor:pointer;flex-shrink:0;letter-spacing:.04em;white-space:nowrap;">▶ Anim</button>
@@ -438,11 +532,7 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
   </div>
 
   <!-- Grid sub-panel (grid-only extras) -->
-  <div class="view-panel" id="vp-grid" style="border-color:rgba(200,168,74,.2);border-top:none;">
-    <div class="vp-body" style="padding:5px 14px;">
-      <span class="cv-lbl" style="color:rgba(200,168,74,.7);font-size:7.5px;">GRID ONLY:</span>
-    </div>
-  </div>
+  <div class="view-panel" id="vp-grid" style="border-color:rgba(200,168,74,.2);border-top:none;"></div>
   <!-- Ring sub-panel -->
   <div class="view-panel" id="vp-ring" style="border-color:rgba(61,200,184,.3);">
     <div class="vp-head"><span class="vp-title" style="color:rgba(61,200,184,.9);">Ring — Concentric Residue Circles</span>
@@ -458,6 +548,25 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
       <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
       <label style="display:flex;align-items:center;gap:4px;font-size:8px;color:var(--cream2);cursor:pointer;">
         <input type="checkbox" id="ring-invert" style="accent-color:var(--gold);" onchange="drawHero()">Invert rings</label>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <span class="cv-lbl" style="color:var(--lime);">Per-ring preset:</span>
+      <button class="cv-btn" onclick="applyRingFractionPreset(1,2)" title="Per-ring = 180°">½</button>
+      <button class="cv-btn" onclick="applyRingFractionPreset(1,3)" title="Per-ring = 120°">⅓</button>
+      <button class="cv-btn" onclick="applyRingFractionPreset(1,4)" title="Per-ring = 90°">¼</button>
+      <button class="cv-btn" onclick="applyRingFractionPreset(2,3)" title="Per-ring = 240°">⅔</button>
+      <button class="cv-btn" onclick="applyRingFractionPreset(1,6)" title="Per-ring = 60°">⅙</button>
+      <button class="cv-btn" onclick="applyRingFractionPreset(3,4)" title="Per-ring = 270°">¾</button>
+      <button class="cv-btn" onclick="applyRingFractionPreset(1,8)" title="Per-ring = 45°">⅛</button>
+      <button class="cv-btn" onclick="applyRingFractionPreset(0,1)" title="Reset per-ring to 0°">0°</button>
+      <div class="cv-sep" style="width:1px;height:18px;background:var(--edge);"></div>
+      <span class="cv-lbl" style="color:var(--lime);">Per-ring:</span>
+      <input class="cv-sl" type="range" id="ring-per-inc" min="0" max="1" step="0.0001" value="0" style="width:60px;"
+        oninput="_syncPerRingFromSlider(+this.value)">
+      <input type="text" id="ring-per-inc-txt" value="0" inputmode="decimal"
+        style="width:64px;background:rgba(255,255,255,.04);border:1px solid var(--edge2);color:var(--lime);font-family:var(--mono);font-size:9px;padding:2px 4px;outline:none;text-align:center;"
+        oninput="_syncPerRingFromText(this.value)" title="Enter decimal (0.3333) or fraction (1/3)" placeholder="0 or a/b">
+      <span class="cv-lbl" style="color:var(--lime);min-width:62px;white-space:nowrap;" id="ring-per-inc-v">= 0.00000</span>
+      <span class="cv-lbl" style="color:rgba(155,127,232,.45);font-size:7px;" title="The extra rotation for ring M is 2π·(a/b)·(M−1)">per ring</span>
     </div>
     <div class="vp-note"><span style="color:rgba(61,200,184,.6);">Theory:</span> Each ring M holds the φ(M) coprime residues r mod M at angle 2πr/M. Gold = block-coprime (depth ≥ n). The density of gold dots → C(n)/ζ(2) as M max grows.</div>
   </div>
@@ -605,6 +714,49 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
     </div>
   </div>
 
+  <!-- Advanced — custom ring selection + χ(r) character filter panel -->
+  <details id="adv-details" style="background:rgba(7,7,18,.98);border:1px solid rgba(155,127,232,.3);border-top:none;font-family:var(--mono);">
+    <summary style="cursor:pointer;padding:7px 14px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(155,127,232,.9);list-style:none;display:flex;align-items:center;gap:6px;user-select:none;">
+      <span style="display:inline-block;transition:transform .15s;">▸</span>
+      Advanced — Custom Rings &amp; χ(r) Filter
+      <span style="font-size:7.5px;color:var(--cream3);font-weight:400;letter-spacing:.04em;text-transform:none;margin-left:6px;">applies to every view</span>
+    </summary>
+    <style>#adv-details[open]>summary>span:first-child{transform:rotate(90deg);}</style>
+    <div style="padding:10px 14px;border-top:1px solid rgba(155,127,232,.14);">
+
+      <div style="font-size:8px;color:var(--cream3);margin-bottom:6px;">Dirichlet Character Controls</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <label style="display:flex;align-items:center;gap:5px;font-size:8px;color:var(--gold);cursor:pointer;">
+          <input type="checkbox" id="pg-char-support" checked onchange="pgSetCharFilter()" style="accent-color:rgba(200,168,74,.9);"> Show χ(r) ≠ 0 (Character Support)
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:8px;color:var(--cream2);cursor:pointer;">
+          <input type="checkbox" id="pg-char-vanishing" checked onchange="pgSetCharFilter()" style="accent-color:rgba(200,168,74,.9);"> Show χ(r) = 0 (Character Vanishing)
+        </label>
+      </div>
+
+      <div style="font-size:8px;color:var(--cream3);margin-bottom:6px;">Advanced Modulus Selection — restrict which rings (M) draw, across all views</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:7px;">
+        <span style="font-size:7.5px;color:var(--cream3);">Multi-select:</span>
+        <input type="text" id="pg-ring-multi" placeholder="e.g. 2,3,5,7,11" value="2,3,5,7,11" style="flex:1;min-width:90px;background:rgba(255,255,255,.04);border:1px solid rgba(155,127,232,.3);color:var(--violet);font-family:var(--mono);font-size:8px;padding:3px 5px;outline:none;">
+        <button onclick="pgAddMultiRings()" style="background:rgba(155,127,232,.12);border:1px solid rgba(155,127,232,.5);color:var(--violet);font-family:var(--mono);font-size:7.5px;padding:4px 8px;cursor:pointer;">Add</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:7px;">
+        <span style="font-size:7.5px;color:var(--cream3);">Single M:</span>
+        <input type="number" id="pg-ring-single" min="1" placeholder="42" value="42" style="width:54px;background:rgba(255,255,255,.04);border:1px solid rgba(155,127,232,.3);color:var(--violet);font-family:var(--mono);font-size:8px;text-align:center;padding:3px 4px;outline:none;">
+        <button onclick="pgAddSingleRing()" style="background:rgba(155,127,232,.12);border:1px solid rgba(155,127,232,.5);color:var(--violet);font-family:var(--mono);font-size:7.5px;padding:4px 8px;cursor:pointer;">Add</button>
+        <span style="font-size:7.5px;color:var(--cream3);margin-left:6px;">Range:</span>
+        <input type="number" id="pg-ring-from" min="1" placeholder="1" value="1" style="width:44px;background:rgba(255,255,255,.04);border:1px solid rgba(155,127,232,.3);color:var(--violet);font-family:var(--mono);font-size:8px;text-align:center;padding:3px 4px;outline:none;">
+        <span style="font-size:8px;color:var(--cream3);">–</span>
+        <input type="number" id="pg-ring-to" min="1" placeholder="20" value="20" style="width:44px;background:rgba(255,255,255,.04);border:1px solid rgba(155,127,232,.3);color:var(--violet);font-family:var(--mono);font-size:8px;text-align:center;padding:3px 4px;outline:none;">
+        <button onclick="pgAddRingRange()" style="background:rgba(155,127,232,.12);border:1px solid rgba(155,127,232,.5);color:var(--violet);font-family:var(--mono);font-size:7.5px;padding:4px 8px;cursor:pointer;">Add range</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <button onclick="pgResetActiveRings()" style="background:none;border:1px solid var(--edge2);color:var(--cream2);font-family:var(--mono);font-size:7.5px;padding:4px 9px;cursor:pointer;">Reset — show all rings</button>
+      </div>
+      <div id="pg-ring-list" style="font-size:7.5px;color:var(--violet);line-height:1.9;max-height:130px;overflow-y:auto;padding-right:2px;"><span style="color:var(--cream3);">All rings 1–G active (default)</span></div>
+    </div>
+  </details>
+
   <!-- Sector Path panel -->
   <details id="sec-details" style="background:rgba(7,7,18,.98);border:1px solid rgba(155,127,232,.3);font-family:var(--mono);">
     <summary style="cursor:pointer;padding:7px 14px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(155,127,232,.9);list-style:none;display:flex;align-items:center;gap:6px;user-select:none;">
@@ -702,6 +854,19 @@ table.dt td:first-child{text-align:center;color:var(--cream3);}
   <span class="lv-lbl">Next sat n=<b style="color:var(--violet)" id="lb-next">1</b></span>
   <div class="lv-sep"></div>
   <span class="lv-lbl" style="color:var(--cream3);" id="lb-view">grid · G=30</span>
+</div>
+<!-- Finite-lattice counts row — gcd=1/total, lift/total, lift/gcd=1 vs asymptotic -->
+<div id="live-counts-bar" style="background:rgba(4,4,13,.95);border-bottom:1px solid rgba(255,255,255,.06);padding:6px 14px;font-family:var(--mono);font-size:8px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;">
+  <span style="color:var(--cream3);font-size:7px;letter-spacing:.09em;text-transform:uppercase;flex-shrink:0;">Finite G lattice</span>
+  <span style="color:rgba(255,255,255,.15);">·</span>
+  <span style="color:var(--cream3);">gcd=1/total: <b id="lc-gcd" style="color:var(--gold);">—</b></span>
+  <span style="color:rgba(255,255,255,.08);">→∞ 1/ζ(2)≈<span style="color:rgba(200,168,74,.5);">0.6079</span></span>
+  <span style="color:rgba(255,255,255,.15);">·</span>
+  <span style="color:var(--cream3);">lift/total: <b id="lc-lift" style="color:var(--teal);">—</b></span>
+  <span style="color:rgba(255,255,255,.08);">→∞ D(n)</span>
+  <span style="color:rgba(255,255,255,.15);">·</span>
+  <span style="color:var(--cream3);">lift/gcd=1: <b id="lc-cond" style="color:var(--violet);">—</b></span>
+  <span style="color:rgba(255,255,255,.08);">→∞ D(n)/D(0)</span>
 </div>
 
 <div id="content">
@@ -928,6 +1093,112 @@ const PS=new Set();
 function sieve(lim){const c=new Uint8Array(lim+1),ps=[];for(let i=2;i<=lim;i++){if(!c[i]){ps.push(i);PS.add(i);for(let j=i*i;j<=lim;j+=i)c[j]=1;}}return ps;}
 const PRIMES=sieve(200000);
 function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=b;b=a%b;a=t;}return a;}
+
+// ── Per-ring twist — ported from the opener (page 1): each successive ring
+// M adds an extra rotation of incFrac·2π·(M−1) on top of θ=2πr/M. Same
+// formula, same preset buttons, just calling drawHero() instead of renderRing(). ──
+function applyRingFractionPreset(a,b){
+  const frac=b===0?0:a/b;
+  const sl=document.getElementById('ring-per-inc');
+  const lbl=document.getElementById('ring-per-inc-v');
+  const txt=document.getElementById('ring-per-inc-txt');
+  if(sl)sl.value=frac;
+  if(lbl)lbl.textContent='= '+frac.toFixed(5);
+  if(txt)txt.value=b===1?`${a}`:`${a}/${b}`;
+  drawHero();
+}
+function _syncPerRingFromSlider(v){
+  v=Math.max(0,Math.min(1,v));
+  const lbl=document.getElementById('ring-per-inc-v');
+  const txt=document.getElementById('ring-per-inc-txt');
+  if(lbl)lbl.textContent='= '+v.toFixed(5);
+  if(txt)txt.value=v.toFixed(5);
+  drawHero();
+}
+function _syncPerRingFromText(raw){
+  raw=(raw||'').trim();
+  let v;
+  if(raw.includes('/')){
+    const parts=raw.split('/');
+    const a=parseFloat(parts[0]),b=parseFloat(parts[1]);
+    v=(isNaN(a)||isNaN(b)||b===0)?0:a/b;
+  } else {
+    v=parseFloat(raw);
+  }
+  v=isNaN(v)?0:Math.max(0,Math.min(1,v));
+  const sl=document.getElementById('ring-per-inc');
+  const lbl=document.getElementById('ring-per-inc-v');
+  if(sl)sl.value=v;
+  if(lbl)lbl.textContent='= '+v.toFixed(5);
+  drawHero();
+}
+function _ringPerRingInc(){
+  return (parseFloat(document.getElementById('ring-per-inc')?.value)||0)*2*Math.PI;
+}
+
+// ── Advanced: custom ring (modulus) selection + χ(r) character filter —
+// shared across all views (Grid/Ring/Farey/Lift/Smith). Same logic as the
+// opener's wActiveRings/wCharFilter, ported to page8's gcd()/draw* functions. ──
+let _pgActiveRings=null; // null = all rings 1..G active (default); else a Set of specific M values
+let _pgCharFilter='both'; // 'both' | 'support' (χ≠0, gcd=1) | 'vanishing' (χ=0, gcd>1)
+function pgRingActive(M){ return M===1||!_pgActiveRings||_pgActiveRings.has(M); }
+function pgCharPass(isCoprime){ return _pgCharFilter==='both'||(_pgCharFilter==='support'&&isCoprime)||(_pgCharFilter==='vanishing'&&!isCoprime); }
+function pgSetCharFilter(){
+  let sup=document.getElementById('pg-char-support')?.checked;
+  let van=document.getElementById('pg-char-vanishing')?.checked;
+  if(!sup&&!van){ sup=true; const e=document.getElementById('pg-char-support'); if(e)e.checked=true; }
+  _pgCharFilter=(sup&&van)?'both':(sup?'support':'vanishing');
+  drawHero();
+}
+function pgAddSingleRing(){
+  const v=parseInt(document.getElementById('pg-ring-single')?.value);
+  if(!v||v<1)return;
+  if(!_pgActiveRings)_pgActiveRings=new Set();
+  _pgActiveRings.add(v);
+  if(v>G)setG(v); // bump lattice size so the new ring is actually in range
+  pgRefreshRingList();drawHero();
+}
+function pgAddRingRange(){
+  const a=parseInt(document.getElementById('pg-ring-from')?.value);
+  const b=parseInt(document.getElementById('pg-ring-to')?.value);
+  if(!a||!b||a<1||b<a)return;
+  if(b-a>2000){ if(!confirm('This will add '+(b-a+1)+' rings — continue?'))return; }
+  if(!_pgActiveRings)_pgActiveRings=new Set();
+  for(let i=a;i<=b;i++)_pgActiveRings.add(i);
+  if(b>G)setG(b);
+  pgRefreshRingList();drawHero();
+}
+function pgAddMultiRings(){
+  const raw=document.getElementById('pg-ring-multi')?.value||'';
+  const parts=raw.split(',').map(s=>parseInt(s.trim())).filter(v=>v>=1);
+  if(!parts.length)return;
+  if(!_pgActiveRings)_pgActiveRings=new Set();
+  parts.forEach(v=>_pgActiveRings.add(v));
+  const maxV=Math.max(...parts);
+  if(maxV>G)setG(maxV);
+  pgRefreshRingList();drawHero();
+}
+function pgRemoveActiveRing(M){
+  if(!_pgActiveRings)return;
+  _pgActiveRings.delete(M);
+  pgRefreshRingList();drawHero();
+}
+function pgResetActiveRings(){
+  _pgActiveRings=null;
+  pgRefreshRingList();drawHero();
+}
+function pgRefreshRingList(){
+  const el=document.getElementById('pg-ring-list');
+  if(!el)return;
+  if(!_pgActiveRings||!_pgActiveRings.size){
+    el.innerHTML='<span style="color:var(--cream3);">All rings 1–G active (default)</span>';
+    return;
+  }
+  const sorted=Array.from(_pgActiveRings).sort((a,b)=>a-b);
+  el.innerHTML=sorted.map(M=>
+    `<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(155,127,232,.12);border:1px solid rgba(155,127,232,.4);border-radius:2px;padding:1px 4px 1px 6px;margin:2px 3px 0 0;">M${M}<button onclick="pgRemoveActiveRing(${M})" style="background:none;border:none;color:rgba(224,80,96,.85);cursor:pointer;font-size:9px;padding:0 2px;">×</button></span>`
+  ).join('');
+}
 function phi(n){let r=n,x=n;for(const p of PRIMES){if(p*p>x)break;if(x%p===0){while(x%p===0)x/=p;r-=r/p;}}if(x>1)r-=r/x;return Math.round(r);}
 function mobius(n){if(n<=1)return n===1?1:0;let x=n,f=0;for(const p of PRIMES){if(p*p>x)break;if(x%p===0){f++;x=Math.floor(x/p);if(x%p===0)return 0;}}if(x>1)f++;return f%2===0?1:-1;}
 
@@ -1394,6 +1665,7 @@ function drawGrid(W,H){
     ctx.rotate((_rotSteps&3)*Math.PI/2);
     ctx.translate(-W/2,-H/2);
   }
+  const _gridFillTextOrig=_patchFillTextUpright(ctx);
 
   const mode=document.getElementById('grid-color-sel').value;
   const labelMode=document.getElementById('grid-label-sel').value;
@@ -1407,10 +1679,12 @@ function drawGrid(W,H){
 
   // ── Draw cells ──
   for(let M=1;M<=G;M++){
+    if(!pgRingActive(M))continue;
     for(let r=1;r<=G;r++){
       const {px,py}=cellXY(r,M,W,H,pad);
       if(px+cellW<0||px>W||py+cellH<0||py>H) continue;
       const g=gcd(r,M);
+      if(!pgCharPass(g===1))continue;
       const lit=isLit(r,M,N);
       const col=cellColor(r,M,N,mode,g,lit);
       if(lit&&(mode==='3state'||mode==='kill')){
@@ -1606,6 +1880,7 @@ function drawRing(W,H){
   if(_ringNeedsTransform){
     ctx.save();
     if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+  const _ringFillTextOrig=_patchFillTextUpright(ctx);
     if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
   }
   const cx=W/2,cy=H/2,maxR=Math.min(W,H)*.44;
@@ -1634,12 +1909,14 @@ function drawRing(W,H){
   const labelMode=document.getElementById('grid-label-sel')?.value||'none';
   const dotBase=Math.max(1,Math.min(3.5,maxR/mMax*.35))*dotSc;
   for(let M=2;M<=mMax;M++){
+    if(!pgRingActive(M))continue;
     const rho=invert?((mMax+1-M)/mMax)*maxR:(M/mMax)*maxR;
     for(let r=1;r<M;r++){
       const g=gcd(r,M);
+      if(!pgCharPass(g===1))continue;
       const lit=isLit(r,M,N);
-      if(g>1&&!lit&&mode==='mod_dist')continue; // skip non-coprime in default mode for clarity
-      const theta=2*Math.PI*r/M;
+      if(g>1&&!lit&&mode==='mod_dist'&&_gapHighlight<0)continue; // skip non-coprime in default mode for clarity — but not while gap highlight is active, or the diagonal can't render
+      const theta=2*Math.PI*r/M+_ringPerRingInc()*(M-1);
       const x=cx+rho*Math.cos(theta),y2=cy-rho*Math.sin(theta);
       let col=cellColor(r,M,N,mode,g,lit)||'rgba(200,168,74,.85)';
       if(!lit)col=g===1?col.replace(/[\d.]+\)$/,m=>String(Math.min(parseFloat(m),.5))+')'):'rgba(255,255,255,.04)';
@@ -1665,6 +1942,7 @@ function drawRing(W,H){
   }
   drawClickedHighlights('ring',W,H);
   if(_ringNeedsTransform)ctx.restore();
+  if(_nativeFillText)ctx.fillText=_nativeFillText; // overlay drawn in unrotated space — don't leave the rotated patch active
   drawSectorOverlay(W,H,0);
   ctx.font="7px 'JetBrains Mono',monospace";ctx.textAlign='right';ctx.textBaseline='bottom';
   ctx.fillStyle='rgba(200,168,74,.4)';
@@ -1678,6 +1956,7 @@ function drawFarey(W,H){
   if(_fareyNeedsTransform){
     ctx.save();
     if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+  const _fareyFillTextOrig=_patchFillTextUpright(ctx);
     if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
   }
   const mMax=G;
@@ -1700,6 +1979,7 @@ function drawFarey(W,H){
 
   const dotR=Math.max(1.2,Math.min(5,(H*.012)/Math.sqrt(mMax)))*dotSc;
   for(let M=2;M<=mMax;M++){
+    if(!pgRingActive(M))continue;
     const rawY=Math.log(2/M)/Math.log(2/mMax);
     const logY=Math.pow(Math.max(0,rawY),1/yexp);
     const sy=cy+(logY*1.8-.9)*H/2;
@@ -1708,8 +1988,9 @@ function drawFarey(W,H){
     const fLabelMode=document.getElementById('grid-label-sel')?.value||'none';
     for(let r=1;r<M;r++){
       const fg=gcd(r,M);
+      if(!pgCharPass(fg===1))continue;
       const lit=isLit(r,M,N);
-      if(fg>1&&!lit&&fmode==='mod_dist')continue;
+      if(fg>1&&!lit&&fmode==='mod_dist'&&_gapHighlight<0)continue;
       const fx=r/M*2-1;
       const sx=cx+fx*W/2;
       let fcol=cellColor(r,M,N,fmode,fg,lit)||'rgba(200,168,74,.85)';
@@ -1756,6 +2037,7 @@ function drawFarey(W,H){
   }
   drawClickedHighlights('farey',W,H);
   if(_fareyNeedsTransform)ctx.restore();
+  if(_nativeFillText)ctx.fillText=_nativeFillText; // overlay drawn in unrotated space — don't leave the rotated patch active
   drawSectorOverlay(W,H,0);
   ctx.font="7px 'JetBrains Mono',monospace";ctx.textAlign='right';ctx.textBaseline='bottom';
   ctx.fillStyle='rgba(200,168,74,.4)';
@@ -1833,7 +2115,7 @@ function _dotXYFor(view,r,M,W,H){
     const invert=document.getElementById('ring-invert')?.checked;
     const maxR=Math.min(W,H)*.44;
     const rho=invert?((mMax+1-M)/mMax)*maxR:(M/mMax)*maxR;
-    const th=2*Math.PI*r/M;
+    const th=2*Math.PI*r/M+_ringPerRingInc()*(M-1);
     return[cx+rho*Math.cos(th),cy-rho*Math.sin(th)];
   }
   if(view==='lift'){
@@ -1913,8 +2195,9 @@ function findNearestDot(mx,my,W,H){
         const invert=document.getElementById('ring-invert')?.checked;
         const maxR=Math.min(W,H)*.44;
         const rho=invert?((mMax+1-M)/mMax)*maxR:(M/mMax)*maxR;
-        px=cx+rho*Math.cos(2*Math.PI*r/M);
-        py=cy-rho*Math.sin(2*Math.PI*r/M);
+        const th=2*Math.PI*r/M+_ringPerRingInc()*(M-1);
+        px=cx+rho*Math.cos(th);
+        py=cy-rho*Math.sin(th);
       } else if(_view==='farey'){
         const yexp=+document.getElementById('farey-yexp')?.value||1;
         const rawY=Math.log(2/M)/Math.log(2/mMax);
@@ -1993,6 +2276,7 @@ function drawLift(W,H){
   if(_liftNeedsTransform){
     ctx.save();
     if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+  const _liftFillTextOrig=_patchFillTextUpright(ctx);
     if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
   }
   const mMax=G;
@@ -2046,10 +2330,12 @@ function drawLift(W,H){
   const labelMode=document.getElementById('grid-label-sel')?.value||'none';
 
   for(let M=2;M<=mMax;M++){
+    if(!pgRingActive(M))continue;
     // Loop ALL r from 1..M-1 so non-coprime cells show too
     for(let r=1;r<M;r++){
-      const[sx,sy]=toXY(r,M);
       const lg=gcd(r,M);
+      if(!pgCharPass(lg===1))continue;
+      const[sx,sy]=toXY(r,M);
       const isCop=lg===1;
       const lit=isLit(r,M,N); // block-coprime (requires gcd(r,M+j)=1 for j=0..n)
 
@@ -2106,6 +2392,7 @@ function drawLift(W,H){
 
   drawClickedHighlights('lift',W,H);
   if(_liftNeedsTransform)ctx.restore();
+  if(_nativeFillText)ctx.fillText=_nativeFillText; // overlay drawn in unrotated space — don't leave the rotated patch active
   drawSectorOverlay(W,H,0);
 
   // Legend (outside transform)
@@ -2154,6 +2441,7 @@ function drawConformal(W,H){
   if(_ct){
     ctx.save();
     if(_rotSteps&3){ctx.translate(W/2,H/2);ctx.rotate((_rotSteps&3)*Math.PI/2);ctx.translate(-W/2,-H/2);}
+  const _confFillTextOrig=_patchFillTextUpright(ctx);
     if(_zoom!==1||_panX!==0.5||_panY!==0.5){ctx.translate((_panX-0.5)*W,(_panY-0.5)*H);ctx.translate(W/2,H/2);ctx.scale(_zoom,_zoom);ctx.translate(-W/2,-H/2);}
   }
   const extendOutside=document.getElementById('smith-extend')?.checked||false;
@@ -2214,12 +2502,14 @@ function drawConformal(W,H){
   for(let pass=extendOutside?0:1;pass<=1;pass++){
     const isOutsidePass=pass===0;
   for(let M=2;M<=mMax;M++){
+    if(!pgRingActive(M))continue;
     // Ring-style invert: flip the ring index so outer rings become inner
     const Meff=invertRings?(mMax+2-M):M;
     const R=_smithRadius(Meff-2,mMax-1,Meff);
     for(let r=1;r<M;r++){
       const g2=gcd(r,M),lit=isLit(r,M,N);
-      if(g2>1&&!lit&&cmode==='mod_dist')continue;
+      if(!pgCharPass(g2===1))continue;
+      if(g2>1&&!lit&&cmode==='mod_dist'&&_gapHighlight<0)continue;
       const theta=2*Math.PI*r/M+alpha;
       let gamma=rMode==='unit'?_cayleyUnit(theta):_cayley(R,theta);
       if(!gamma)continue;
@@ -2268,6 +2558,7 @@ function drawConformal(W,H){
   } // end pass loop
   drawClickedHighlights('conformal',W,H);
   if(_ct)ctx.restore();
+  if(_nativeFillText)ctx.fillText=_nativeFillText; // overlay drawn in unrotated space — don't leave the rotated patch active
   drawSectorOverlay(W,H,0);
   ctx.font="8px 'JetBrains Mono',monospace";ctx.textAlign='right';ctx.textBaseline='bottom';
   ctx.fillStyle='rgba(242,168,74,.5)';
@@ -2289,7 +2580,58 @@ function drawHero(){
   else if(_view==='farey')drawFarey(W,H);
   else if(_view==='lift')drawLift(W,H);
   else if(_view==='conformal')drawConformal(W,H);
+  if(_compareMode&&!_inCompareRender)renderCompareGrid();
 }
+
+// ═══════════════════════════════════════════
+//  COMPARE — live 2×2 Grid/Ring/Farey/Smith
+// ═══════════════════════════════════════════
+let _compareMode=false;
+let _inCompareRender=false; // re-entrancy guard: renderCompareGrid() itself calls drawHero()
+const _CMP_VIEWS=['grid','ring','farey','conformal'];
+function toggleCompare(){
+  _compareMode=!_compareMode;
+  const wrap=document.getElementById('compare-wrap');
+  const heroWrap=document.getElementById('hero-wrap');
+  if(wrap)wrap.style.display=_compareMode?'block':'none';
+  if(heroWrap)heroWrap.style.display=_compareMode?'none':'';
+  const btn=document.getElementById('compare-btn');
+  if(btn){
+    btn.style.background=_compareMode?'rgba(155,127,232,.18)':'none';
+    btn.style.color=_compareMode?'#fff':'var(--violet)';
+  }
+  if(_compareMode)renderCompareGrid();
+}
+function renderCompareGrid(){
+  if(_inCompareRender)return;
+  _inCompareRender=true;
+  const savedView=_view, savedDpr=_dpr, savedW=cv.width, savedH=cv.height;
+  const dpr=Math.min(window.devicePixelRatio||1,2); // cap at 2× — 4 renders per call, keep it snappy
+  _CMP_VIEWS.forEach(v=>{
+    const target=document.getElementById('cmp-cv-'+v);
+    if(!target)return;
+    const rect=target.getBoundingClientRect();
+    const w=Math.max(40,Math.round(rect.width)), h=Math.max(40,Math.round(rect.height));
+    // Render this view into the shared offscreen cv/ctx (same trick as Multi-export)
+    _view=v; _dpr=dpr;
+    cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    drawHero();
+    // Snapshot into the small visible canvas for this slot
+    target.width=Math.round(w*dpr); target.height=Math.round(h*dpr);
+    const tctx=target.getContext('2d');
+    tctx.setTransform(1,0,0,1,0,0);
+    tctx.clearRect(0,0,target.width,target.height);
+    tctx.drawImage(cv,0,0);
+  });
+  // Restore the main hero canvas to the currently-selected view
+  _view=savedView; _dpr=savedDpr;
+  cv.width=savedW; cv.height=savedH;
+  resizeCV();
+  drawHero(); // still inside the guard — won't re-trigger renderCompareGrid()
+  _inCompareRender=false;
+}
+window.addEventListener('resize',()=>{ if(_compareMode)renderCompareGrid(); });
 
 // ═══════════════════════════════════════════
 //  VIEW SWITCHING
@@ -2316,6 +2658,10 @@ function setView(v){
     const p=document.getElementById('vp-'+k);
     if(p)p.style.display=k===v?'block':'none';
   });
+  // If in fullscreen, rebuild ctrl bar to show only the new view's panel
+  const wrap=document.getElementById('p8-fs-wrap');
+  const isFs=document.fullscreenElement||document.webkitFullscreenElement;
+  if(isFs===wrap) setTimeout(_p8FsChange.bind(null,'_rebuildOnly'),0);
   // Caption
   const top=document.getElementById('view-cap-top');
   const vc=VIEW_COLORS[v];
@@ -2376,10 +2722,12 @@ function setG(v){
   G=Math.max(1,Math.min(2048,v|0));
   document.getElementById('sl-G').value=Math.min(G,512);
   document.getElementById('num-G').value=G;
+  // If ½G lock is active, track G automatically
+  if(_gapHalfLock) setGap(Math.floor(G/2));
   // Re-trace sector path with new G
   if(_sectorFrac)traceSector();
   // Re-clamp gap highlight
-  if(_gapHighlight>G)clearGap();
+  if(!_gapHalfLock&&_gapHighlight>G)clearGap();
   updateLiveLbl();updateCap();drawHero();_debounceSave();
 }
 function stepG(d){setG(G+d);}
@@ -2407,7 +2755,22 @@ function stepGap(d){
   else if(d>0&&_gapHighlight<0)setGap(0); // off → r/M mode
   else setGap(_gapHighlight+d);
 }
-function clearGap(){setGap(-1);}
+function clearGap(){_gapHalfLock=false;_syncGapHalfBtn();setGap(-1);}
+
+// ── Gap ½G Lock — gap tracks ½·G whenever G changes ──────────────────
+let _gapHalfLock=false;
+function _syncGapHalfBtn(){
+  const btn=document.getElementById('gap-half-btn');
+  if(!btn)return;
+  btn.style.background=_gapHalfLock?'rgba(200,168,74,.2)':'none';
+  btn.style.borderColor=_gapHalfLock?'rgba(200,168,74,.8)':'rgba(200,168,74,.35)';
+  btn.style.color=_gapHalfLock?'var(--gold)':'rgba(200,168,74,.6)';
+}
+function toggleGapHalfLock(){
+  _gapHalfLock=!_gapHalfLock;
+  _syncGapHalfBtn();
+  if(_gapHalfLock) setGap(Math.floor(G/2));
+}
 
 // ── GAP SLIDER ANIMATION ─────────────────────────────────────────────
 let _gapPlaying=false,_gapDir=1,_gapTimer=null;
@@ -2498,6 +2861,31 @@ function jumpPrevSat(){const n=prevSatN(N);if(n!==null)setN(n);}
 function updateLiveLbl(){
   const modeStr=_finiteMode?`⊞ finite p≤${PRIMES[_finitePrimes-1]||'?'}`:'∞ asymptotic';
   const _lbv=document.getElementById('lb-view');if(_lbv)_lbv.textContent=`${_view} · G=${G} · ${modeStr}`;
+  // ── Finite-lattice counts (gcd=1/total, lift/total, lift/gcd=1) ──
+  // Only recomputed when G changes (cheap for G≤200, debounced for larger).
+  // Each tells you: what this G×G grid actually achieves, vs the asymptotic limit.
+  const gcdEl=document.getElementById('lc-gcd');
+  const liftEl=document.getElementById('lc-lift');
+  const condEl=document.getElementById('lc-cond');
+  if(gcdEl||liftEl||condEl){
+    const n=N, maxG=Math.min(G,400); // cap at 400 to keep it real-time
+    let total=0,gcd1=0,lift=0;
+    for(let M=2;M<=maxG;M++){
+      for(let r=1;r<M;r++){
+        total++;
+        const g=gcd(r,M);
+        const coprime=(g===1);
+        // isLit = block-coprime at depth n: gcd=1 AND no prime ≤ n+1 divides gcd(r+j,M) for j=0..n
+        // For the counts row we use: gcd1 = plain gcd(r,M)=1 count, lift = isLit(r,M,n)
+        if(coprime) gcd1++;
+        if(isLit(r,M,n)) lift++;
+      }
+    }
+    const fmt=(a,b)=>b===0?'—':`${a}/${b} (${(a/b*100).toFixed(2)}%)`;
+    if(gcdEl) gcdEl.textContent=fmt(gcd1,total);
+    if(liftEl) liftEl.textContent=fmt(lift,total);
+    if(condEl) condEl.textContent=gcd1===0?'—':`${lift}/${gcd1} (${(lift/gcd1*100).toFixed(2)}%)`;
+  }
 }
 
 // Detect if x is close to a rational multiple of π^k / integer
@@ -2867,6 +3255,26 @@ function togglePlay(){
   _playing=!_playing;
   const _pbtn=document.getElementById('play-btn');if(_pbtn)_pbtn.textContent=_playing?'⏹ Stop':'▶ Play';
   if(_playing)schedPlay();else if(_playTimer){clearTimeout(_playTimer);_playTimer=null;}
+}
+
+// ── G ping-pong play — mirrors page 1's wGPlay ──
+let _gPlaying=false,_gPlayDir=1,_gPlayTimer=null;
+function toggleGPlay(){
+  _gPlaying=!_gPlaying;
+  const btn=document.getElementById('g-play-btn');
+  if(btn){btn.textContent=_gPlaying?'⏹ G':'▶ G';btn.style.background=_gPlaying?'rgba(200,168,74,.2)':'rgba(200,168,74,.08)';}
+  if(_gPlaying)_schedGPlay();else{clearTimeout(_gPlayTimer);_gPlayTimer=null;}
+}
+function _schedGPlay(){
+  if(!_gPlaying)return;
+  const spd=+document.getElementById('sl-spd')?.value||300;
+  _gPlayTimer=setTimeout(()=>{
+    const next=G+_gPlayDir;
+    if(next<1){_gPlayDir=1;setG(1);}
+    else if(next>512){_gPlayDir=-1;setG(512);}
+    else setG(next);
+    _schedGPlay();
+  },Math.round(1000/Math.max(1,spd/100)));
 }
 function schedPlay(){
   if(!_playing)return;
@@ -3474,7 +3882,7 @@ function exportHTMLReport(){
   let dtRows='';
   for(let i=0;i<=n;i++){getCn(i);const Ci=_cn[i],Di=Ci/ZETA2,si=numSat(i),isSat=i>0&&PS.has(i+1);const ev=isSat?`p=${i+1} sat.`:i===0?'start':'';const ratio=i===0?'—':(_cn[i]/_cn[i-1]).toFixed(6);dtRows+=`<tr ${i===n?'style="background:rgba(200,168,74,.06)"':''}><td>${i}</td><td>${i+1}</td><td style="color:#c8a84a">${Ci.toFixed(8)}</td><td style="color:#3dc8b8">${Di.toFixed(8)}</td><td>${ratio}</td><td>${si}</td><td style="color:#3dc8b8">${ev}</td></tr>`;}
   const date=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>C(n) Report — n=${n}</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#04040d;color:#ddd8cc;font-family:'JetBrains Mono',monospace;font-size:11px;}.page{max-width:1100px;margin:0 auto;padding:40px 24px 80px;}header{text-align:center;padding:36px 0 28px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:28px;}.brand{font-size:7.5px;letter-spacing:.3em;text-transform:uppercase;color:#c8a84a;opacity:.5;margin-bottom:10px;}h1{font-size:1.6rem;color:#ddd8cc;font-weight:400;letter-spacing:.05em;margin-bottom:12px;}.formula{display:inline-block;font-size:.88rem;color:#c8a84a;background:rgba(200,168,74,.06);border:1px solid rgba(200,168,74,.2);padding:9px 20px;margin-bottom:8px;}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:11px;margin-bottom:24px;}.sb{background:#07071a;border:1px solid rgba(255,255,255,.07);padding:13px 15px;text-align:center;}.sl{font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:#6a6560;margin-bottom:5px;}.sv{font-size:1.4rem;font-weight:500;color:#c8a84a;}.sec{font-size:.6rem;letter-spacing:.1em;color:#c8a84a;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.07);margin:24px 0 12px;}table{width:100%;border-collapse:collapse;font-size:10px;}th{background:#0c0c22;padding:6px 10px;text-align:right;color:#6a6560;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12);white-space:nowrap;}th:first-child{text-align:center;}td{padding:5px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.07);}td:first-child{text-align:center;color:#6a6560;}footer{text-align:center;padding:22px 0;border-top:1px solid rgba(255,255,255,.07);color:#6a6560;font-size:8.5px;margin-top:36px;}</style></head><body><div class="page"><header><div class="brand">Analytic Number Theory · Wessen Getachew</div><h1>C(n) — Block-Coprime Density</h1><div class="formula">C(n)=ζ(2)·∏_p(1−min(n+1,p)/p²)</div></header><div class="stats"><div class="sb"><div class="sl">C(n)</div><div class="sv">${Cn.toFixed(6)}</div></div><div class="sb"><div class="sl">D(n)</div><div class="sv" style="color:#3dc8b8;font-size:1.2rem;">${Dn.toFixed(6)}</div></div><div class="sb"><div class="sl">n</div><div class="sv" style="color:#ddd8cc">${n}</div></div><div class="sb"><div class="sl">Block</div><div class="sv" style="color:#ddd8cc">${n+1}</div></div><div class="sb"><div class="sl">Sat. primes</div><div class="sv" style="color:#e05060">${sat}</div></div><div class="sb"><div class="sl">Next sat. n</div><div class="sv" style="color:#3dc8b8;font-size:1.2rem;">${nextSatN(n)||'—'}</div></div></div><div class="sec">Prime Factor Table</div><table><thead><tr><th>p</th><th>Status</th><th>min(n+1,p)</th><th>p²</th><th>Local factor</th><th>log factor</th><th>Partial D</th><th>Partial C</th></tr></thead><tbody>${prRows}</tbody></table><div class="sec">Data Table — n=0 to ${n}</div><table><thead><tr><th>n</th><th>Block</th><th>C(n)</th><th>D(n)</th><th>C(n)/C(n−1)</th><th>Sat.</th><th>Event</th></tr></thead><tbody>${dtRows}</tbody></table><footer>Wessen Getachew · wessengetachew.github.io · ${date} · n=${n} · C(${n})=${Cn.toFixed(12)}</footer></div></body></html>`;
+  const html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>C(n) Report — n=${n}</title><style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#04040d;color:#ddd8cc;font-family:'JetBrains Mono',monospace;font-size:11px;}.page{max-width:1100px;margin:0 auto;padding:40px 24px 80px;}header{text-align:center;padding:36px 0 28px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:28px;}.brand{font-size:7.5px;letter-spacing:.3em;text-transform:uppercase;color:#c8a84a;opacity:.5;margin-bottom:10px;}h1{font-size:1.6rem;color:#ddd8cc;font-weight:400;letter-spacing:.05em;margin-bottom:12px;}.formula{display:inline-block;font-size:.88rem;color:#c8a84a;background:rgba(200,168,74,.06);border:1px solid rgba(200,168,74,.2);padding:9px 20px;margin-bottom:8px;}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:11px;margin-bottom:24px;}.sb{background:#07071a;border:1px solid rgba(255,255,255,.07);padding:13px 15px;text-align:center;}.sl{font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:#6a6560;margin-bottom:5px;}.sv{font-size:1.4rem;font-weight:500;color:#c8a84a;}.sec{font-size:.6rem;letter-spacing:.1em;color:#c8a84a;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.07);margin:24px 0 12px;}table{width:100%;border-collapse:collapse;font-size:10px;}th{background:#0c0c22;padding:6px 10px;text-align:right;color:#6a6560;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12);white-space:nowrap;}th:first-child{text-align:center;}td{padding:5px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.07);}td:first-child{text-align:center;color:#6a6560;}footer{text-align:center;padding:22px 0;border-top:1px solid rgba(255,255,255,.07);color:#6a6560;font-size:8.5px;margin-top:36px;}<\/style></head><body><div class="page"><header><div class="brand">Analytic Number Theory · Wessen Getachew</div><h1>C(n) — Block-Coprime Density</h1><div class="formula">C(n)=ζ(2)·∏_p(1−min(n+1,p)/p²)</div></header><div class="stats"><div class="sb"><div class="sl">C(n)</div><div class="sv">${Cn.toFixed(6)}</div></div><div class="sb"><div class="sl">D(n)</div><div class="sv" style="color:#3dc8b8;font-size:1.2rem;">${Dn.toFixed(6)}</div></div><div class="sb"><div class="sl">n</div><div class="sv" style="color:#ddd8cc">${n}</div></div><div class="sb"><div class="sl">Block</div><div class="sv" style="color:#ddd8cc">${n+1}</div></div><div class="sb"><div class="sl">Sat. primes</div><div class="sv" style="color:#e05060">${sat}</div></div><div class="sb"><div class="sl">Next sat. n</div><div class="sv" style="color:#3dc8b8;font-size:1.2rem;">${nextSatN(n)||'—'}</div></div></div><div class="sec">Prime Factor Table</div><table><thead><tr><th>p</th><th>Status</th><th>min(n+1,p)</th><th>p²</th><th>Local factor</th><th>log factor</th><th>Partial D</th><th>Partial C</th></tr></thead><tbody>${prRows}</tbody></table><div class="sec">Data Table — n=0 to ${n}</div><table><thead><tr><th>n</th><th>Block</th><th>C(n)</th><th>D(n)</th><th>C(n)/C(n−1)</th><th>Sat.</th><th>Event</th></tr></thead><tbody>${dtRows}</tbody></table><footer>Wessen Getachew · wessengetachew.github.io · ${date} · n=${n} · C(${n})=${Cn.toFixed(12)}</footer></div><\/body><\/html>`;
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download=`cn_report_n${n}.html`;a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),1200);
 }
 
@@ -3577,7 +3985,7 @@ function sectorPtXY(r,M,W,H){
     const maxR=Math.min(W,H)*.44;
     const invert=_view==='ring'&&document.getElementById('ring-invert')?.checked;
     const rho=invert?((mMax+1-M)/mMax)*maxR:(M/mMax)*maxR;
-    const theta=2*Math.PI*r/M;
+    const theta=2*Math.PI*r/M+(_view==='ring'?_ringPerRingInc()*(M-1):0);
     lx=cx+rho*Math.cos(theta); ly=cy-rho*Math.sin(theta);
   } else if(_view==='farey'){
     const yexp=+document.getElementById('farey-yexp')?.value||1;
@@ -3896,6 +4304,120 @@ function _loadState(){
     if(rotLbl)rotLbl.textContent=[' 0°',' 90°','180°','270°'][_rotSteps];
   }catch(e){}
 }
+// ── Shared helper: patch ctx.fillText so every label counter-rotates around
+// its own anchor and stays upright regardless of the global _rotSteps transform.
+// Call this right after entering the rotation transform; store the original to
+// restore at the end of each draw function. ──
+let _nativeFillText=null; // captured once — the TRUE unpatched fillText
+function _patchFillTextUpright(ctx){
+  if(!_nativeFillText) _nativeFillText=ctx.fillText.bind(ctx);
+  // Always start from the true native fillText so repeated calls never
+  // stack rotation wrappers on top of each other (that was the bug: a
+  // stale, already-rotated fillText got treated as "original" forever).
+  ctx.fillText=_nativeFillText;
+  const rad=(_rotSteps&3)*Math.PI/2;
+  if(!rad)return _nativeFillText; // no rotation active — leave native fillText in place
+  const orig=_nativeFillText;
+  ctx.fillText=function(text,x,y,maxW){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(-rad);
+    orig(text,0,0,maxW);
+    ctx.restore();
+  };
+  return orig; // caller may restore early with: ctx.fillText = orig;
+}
+
+// ── CANVAS FULLSCREEN — same pattern as the main index page's canvas-fs ──
+// The control panel IDs to relocate into the fullscreen scrollable ctrl-bar:
+const _P8_FS_PANELS=[
+  'hero-live-bar',   // C(n) live formula bar
+  'view-cap-top',    // view caption
+  'vp-shared',       // shared controls (color, label, zoom, rotate)
+  'vp-grid','vp-ring','vp-farey','vp-lift','vp-conformal', // per-view panels
+  'finite-panel',    // finite mode prime stepper
+];
+function p8ToggleFs(){
+  const wrap=document.getElementById('p8-fs-wrap');
+  if(!wrap)return;
+  const isFs=document.fullscreenElement||document.webkitFullscreenElement;
+  if(!isFs){
+    const req=wrap.requestFullscreen||wrap.webkitRequestFullscreen;
+    if(req){const p=req.call(wrap);if(p&&p.catch)p.catch(()=>{});}
+  }else{
+    const exit=document.exitFullscreen||document.webkitExitFullscreen;
+    if(exit){const p=exit.call(document);if(p&&p.catch)p.catch(()=>{});}
+  }
+}
+function _p8FsSection(label,el,open){
+  const sec=document.createElement('div');
+  sec.className='p8-fs-section'+(open?' open':'');
+  const hd=document.createElement('div');
+  hd.className='p8-fs-section-hd';
+  hd.innerHTML=`<span>${label}<\/span><span class="arr">▸<\/span>`;
+  hd.onclick=()=>sec.classList.toggle('open');
+  const body=document.createElement('div');
+  body.className='p8-fs-section-body';
+  if(el)body.appendChild(el);
+  sec.appendChild(hd);sec.appendChild(body);
+  return sec;
+}
+let _p8FsOrigParents={};
+function _p8FsChange(hint){
+  const wrap=document.getElementById('p8-fs-wrap');
+  const bar=document.getElementById('p8-fs-ctrl-bar');
+  const btn=document.getElementById('p8-fs-btn');
+  const isFs=document.fullscreenElement||document.webkitFullscreenElement;
+  const active=(isFs===wrap);
+  if(btn&&hint!=='_rebuildOnly')btn.textContent=active?'⤬':'⛶';
+  if(!bar)return;
+  if(active){
+    // Return any currently-moved elements to original positions first (for rebuild)
+    Object.entries(_p8FsOrigParents).forEach(([id,{parent,next}])=>{
+      const el=document.getElementById(id);
+      if(el&&parent){
+        if(next&&next.parentNode===parent)parent.insertBefore(el,next);
+        else parent.appendChild(el);
+      }
+    });
+    _p8FsOrigParents={};
+    bar.innerHTML='';
+    // Map view name → its panel id
+    const viewPanels={grid:'vp-grid',ring:'vp-ring',farey:'vp-farey',lift:'vp-lift',conformal:'vp-conformal'};
+    const viewLabels={grid:'Grid Controls',ring:'Ring Controls',farey:'Farey Controls',lift:'Lift Controls',conformal:'Conformal / Smith Controls'};
+    const always=[
+      ['N · View · Play · 4K','ctrl-bar',true],
+      ['Live Formula','hero-live-bar',true],
+      ['Color · Label · Zoom · Rotate','vp-shared',false],
+    ];
+    const perView=_view&&viewPanels[_view]?[[viewLabels[_view]||'View Controls',viewPanels[_view],true]]:[];
+    const extra=[
+      ['Sector Path','sec-details',false],
+      ['Finite Mode — Prime Stepper','finite-panel',false],
+    ];
+    [...always,...perView,...extra].forEach(([label,id,open])=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      _p8FsOrigParents[id]={parent:el.parentNode,next:el.nextSibling};
+      bar.appendChild(_p8FsSection(label,el,open));
+    });
+  }else{
+    Object.entries(_p8FsOrigParents).forEach(([id,{parent,next}])=>{
+      const el=document.getElementById(id);
+      if(el&&parent){
+        if(next&&next.parentNode===parent)parent.insertBefore(el,next);
+        else parent.appendChild(el);
+      }
+    });
+    _p8FsOrigParents={};
+    bar.innerHTML='';
+    wrap.classList.remove('p8-fs-hidden');
+  }
+  setTimeout(()=>{resizeCV();drawHero();},80);
+}
+document.addEventListener('fullscreenchange',_p8FsChange);
+document.addEventListener('webkitfullscreenchange',_p8FsChange);
+
 function _init(){
   _loadState();
   resizeCV();
@@ -3910,6 +4432,12 @@ if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(()=>requestAnimationFrame(_init)));
 }else{
   requestAnimationFrame(()=>requestAnimationFrame(_init));
+}
+</script>
+<script>
+function openOpener(){
+  sessionStorage.setItem('wg_open_opener','1');
+  window.open('index.html','_blank');
 }
 </script>
 </body>

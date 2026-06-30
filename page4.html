@@ -322,6 +322,10 @@ table.dt td.lime{color:var(--lime);}
 <a href="page13.html" target="_blank" title="The Complex Extension — Page 13" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">P13</a>
 <a href="page14.html" target="_blank" title="The Character Twist — Page 14" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #7ec87a59;color:#7ec87a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#7ec87a14';this.style.borderColor='#7ec87a'" onmouseout="this.style.background='transparent';this.style.borderColor='#7ec87a59'">P14</a>
 <a href="page15.html" target="_blank" title="C(t,s) Surface Explorer — Page 15" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #c8a84a59;color:#c8a84a;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#c8a84a14';this.style.borderColor='#c8a84a'" onmouseout="this.style.background='transparent';this.style.borderColor='#c8a84a59'">P15</a>
+
+<a href="page16.html" target="_blank" title="The Decay Theorem — Page 16" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #3dc8b859;color:#3dc8b8;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#3dc8b814';this.style.borderColor='#3dc8b8'" onmouseout="this.style.background='transparent';this.style.borderColor='#3dc8b859'">P16</a>
+<a href="#" onclick="openOpener();return false;" title="Open the Welcome / Opener Teaser on the home page" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid #e0506059;color:#e05060;text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background='#e0506014';this.style.borderColor='#e05060'" onmouseout="this.style.background='transparent';this.style.borderColor='#e0506059'">Opener</a>
+
 </div>
 <!-- ── NAVBAR ── -->
 <nav id="nbar">
@@ -653,10 +657,12 @@ table.dt td.lime{color:var(--lime);}
     <div class="rbox"><div class="rl">Contribution w(d)·C(n,d)</div><div class="rv" id="rv-contrib" style="color:var(--lime)">—</div></div>
   </div>
   <div class="ibox">
-    <strong>Decomposition identity:</strong>
+    <strong>Decomposition identity (by definition):</strong>
     C(n) = ∑<sub>d≥1</sub> w(d)·C(n,d), where w(d) = #{(r,M) : min(r,M−r) = d} / #{all pairs}.
+    This holds <em>by construction</em> — the strata partition the lattice, so their weighted densities sum exactly to C(n).
+    It is a useful decomposition for visualization, not a non-trivial theorem.
     At d=1 every cell (1, M) has gcd(1,M)=1 so C(n,1) is near-maximal.
-    As d grows the density falls, governed by φ(d)/d from the Gap Diagonal Identity.
+    As d grows the density falls, tracking φ(d)/d from the Gap Diagonal Identity.
   </div>
 </div>
 
@@ -744,7 +750,7 @@ table.dt td.lime{color:var(--lime);}
     </div>
 
     <div class="doc-section">
-      <div class="doc-h">Stratification Identity</div>
+      <div class="doc-h">Stratification Decomposition</div>
       <p class="doc-p">
         Every pair (r, M) belongs to a unique <b class="doc-violet">stratum d = min(r, M−r)</b>,
         the modular distance from r to the nearest boundary of [0, M].
@@ -4095,5 +4101,15 @@ window.addEventListener('resize',()=>{
   drawScatter();
 });
 </script>
+
+<script>
+function openOpener(){
+  // Signal the index page to open its welcome/opener modal on load,
+  // then navigate to it. Uses sessionStorage so only the next load acts on it.
+  sessionStorage.setItem('wg_open_opener','1');
+  window.open('index.html','_blank');
+}
+</script>
+
 </body>
 </html>
