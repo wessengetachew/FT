@@ -2956,8 +2956,48 @@ table.dt tbody tr:focus-visible{outline:1px solid rgba(200,168,74,.55);outline-o
     else if(cur){bar+='<a href="'+href+'" title="'+ti+' (current)" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;background:'+c+'22;border:1px solid '+c+';color:'+c+';text-decoration:none;flex-shrink:0;white-space:nowrap;font-weight:600;">'+lab+'</a>';}
     else{bar+='<a href="'+href+'" target="_blank" title="'+ti+'" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;background:transparent;border:1px solid '+c+'59;color:'+c+';text-decoration:none;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.background=\''+c+'14\';this.style.borderColor=\''+c+'\'" onmouseout="this.style.background=\'transparent\';this.style.borderColor=\''+c+'59\'">'+lab+'</a>';}
   });
+  bar+='<span style="flex:1"></span>';
+  bar+='<button id="wg-credits-btn" onclick="wgToggleCredits()" style="display:inline-flex;align-items:center;padding:4px 10px;height:28px;font-size:8px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.65);font-family:\'JetBrains Mono\',monospace;flex-shrink:0;white-space:nowrap;" onmouseover="this.style.borderColor=\'#c8a84a\';this.style.color=\'#c8a84a\'" onmouseout="this.style.borderColor=\'rgba(255,255,255,.25)\';this.style.color=\'rgba(255,255,255,.65)\'">Credits ▾</button>';
   bar+='</div>';
-  document.body.insertAdjacentHTML('afterbegin',bar);
+
+  // ── Credits panel — historical / mathematical attributions, collapsed by default ──
+  var creditGroups=[
+   ['Analytic foundations',[
+     ['Leonhard Euler','Euler product formula; the ζ(2)=π²/6 identity underlying the C(n) normalization.'],
+     ['Bernhard Riemann','Analytic continuation of ζ(s); the complex framework echoed in the C(t,s) extension (Page 13/15).'],
+     ['Peter Gustav Lejeune Dirichlet','Dirichlet characters and L-functions, relevant to the modular twist constructions (Page 14).']
+   ]],
+   ['Density & sieve results',[
+     ['William Feller & Erhard Tornier','The Feller–Tornier constant D_FT — a distinct classical object referenced against C(1), not the same quantity.'],
+     ['G. H. Hardy & J. E. Littlewood','Prime k-tuple conjecture and constants, the natural point of comparison for the primorial survivor counts (Page 7).'],
+     ['Franz Mertens','Mertens\' theorems on prime products, foundational to the Euler-product asymptotics used throughout.']
+   ]],
+   ['Geometric & number-theoretic tools',[
+     ['John Farey','Farey sequences, used in several lattice/ring views across the explorer.'],
+     ['Lester R. Ford Sr.','Ford circles, referenced in the conformal/hyperbolic geometry views.'],
+     ['Carl Friedrich Gauss','Gaussian integers ℤ[i], used in the lattice visualization on Page 2.'],
+     ['Phillip H. Smith','The Smith chart, repurposed here as a visualization mode rather than for its original transmission-line context.']
+   ]],
+   ['Other classical references noted in the honesty audit',[
+     ['Ernesto Cesàro','Cesàro summation/averaging, referenced where relevant and explicitly distinguished from this site\'s own constructions.'],
+     ['J. Franel & E. Landau','Franel–Landau results connecting error terms to the Riemann Hypothesis, cited for context around the decay theorem (Page 16).']
+   ]]
+  ];
+  var cp='<div id="wg-credits-panel" style="display:none;position:sticky;top:44px;z-index:9998;background:#0a0a16;border-bottom:1px solid rgba(255,255,255,.13);padding:14px 18px 16px;font-family:\'JetBrains Mono\',monospace;font-size:10px;line-height:1.55;color:rgba(255,255,255,.72);max-height:60vh;overflow-y:auto;">';
+  cp+='<div style="font-family:\'Cinzel\',serif;font-size:9px;letter-spacing:.12em;color:#c8a84a;margin-bottom:10px;text-transform:uppercase;">Credits — Classical Foundations</div>';
+  cp+='<div style="font-size:9.5px;color:rgba(255,255,255,.55);margin-bottom:12px;max-width:70ch;">This site builds on centuries of number theory. C(n) itself, the Wessen Identity, and the derived curves/theorems are original constructions by Wessen Getachew; the mathematicians below provided the classical tools, theorems, and comparison constants that make this work possible. See each page\'s own notes for detailed attributions.</div>';
+  creditGroups.forEach(function(g){
+    cp+='<div style="margin-bottom:10px;"><div style="color:#9b7fe8;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">'+g[0]+'</div>';
+    g[1].forEach(function(e){cp+='<div style="margin-bottom:3px;"><b style="color:rgba(255,255,255,.88);">'+e[0]+'</b> — '+e[1]+'</div>';});
+    cp+='</div>';
+  });
+  cp+='</div>';
+  document.body.insertAdjacentHTML('afterbegin',bar+cp);
+  window.wgToggleCredits=function(){
+    var p=document.getElementById('wg-credits-panel');
+    var open=p.style.display!=='none';
+    p.style.display=open?'none':'block';
+  };
 })();
 </script>
 
